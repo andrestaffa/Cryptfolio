@@ -19,12 +19,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate {
         super.viewDidLoad()
         
         scrollView.delegate = self;
+        self.navigationController?.navigationBar.isTranslucent = true;
 
        
         
     }
     
-    // MARK Scroll View Methods
+    // MARK: - Scroll view methods
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         //let topBarHeight = UIApplication.shared.statusBarFrame.size.height + (self.navigationController?.navigationBar.frame.height ?? 0.0)

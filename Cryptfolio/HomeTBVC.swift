@@ -15,7 +15,7 @@ class HomeTBVC: UITableViewController {
     var tickers = Array<Ticker>();
     var tickerImages = Array<UIImage>();
     var loading = true;
-    var maxCoins = 18;
+    var maxCoins = 40;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,31 +35,32 @@ class HomeTBVC: UITableViewController {
         
     }
 
-    // MARK - Data Gathering
+    // MARK: - Data gathering
     
     private func getData() {
         CryptoCurrencyKit.fetchTickers { [weak self] response in
             switch response {
             case .success(let data):
-                for i in 0...self!.maxCoins - 1 {
-                    self?.tickers.append(data[i]);
+                for i in 0...data.count - 1 {
                     let url = NSURL(string: "https://raw.githubusercontent.com/atomiclabs/cryptocurrency-icons/master/128/icon/" + "\(data[i].symbol.lowercased())" + ".png");
                     if (url != nil) {
-                        let data = NSData(contentsOf: url! as URL);
-                        if (data != nil) {
-                            let image = UIImage(data: data! as Data);
+                        let webData = NSData(contentsOf: url! as URL);
+                        if (webData != nil) {
+                            let image = UIImage(data: webData! as Data);
                             if (image != nil) {
+                                self?.tickers.append(data[i])
                                 self?.tickerImages.append(image!);
                             } else {
-                                self?.tickerImages.append(UIImage(named: "circle")!);
+                                //self?.tickerImages.append(UIImage(named: "circle")!);
                             }
                         } else {
-                            self?.tickerImages.append(UIImage(named: "circle")!);
+                            //self?.tickerImages.append(UIImage(named: "circle")!);
                         }
                     } else {
-                        self?.tickerImages.append(UIImage(named: "circle")!);
+                        //self?.tickerImages.append(UIImage(named: "circle")!);
                     }
                 }
+
             case .failure(let error):
                 print(error);
             }
@@ -103,14 +104,14 @@ class HomeTBVC: UITableViewController {
         self.navigationController?.pushViewController(infoVC, animated: true);
         
     }
-    // MARK - Alert
+    // MARK: - Alert view controller
     
     private func alert(title:String, message:String) -> Void {
         let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
         alert.show();
     }
     
-    // MARK - NAV Custom
+    // MARK: - Navigation controller custom image
     
     func navTitleWithImageAndText(titleText: String, imageIcon: UIImage) -> UIView {
         
