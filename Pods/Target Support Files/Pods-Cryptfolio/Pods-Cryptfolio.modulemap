@@ -1,0 +1,6 @@
+framework module Pods_Cryptfolio {
+  umbrella header "Pods-Cryptfolio-umbrella.h"
+
+  export *
+  module * { export * }
+}
