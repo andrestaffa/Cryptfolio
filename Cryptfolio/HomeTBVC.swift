@@ -10,34 +10,79 @@ import UIKit
 import CryptoCurrencyKit
 import SVProgressHUD
 
-class HomeTBVC: UITableViewController {
+// Coin class
+public class Coin {
+    public let ticker:Ticker?;
+    public let image:UIImage?;
     
-    var tickers = Array<Ticker>();
-    var tickerImages = Array<UIImage>();
-    var loading = true;
-    var maxCoins = 40;
+    init(ticker:Ticker, image:UIImage) {
+        self.ticker = ticker;
+        self.image = image;
+    }
+    
+    public func isEqual(coin:Coin) -> Bool {
+        if (self.ticker == coin.ticker && self.image == coin.image) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+}
+
+class HomeTBVC: UITableViewController {
+
+    // Member vairables
+    private var coins = Array<Coin>();
+    private var filterCoins = Array<Coin>();
+    private var loading = true;
+    private var maxCoins = 20;
+    private var counter = 0;
+    private var prevLength = 0;
+    
+    // Define scroll view properties
+    private let searchController = UISearchController(searchResultsController: nil)
+    private var isSearchBarEmpty: Bool {
+        return self.searchController.searchBar.text?.isEmpty ?? true;
+    }
+    private var isFiltering: Bool {
+        return self.searchController.isActive && !isSearchBarEmpty;
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
+        // Configure navigation controller
         self.clearsSelectionOnViewWillAppear = false;
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        self.navigationItem.rightBarButtonItem = self.editButtonItem;
-        
         self.navigationController?.navigationBar.isTranslucent = true;
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem:UIBarButtonItem.SystemItem.refresh, target: self, action:#selector(refresh))
+        
+        // Configure searchView
+        searchController.searchResultsUpdater = self;
+        searchController.obscuresBackgroundDuringPresentation = false;
+        searchController.searchBar.placeholder = "Search";
+        navigationItem.searchController = searchController;
+        definesPresentationContext = true;
         
         self.title = "Explore";
-        
         self.getData();
-        
-        
+
     }
 
+    // MARK: - Refresh data
+    
+    @objc private func refresh() {
+        self.tableView.reloadData();
+        self.getData();
+    }
+    
     // MARK: - Data gathering
     
     private func getData() {
+        self.counter += 1;
+        if (!self.loading) {
+            self.loading = true;
+        }
         CryptoCurrencyKit.fetchTickers { [weak self] response in
             switch response {
             case .success(let data):
@@ -48,61 +93,76 @@ class HomeTBVC: UITableViewController {
                         if (webData != nil) {
                             let image = UIImage(data: webData! as Data);
                             if (image != nil) {
-                                self?.tickers.append(data[i])
-                                self?.tickerImages.append(image!);
-                            } else {
-                                //self?.tickerImages.append(UIImage(named: "circle")!);
+                                self?.coins.append(Coin(ticker: data[i], image: image!));
+                                if (self!.counter < 2) {
+                                    self?.prevLength = (self?.coins.count)!;
+                                }
+                               if ((self?.coins.count)! > self!.prevLength) {
+                                    self?.coins.removeSubrange((0...self!.prevLength - 1));
+                                }
                             }
                         } else {
-                            //self?.tickerImages.append(UIImage(named: "circle")!);
+                            //self?.coins.append(Coin(ticker: data[i], image: UIImage(named: "circle")!));
                         }
-                    } else {
-                        //self?.tickerImages.append(UIImage(named: "circle")!);
                     }
                 }
-
             case .failure(let error):
                 print(error);
             }
             self?.loading = false;
             self?.tableView.reloadData();
+            self?.tableView.reloadData();
         }
-        
     }
-    
     
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (loading) {
+        if (self.loading) {
             return 1;
         } else {
-            return self.tickers.count;
+            if (self.isFiltering) {
+                return filterCoins.count;
+            } else {
+            return self.coins.count;
+            }
         }
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! CustomCell;
-        if (loading) {
+        if (self.loading) {
             SVProgressHUD.show(withStatus: "Loading...")
             cell.name_lbl.isHidden = true;
             cell.crypto_img.isHidden = true;
         } else {
             SVProgressHUD.dismiss();
-            cell.name_lbl.isHidden = false;
-            cell.crypto_img.isHidden = false;
-            cell.name_lbl.text = self.tickers[indexPath.row].name;
-            cell.crypto_img.image = self.tickerImages[indexPath.row];
+            if (self.isFiltering) {
+                cell.name_lbl.text = self.filterCoins[indexPath.row].ticker?.name;
+                cell.crypto_img.image = self.filterCoins[indexPath.row].image;
+            } else {
+                cell.name_lbl.isHidden = false;
+                cell.crypto_img.isHidden = false;
+                cell.name_lbl.text = self.coins[indexPath.row].ticker?.name;
+                cell.crypto_img.image = self.coins[indexPath.row].image;
+            }
+            
         }
         return cell;
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
-        infoVC.title = self.tickers[indexPath.row].name;
-        infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.tickers[indexPath.row].name, imageIcon: self.tickerImages[indexPath.row]);
-        self.navigationController?.pushViewController(infoVC, animated: true);
-        
+        if (self.isFiltering) {
+            infoVC.title = self.filterCoins[indexPath.row].ticker?.name;
+            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker!.name, imageIcon: self.filterCoins[indexPath.row].image!)
+            self.navigationController?.pushViewController(infoVC, animated: true);
+        } else {
+            alert(title: self.coins[indexPath.row].ticker!.name, message: String(self.coins[indexPath.row].ticker!.priceUSD!))
+            infoVC.title = self.coins[indexPath.row].ticker?.name;
+            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker!.name, imageIcon: self.coins[indexPath.row].image!);
+            self.navigationController?.pushViewController(infoVC, animated: true);
+        }
     }
     // MARK: - Alert view controller
     
@@ -153,7 +213,22 @@ class HomeTBVC: UITableViewController {
         return titleView;
         
     }
+    
+    func filterContentForSearchText(_ searchText: String) {
+        self.filterCoins = self.coins.filter({ (coin) -> Bool in
+            let filterContext = (coin.ticker?.name.lowercased().contains(searchText.lowercased()))! || ((coin.ticker?.symbol.lowercased().contains(searchText.lowercased()))!);
+            return filterContext;
+        })
+        self.tableView.reloadData();
+    }
+    
+}
 
-   
+// MARK: - Extentions
 
+extension HomeTBVC: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar;
+        filterContentForSearchText(searchBar.text!);
+    }
 }
