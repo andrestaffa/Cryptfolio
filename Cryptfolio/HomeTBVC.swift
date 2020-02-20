@@ -15,7 +15,7 @@ class HomeTBVC: UITableViewController {
     var tickers = Array<Ticker>();
     var tickerImages = Array<UIImage>();
     var loading = true;
-    var maxCoins = 13;
+    var maxCoins = 18;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -26,7 +26,10 @@ class HomeTBVC: UITableViewController {
         // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
         self.navigationItem.rightBarButtonItem = self.editButtonItem;
         
+        self.navigationController?.navigationBar.isTranslucent = true;
+        
         self.title = "Explore";
+        
         self.getData();
         
         
@@ -94,12 +97,60 @@ class HomeTBVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        alert(title: self.tickers[indexPath.row].symbol, message: String(self.tickers[indexPath.row].priceUSD!));
+        let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
+        infoVC.title = self.tickers[indexPath.row].name;
+        infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.tickers[indexPath.row].name, imageIcon: self.tickerImages[indexPath.row]);
+        self.navigationController?.pushViewController(infoVC, animated: true);
+        
     }
+    // MARK - Alert
     
     private func alert(title:String, message:String) -> Void {
         let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
         alert.show();
+    }
+    
+    // MARK - NAV Custom
+    
+    func navTitleWithImageAndText(titleText: String, imageIcon: UIImage) -> UIView {
+        
+        // Creates a new UIView
+        let titleView = UIView();
+        
+        // Creates a new text label
+        let label = UILabel();
+        label.text = titleText;
+        label.sizeToFit();
+        label.center = titleView.center;
+        label.textAlignment = NSTextAlignment.center;
+        
+        // Creates the image view
+        let image = UIImageView();
+        image.image = imageIcon;
+        
+        // Maintains the image's aspect ratio:
+        let imageAspect = image.image!.size.width / image.image!.size.height
+        ;
+        // Sets the image frame so that it's immediately before the text:
+        let imageX = label.frame.origin.x - label.frame.size.height * imageAspect - 10;
+        let imageY = label.frame.origin.y;
+        
+        let imageWidth = label.frame.size.height * imageAspect;
+        let imageHeight = label.frame.size.height;
+        
+        image.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight);
+        
+        image.contentMode = UIView.ContentMode.scaleAspectFit;
+        
+        // Adds both the label and image view to the titleView
+        titleView.addSubview(label);
+        titleView.addSubview(image);
+        
+        // Sets the titleView frame to fit within the UINavigation Title
+        titleView.sizeToFit();
+        
+        return titleView;
+        
     }
 
    

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,7 @@
 		2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F123FE1202007B4343 /* HomeTBVC.swift */; };
 		2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F323FE1240007B4343 /* CustomCell.swift */; };
 		2010F1F623FE12DC007B4343 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 2010F1F523FE12DC007B4343 /* circle.png */; };
+		206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206ABFBE23FE346F00198C12 /* InfoVC.swift */; };
 		E3E476F39D398D2B7B08E255 /* Pods_Cryptfolio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B028B617057DAEDFDAD55411 /* Pods_Cryptfolio.framework */; };
 /* End PBXBuildFile section */
 
@@ -30,6 +31,7 @@
 		2010F1F123FE1202007B4343 /* HomeTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTBVC.swift; sourceTree = "<group>"; };
 		2010F1F323FE1240007B4343 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		2010F1F523FE12DC007B4343 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
+		206ABFBE23FE346F00198C12 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
 		39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.debug.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.debug.xcconfig"; sourceTree = "<group>"; };
 		B028B617057DAEDFDAD55411 /* Pods_Cryptfolio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cryptfolio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -69,6 +71,7 @@
 			children = (
 				2010F1DA23FE113C007B4343 /* AppDelegate.swift */,
 				2010F1F123FE1202007B4343 /* HomeTBVC.swift */,
+				206ABFBE23FE346F00198C12 /* InfoVC.swift */,
 				2010F1DE23FE113C007B4343 /* Main.storyboard */,
 				2010F1F323FE1240007B4343 /* CustomCell.swift */,
 				2010F1F523FE12DC007B4343 /* circle.png */,
@@ -86,7 +89,6 @@
 				39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */,
 				1DFA243DDE5BA8FC526E1876 /* Pods-Cryptfolio.release.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -218,6 +220,7 @@
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
 				2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */,
 				2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */,
+				206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
