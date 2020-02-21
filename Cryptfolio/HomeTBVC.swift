@@ -154,17 +154,46 @@ class HomeTBVC: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
+            let ticker = self.filterCoins[indexPath.row].ticker;
+            let tickerImage = self.filterCoins[indexPath.row].image;
             infoVC.title = self.filterCoins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker!.name, imageIcon: self.filterCoins[indexPath.row].image!)
+            updateInfoVC(infoVC: infoVC, ticker: ticker!, tickerImage: tickerImage!);
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
-            alert(title: self.coins[indexPath.row].ticker!.name, message: String(self.coins[indexPath.row].ticker!.priceUSD!))
+            let ticker = self.coins[indexPath.row].ticker;
+            let tickerImage = self.coins[indexPath.row].image;
             infoVC.title = self.coins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker!.name, imageIcon: self.coins[indexPath.row].image!);
+            updateInfoVC(infoVC: infoVC, ticker: ticker!, tickerImage: tickerImage!);
             self.navigationController?.pushViewController(infoVC, animated: true);
         }
     }
     // MARK: - Alert view controller
+    
+    private func setChange(change:String) -> String {
+        if (change.first != "-") {
+            let newChange = "+\(change)%";
+            return newChange;
+        }
+        else {
+            let newChange = "\(change)%";
+            return newChange;
+        }
+    }
+    
+    private func updateInfoVC(infoVC:InfoVC, ticker:Ticker, tickerImage:UIImage) {
+        infoVC.name = ticker.name;
+        infoVC.symbol = ticker.symbol;
+        infoVC.image = tickerImage;
+        infoVC.price = "$\(String(round(10000.0 * ticker.priceUSD!) / 10000.0))";
+        infoVC.change = setChange(change: String(ticker.percentChange24h!));
+        infoVC.rank =  "#\(String(ticker.rank))";
+        infoVC.volume24H = "$\(String(ticker.volumeUSD24h!))";
+        infoVC.marketCap = "$\(String(ticker.marketCapUSD!))";
+        infoVC.maxSupply = "$\(String(ticker.totalSupply!))";
+        infoVC.circulation = "$\(String(ticker.availableSupply!))";
+    }
     
     private func alert(title:String, message:String) -> Void {
         let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
