@@ -6,5 +6,6 @@ target 'Cryptfolio' do
     pod 'CryptoCurrencyKit', '~> 0.3'
     pod 'SVProgressHUD'
     pod 'SwiftChart'
+    pod 'Alamofire', '~> 5.0'
 
 end
