@@ -71,9 +71,11 @@ class HomeTBVC: UITableViewController {
 
     // MARK: - Refresh data
     
+    // TODO: - Refresh might be brolken, weird tableview was displayed
     @objc private func refresh() {
         self.tableView.reloadData();
         self.getData();
+        self.tableView.reloadData();
     }
     
     // MARK: - Data gathering

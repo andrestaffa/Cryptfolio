@@ -39,7 +39,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     public var circulation = "";
     
     private var dataPoints = Array<Double>();
-    private var timestaps = Array<Double>();
+    private var timestamps = Array<Double>();
     private var lastContentOffset: CGFloat = 0
     
     override func viewDidLoad() {
@@ -69,52 +69,100 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
         }
         
         self.chartPrice_lbl.isHidden = true;
+        self.dayChart();
         
-        execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histoday?fsym=" + "\(self.symbol.uppercased())" + "&tsym=USD&limit=364")!) { (data, error) in
+    }
+    
+    // MARK: - Methods describing how all charts are being displayed dependent on the timestap
+    // TODO: - Add loading symbol (chart data and current price dont quite add up)
+    
+    private func dayChart() {
+        self.updateGraph(timePeriod: "minute", limit: "1440", divisor: 8); // 180 units
+    }
+    
+    private func weekChart() {
+        self.updateGraph(timePeriod: "hour", limit: "168", divisor: 1); // 168 units
+    }
+    
+    private func oneMonthChart() {
+        self.updateGraph(timePeriod: "hour", limit: "744", divisor: 4); // 186 units
+    }
+    
+    private func threeMonthChart() {
+        self.updateGraph(timePeriod: "day", limit: "93", divisor: 1); // 93 units
+    }
+    
+    private func sixMonthChart() {
+        self.updateGraph(timePeriod: "day", limit: "182", divisor: 1); // 182 units
+    }
+    
+    private func yearChart() {
+        self.updateGraph(timePeriod: "day", limit: "365", divisor: 1) // 365 units
+    }
+    
+    private func updateGraph(timePeriod:String, limit:String, divisor:Int) {
+        self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
+        execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histo" + "\(timePeriod)" + "?fsym=" + "\(self.symbol.uppercased())" + "&tsym=USD&limit=" + "\(limit)")!) { (data, error) in
             if let error = error {
                 print(error.localizedDescription)
             } else {
                 for i in 0...data!.count - 1 {
-                    self.dataPoints.append(data![i]["open"] as! Double);
-                    self.timestaps.append(data![i]["time"] as! Double);
+                    if (i < divisor) {
+                        self.dataPoints.append(data![i]["open"] as! Double);
+                        self.timestamps.append(data![i]["time"] as! Double);
+                    } else if (i % divisor == 0) {
+                        self.dataPoints.append(data![i]["open"] as! Double);
+                        self.timestamps.append(data![i]["time"] as! Double);
+                    }
                 }
-                let series = ChartSeries(self.dataPoints);
-                series.area = true;
-                if (!((self.dataPoints.first?.isLess(than: self.dataPoints.last!))!)) {
-                    series.color = ChartColors.darkRedColor();
-                } else {
-                    series.color = ChartColors.greenColor();
-                }
-                self.chart_view.showXLabelsAndGrid = false;
-                self.chart_view.add(series);
+                self.chartSetup(data: self.dataPoints);
             }
         }
     }
     
-    // TODO: - Write code for different timestap charts
+    private func chartSetup(data: Array<Double>) {
+        self.chart_view.removeAllSeries();
+        let series = ChartSeries(data);
+        series.area = true;
+        if (!((data.first?.isLess(than: data.last!))!)) {
+            series.color = ChartColors.darkRedColor();
+        } else {
+            series.color = ChartColors.greenColor();
+        }
+        self.chart_view.showXLabelsAndGrid = false;
+        self.chart_view.add(series);
+    }
+    
+    private func deleteDataForReuse( dataPoints: inout Array<Double>, timestaps: inout Array<Double>) {
+        if (!dataPoints.isEmpty) {
+            dataPoints.removeAll();
+        }
+        if (!timestaps.isEmpty) {
+            timestaps.removeAll();
+        }
+    }
     
     @IBAction func timestapLogHandler(_ sender: UISegmentedControl) {
         switch (sender.selectedSegmentIndex) {
         case 0:
-            print("1D");
+            self.dayChart();
         case 1:
-            print("1W");
+            self.weekChart();
         case 2:
-            print("1M");
+            self.oneMonthChart();
         case 3:
-            print("3M");
+            self.threeMonthChart();
         case 4:
-            print("6M");
+            self.sixMonthChart();
         case 5:
-            print("1Y");
+            self.yearChart();
         default:
             print("Not a date");
         }
     }
     
     
-    
-    // MARK: - Custom Methods
+    // MARK: - Date formatting
     
     func getFormattedDate(data:Array<Double>?, index: Int) -> String {
         let timeResult = data![index];
@@ -165,7 +213,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
                     self.chartPrice_lbl.isHidden = false;
                 }
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex);
-                self.chartPrice_lbl.text = getFormattedDate(data: self.timestaps, index: dataIndex!) + " $\(String(round(1000.0 * value!) / 1000.0))";
+                self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(1000.0 * value!) / 1000.0))";
             }
         }
     }
