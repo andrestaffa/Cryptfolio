@@ -4,6 +4,7 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -160,7 +161,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="backgroundColor" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstItem="6sN-QW-fRw" firstAttribute="top" secondItem="X8h-cT-EGt" secondAttribute="bottom" constant="8" symbolic="YES" id="I5T-2m-r8J"/>
                                                     <constraint firstAttribute="trailing" secondItem="X8h-cT-EGt" secondAttribute="trailing" id="Tcb-Ux-MFk"/>
@@ -190,7 +191,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="backgroundColor" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstAttribute="trailing" secondItem="l8o-Cf-ADc" secondAttribute="trailing" id="1HS-lH-bvL"/>
                                                     <constraint firstItem="AO8-SI-7Nk" firstAttribute="trailing" secondItem="l8o-Cf-ADc" secondAttribute="trailing" id="3ve-ro-aVe"/>
@@ -221,7 +222,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="backgroundColor" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstItem="Gcd-rE-cdd" firstAttribute="top" secondItem="x0f-KQ-oZk" secondAttribute="bottom" id="1iR-R1-stD"/>
                                                     <constraint firstAttribute="trailing" secondItem="x0f-KQ-oZk" secondAttribute="trailing" id="4LT-PQ-AJp"/>
@@ -252,7 +253,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="backgroundColor" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstItem="z7J-6f-Q8S" firstAttribute="leading" secondItem="yYH-bm-32q" secondAttribute="leading" id="1ZI-8m-OY5"/>
                                                     <constraint firstItem="Vdw-cV-7dc" firstAttribute="bottom" secondItem="yYH-bm-32q" secondAttribute="bottomMargin" id="2el-4L-wM8"/>
@@ -272,6 +273,7 @@
                                                     <constraint firstAttribute="width" constant="354" id="49Z-Uh-jGl"/>
                                                 </constraints>
                                                 <string key="text">Bitcoin is a digital currency created in January 2009. It follows the ideas set out in a whitepaper by the mysterious and pseudonymous developer Satoshi Nakamoto, whose true identity has yet to be verified. Bitcoin offers the promise of lower transaction fees than traditional online payment mechanisms and is operated by a decentralized authority, unlike government-issued currencies.</string>
+                                                <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                             </textView>
@@ -298,7 +300,7 @@
                                                         <nil key="highlightedColor"/>
                                                     </label>
                                                 </subviews>
-                                                <color key="backgroundColor" white="0.75" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <color key="backgroundColor" white="0.20000000000000001" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <constraints>
                                                     <constraint firstItem="UmT-le-OKa" firstAttribute="leading" secondItem="vGX-5m-jd7" secondAttribute="leading" id="1en-qq-jgf"/>
                                                     <constraint firstItem="UmT-le-OKa" firstAttribute="top" secondItem="vGX-5m-jd7" secondAttribute="top" id="76K-Ac-HyP"/>
@@ -334,7 +336,7 @@
                                                 </connections>
                                             </segmentedControl>
                                         </subviews>
-                                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <color key="backgroundColor" name="Color"/>
                                         <constraints>
                                             <constraint firstItem="f13-yw-lBU" firstAttribute="centerX" secondItem="m47-TT-wMj" secondAttribute="centerX" id="33A-GR-a9l"/>
                                             <constraint firstItem="f13-yw-lBU" firstAttribute="centerX" secondItem="sIy-J6-1ES" secondAttribute="centerX" id="3S3-cD-B9q"/>
@@ -398,6 +400,7 @@
                                         </constraints>
                                     </view>
                                 </subviews>
+                                <color key="backgroundColor" name="Color"/>
                                 <constraints>
                                     <constraint firstItem="sIy-J6-1ES" firstAttribute="top" secondItem="ICm-2U-St7" secondAttribute="top" id="9dU-gU-nTL"/>
                                     <constraint firstItem="sIy-J6-1ES" firstAttribute="height" secondItem="ICm-2U-St7" secondAttribute="height" priority="250" id="Eto-7T-X0t"/>
@@ -412,7 +415,7 @@
                                 </constraints>
                             </scrollView>
                         </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <color key="backgroundColor" name="Color"/>
                         <constraints>
                             <constraint firstItem="ICm-2U-St7" firstAttribute="leading" secondItem="9mr-4h-rQf" secondAttribute="leading" id="J42-O4-u1f"/>
                             <constraint firstItem="ICm-2U-St7" firstAttribute="bottom" secondItem="lZK-j5-XGu" secondAttribute="bottom" id="TdS-nr-QjU"/>
@@ -446,5 +449,8 @@
     </scenes>
     <resources>
         <image name="circle.png" width="400" height="400"/>
+        <namedColor name="Color">
+            <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

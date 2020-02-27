@@ -1,5 +1,5 @@
 PODS:
-  - Alamofire (5.0.1)
+  - Alamofire (5.0.2)
   - CryptoCurrencyKit (0.3.1)
   - SVProgressHUD (2.2.5)
   - SwiftChart (1.0.1)
@@ -11,19 +11,18 @@ DEPENDENCIES:
   - SwiftChart
 
 SPEC REPOS:
-  https://github.com/CocoaPods/Specs.git:
+  trunk:
+    - Alamofire
     - CryptoCurrencyKit
     - SVProgressHUD
     - SwiftChart
-  trunk:
-    - Alamofire
 
 SPEC CHECKSUMS:
-  Alamofire: 41c162d645ba6a78e7fd030fcdaf6aa394ca39a0
+  Alamofire: 3ba7a4db18b4f62c4a1c0e1cb39d7f3d52e10ada
   CryptoCurrencyKit: 5c78da2dfb845e2feddb519b56169ab39f117ca1
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftChart: ba767a678d568a5ee22d419e146a0582865e1aff
 
-PODFILE CHECKSUM: b5e00e2dc162b2b1ce90d8978fb11d05ccdade0a
+PODFILE CHECKSUM: 7fe47a856ec2dc3fd1386ddc3508eb85b344f6bb
 
 COCOAPODS: 1.8.4

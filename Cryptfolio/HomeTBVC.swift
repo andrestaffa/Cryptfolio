@@ -71,11 +71,9 @@ class HomeTBVC: UITableViewController {
 
     // MARK: - Refresh data
     
-    // TODO: - Refresh might be brolken, weird tableview was displayed
     @objc private func refresh() {
         self.tableView.reloadData();
         self.getData();
-        self.tableView.reloadData();
     }
     
     // MARK: - Data gathering
@@ -89,22 +87,14 @@ class HomeTBVC: UITableViewController {
             switch response {
             case .success(let data):
                 for i in 0...data.count - 1 {
-                    let url = NSURL(string: "https://raw.githubusercontent.com/atomiclabs/cryptocurrency-icons/master/128/icon/" + "\(data[i].symbol.lowercased())" + ".png");
-                    if (url != nil) {
-                        let webData = NSData(contentsOf: url! as URL);
-                        if (webData != nil) {
-                            let image = UIImage(data: webData! as Data);
-                            if (image != nil) {
-                                self?.coins.append(Coin(ticker: data[i], image: image!));
-                                if (self!.counter < 2) {
-                                    self?.prevLength = (self?.coins.count)!;
-                                }
-                               if ((self?.coins.count)! > self!.prevLength) {
-                                    self?.coins.removeSubrange((0...self!.prevLength - 1));
-                                }
-                            }
-                        } else {
-                            //self?.coins.append(Coin(ticker: data[i], image: UIImage(named: "circle")!));
+                    let image = UIImage(named: "Images/" + "\(data[i].symbol.lowercased())" + ".png")
+                    if (image != nil) {
+                        self?.coins.append(Coin(ticker: data[i], image: image!));
+                        if (self!.counter < 2) {
+                            self?.prevLength = (self?.coins.count)!;
+                        }
+                        if ((self?.coins.count)! > self!.prevLength) {
+                            self?.coins.removeSubrange((0...self!.prevLength - 1));
                         }
                     }
                 }
@@ -112,7 +102,6 @@ class HomeTBVC: UITableViewController {
                 print(error);
             }
             self?.loading = false;
-            self?.tableView.reloadData();
             self?.tableView.reloadData();
         }
     }
@@ -154,6 +143,7 @@ class HomeTBVC: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true);
         let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
             let ticker = self.filterCoins[indexPath.row].ticker;

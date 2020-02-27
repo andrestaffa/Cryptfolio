@@ -45,6 +45,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if traitCollection.userInterfaceStyle == .light {
+            print("Light mode")
+        } else {
+            print("Dark mode")
+        }
+        
         scrollView.delegate = self;
         chart_view.delegate = self;
         
@@ -130,6 +136,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
             series.color = ChartColors.greenColor();
         }
         self.chart_view.showXLabelsAndGrid = false;
+        self.chart_view.labelColor = UIColor.white;
         self.chart_view.add(series);
     }
     

@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "6384B96666C58F692508F0FB40131979"
-               BuildableName = "CryptoCurrencyKit.framework"
+               BuildableName = "libCryptoCurrencyKit.a"
                BlueprintName = "CryptoCurrencyKit"
                ReferencedContainer = "container:Pods.xcodeproj">
             </BuildableReference>

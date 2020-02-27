@@ -1,4 +1,4 @@
-framework module CryptoCurrencyKit {
+module CryptoCurrencyKit {
   umbrella header "CryptoCurrencyKit-umbrella.h"
 
   export *
