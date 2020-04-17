@@ -1,6 +1,0 @@
-framework module Pods_TestGetCryptoData {
-  umbrella header "Pods-TestGetCryptoData-umbrella.h"
-
-  export *
-  module * { export * }
-}
