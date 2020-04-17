@@ -87,30 +87,30 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     // TODO: - Add loading symbol (chart data and current price dont quite add up)
     
     private func dayChart() {
-        self.updateGraph(timePeriod: "minute", limit: "1440", divisor: 8); // 180 units
+        self.updateGraph(timePeriod: "minute", limit: "1440", divisor: 8, isDay: true); // 180 units
     }
     
     private func weekChart() {
-        self.updateGraph(timePeriod: "hour", limit: "168", divisor: 1); // 168 units
+        self.updateGraph(timePeriod: "hour", limit: "168", divisor: 1, isDay: false); // 168 units
     }
     
     private func oneMonthChart() {
-        self.updateGraph(timePeriod: "hour", limit: "744", divisor: 4); // 186 units
+        self.updateGraph(timePeriod: "hour", limit: "744", divisor: 4, isDay: false); // 186 units
     }
     
     private func threeMonthChart() {
-        self.updateGraph(timePeriod: "day", limit: "93", divisor: 1); // 93 units
+        self.updateGraph(timePeriod: "day", limit: "93", divisor: 1, isDay: false); // 93 units
     }
     
     private func sixMonthChart() {
-        self.updateGraph(timePeriod: "day", limit: "182", divisor: 1); // 182 units
+        self.updateGraph(timePeriod: "day", limit: "182", divisor: 1, isDay: false); // 182 units
     }
     
     private func yearChart() {
-        self.updateGraph(timePeriod: "day", limit: "365", divisor: 1) // 365 units
+        self.updateGraph(timePeriod: "day", limit: "365", divisor: 1, isDay: false) // 365 units
     }
     
-    private func updateGraph(timePeriod:String, limit:String, divisor:Int) {
+    private func updateGraph(timePeriod:String, limit:String, divisor:Int, isDay:Bool) {
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histo" + "\(timePeriod)" + "?fsym=" + "\(self.symbol_lbl.text!.uppercased())" + "&tsym=USD&limit=" + "\(limit)")!) { (data, error) in
             if let error = error {
@@ -125,19 +125,27 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
                         self.timestamps.append(data![i]["time"] as! Double);
                     }
                 }
-                self.chartSetup(data: self.dataPoints);
+                self.chartSetup(data: self.dataPoints, isDay: isDay);
             }
         }
     }
     
-    private func chartSetup(data: Array<Double>) {
+    private func chartSetup(data: Array<Double>, isDay:Bool) {
         self.chart_view.removeAllSeries();
         let series = ChartSeries(data);
         series.area = true;
-        if (!((data.first?.isLess(than: data.last!))!)) {
-            series.color = ChartColors.darkRedColor();
+        if (isDay) {
+            if (change_lbl.text?.first != "-") {
+                series.color = ChartColors.greenColor();
+            } else {
+                series.color = ChartColors.darkRedColor();
+            }
         } else {
-            series.color = ChartColors.greenColor();
+            if (!((data.first?.isLess(than: data.last!))!)) {
+                series.color = ChartColors.darkRedColor();
+            } else {
+                series.color = ChartColors.greenColor();
+            }
         }
         self.chart_view.showXLabelsAndGrid = false;
         if traitCollection.userInterfaceStyle == .light {
