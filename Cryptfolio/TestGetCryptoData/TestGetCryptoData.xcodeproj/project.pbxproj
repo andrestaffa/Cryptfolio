@@ -1,0 +1,438 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 51;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		2025A2FF244825560081B851 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025A2FE244825560081B851 /* AppDelegate.swift */; };
+		2025A301244825560081B851 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025A300244825560081B851 /* SceneDelegate.swift */; };
+		2025A303244825560081B851 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2025A302244825560081B851 /* ViewController.swift */; };
+		2025A306244825560081B851 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025A304244825560081B851 /* Main.storyboard */; };
+		2025A309244825560081B851 /* TestGetCryptoData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2025A307244825560081B851 /* TestGetCryptoData.xcdatamodeld */; };
+		2025A30B244825590081B851 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2025A30A244825590081B851 /* Assets.xcassets */; };
+		2025A30E244825590081B851 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2025A30C244825590081B851 /* LaunchScreen.storyboard */; };
+		2060D753244928F700B8FB45 /* Data.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 2060D752244928F600B8FB45 /* Data.bundle */; };
+		2090ADA924483E330020BC13 /* CryptoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2090ADA824483E330020BC13 /* CryptoData.swift */; };
+		D920918BE156CDAB60E685A9 /* Pods_TestGetCryptoData.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9AC8012D9802E086E96AD35B /* Pods_TestGetCryptoData.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		1426F6A7E7EC60B46C783DA9 /* Pods-TestGetCryptoData.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestGetCryptoData.release.xcconfig"; path = "Target Support Files/Pods-TestGetCryptoData/Pods-TestGetCryptoData.release.xcconfig"; sourceTree = "<group>"; };
+		2025A2FB244825560081B851 /* TestGetCryptoData.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TestGetCryptoData.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		2025A2FE244825560081B851 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		2025A300244825560081B851 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		2025A302244825560081B851 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		2025A305244825560081B851 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		2025A308244825560081B851 /* TestGetCryptoData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = TestGetCryptoData.xcdatamodel; sourceTree = "<group>"; };
+		2025A30A244825590081B851 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		2025A30D244825590081B851 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		2025A30F244825590081B851 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2060D752244928F600B8FB45 /* Data.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Data.bundle; sourceTree = "<group>"; };
+		2090ADA824483E330020BC13 /* CryptoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoData.swift; sourceTree = "<group>"; };
+		9AC8012D9802E086E96AD35B /* Pods_TestGetCryptoData.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_TestGetCryptoData.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A23834131257622434A33607 /* Pods-TestGetCryptoData.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-TestGetCryptoData.debug.xcconfig"; path = "Target Support Files/Pods-TestGetCryptoData/Pods-TestGetCryptoData.debug.xcconfig"; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		2025A2F8244825560081B851 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D920918BE156CDAB60E685A9 /* Pods_TestGetCryptoData.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		01AB4F6EAA611953E730FCDA /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9AC8012D9802E086E96AD35B /* Pods_TestGetCryptoData.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		2025A2F2244825560081B851 = {
+			isa = PBXGroup;
+			children = (
+				2025A2FD244825560081B851 /* TestGetCryptoData */,
+				2025A2FC244825560081B851 /* Products */,
+				8F9FBC084900BFEFCAE3A2A1 /* Pods */,
+				01AB4F6EAA611953E730FCDA /* Frameworks */,
+			);
+			sourceTree = "<group>";
+		};
+		2025A2FC244825560081B851 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				2025A2FB244825560081B851 /* TestGetCryptoData.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		2025A2FD244825560081B851 /* TestGetCryptoData */ = {
+			isa = PBXGroup;
+			children = (
+				2060D752244928F600B8FB45 /* Data.bundle */,
+				2025A2FE244825560081B851 /* AppDelegate.swift */,
+				2025A300244825560081B851 /* SceneDelegate.swift */,
+				2025A302244825560081B851 /* ViewController.swift */,
+				2090ADA824483E330020BC13 /* CryptoData.swift */,
+				2025A304244825560081B851 /* Main.storyboard */,
+				2025A30A244825590081B851 /* Assets.xcassets */,
+				2025A30C244825590081B851 /* LaunchScreen.storyboard */,
+				2025A30F244825590081B851 /* Info.plist */,
+				2025A307244825560081B851 /* TestGetCryptoData.xcdatamodeld */,
+			);
+			path = TestGetCryptoData;
+			sourceTree = "<group>";
+		};
+		8F9FBC084900BFEFCAE3A2A1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				A23834131257622434A33607 /* Pods-TestGetCryptoData.debug.xcconfig */,
+				1426F6A7E7EC60B46C783DA9 /* Pods-TestGetCryptoData.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		2025A2FA244825560081B851 /* TestGetCryptoData */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2025A312244825590081B851 /* Build configuration list for PBXNativeTarget "TestGetCryptoData" */;
+			buildPhases = (
+				6976949751CB9E29B05A564D /* [CP] Check Pods Manifest.lock */,
+				2025A2F7244825560081B851 /* Sources */,
+				2025A2F8244825560081B851 /* Frameworks */,
+				2025A2F9244825560081B851 /* Resources */,
+				BFD495AD3ECE92070E48191E /* [CP] Embed Pods Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = TestGetCryptoData;
+			productName = TestGetCryptoData;
+			productReference = 2025A2FB244825560081B851 /* TestGetCryptoData.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		2025A2F3244825560081B851 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1130;
+				LastUpgradeCheck = 1130;
+				ORGANIZATIONNAME = "Andre Staffa";
+				TargetAttributes = {
+					2025A2FA244825560081B851 = {
+						CreatedOnToolsVersion = 11.3.1;
+					};
+				};
+			};
+			buildConfigurationList = 2025A2F6244825560081B851 /* Build configuration list for PBXProject "TestGetCryptoData" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 2025A2F2244825560081B851;
+			productRefGroup = 2025A2FC244825560081B851 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				2025A2FA244825560081B851 /* TestGetCryptoData */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		2025A2F9244825560081B851 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2025A30E244825590081B851 /* LaunchScreen.storyboard in Resources */,
+				2060D753244928F700B8FB45 /* Data.bundle in Resources */,
+				2025A30B244825590081B851 /* Assets.xcassets in Resources */,
+				2025A306244825560081B851 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6976949751CB9E29B05A564D /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-TestGetCryptoData-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BFD495AD3ECE92070E48191E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TestGetCryptoData/Pods-TestGetCryptoData-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-TestGetCryptoData/Pods-TestGetCryptoData-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-TestGetCryptoData/Pods-TestGetCryptoData-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		2025A2F7244825560081B851 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2025A303244825560081B851 /* ViewController.swift in Sources */,
+				2025A309244825560081B851 /* TestGetCryptoData.xcdatamodeld in Sources */,
+				2025A2FF244825560081B851 /* AppDelegate.swift in Sources */,
+				2025A301244825560081B851 /* SceneDelegate.swift in Sources */,
+				2090ADA924483E330020BC13 /* CryptoData.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		2025A304244825560081B851 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2025A305244825560081B851 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		2025A30C244825590081B851 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				2025A30D244825590081B851 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		2025A310244825590081B851 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		2025A311244825590081B851 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		2025A313244825590081B851 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = A23834131257622434A33607 /* Pods-TestGetCryptoData.debug.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TestGetCryptoData/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.andrestaffa.TestGetCryptoData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		2025A314244825590081B851 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 1426F6A7E7EC60B46C783DA9 /* Pods-TestGetCryptoData.release.xcconfig */;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_STYLE = Automatic;
+				INFOPLIST_FILE = TestGetCryptoData/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.andrestaffa.TestGetCryptoData;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2025A2F6244825560081B851 /* Build configuration list for PBXProject "TestGetCryptoData" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2025A310244825590081B851 /* Debug */,
+				2025A311244825590081B851 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2025A312244825590081B851 /* Build configuration list for PBXNativeTarget "TestGetCryptoData" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				2025A313244825590081B851 /* Debug */,
+				2025A314244825590081B851 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		2025A307244825560081B851 /* TestGetCryptoData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				2025A308244825560081B851 /* TestGetCryptoData.xcdatamodel */,
+			);
+			currentVersion = 2025A308244825560081B851 /* TestGetCryptoData.xcdatamodel */;
+			path = TestGetCryptoData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
+	};
+	rootObject = 2025A2F3244825560081B851 /* Project object */;
+}

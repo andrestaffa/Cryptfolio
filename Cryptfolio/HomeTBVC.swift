@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import CryptoCurrencyKit
 import SVProgressHUD
 
 // Coin class
@@ -18,14 +17,6 @@ public class Coin {
     init(ticker:Ticker, image:UIImage) {
         self.ticker = ticker;
         self.image = image;
-    }
-    
-    public func isEqual(coin:Coin) -> Bool {
-        if (self.ticker == coin.ticker && self.image == coin.image) {
-            return true;
-        } else {
-            return false;
-        }
     }
     
 }
@@ -74,6 +65,7 @@ class HomeTBVC: UITableViewController {
     @objc private func refresh() {
         self.tableView.reloadData();
         self.getData();
+        self.tableView.reloadData()
     }
     
     // MARK: - Data gathering
@@ -83,26 +75,23 @@ class HomeTBVC: UITableViewController {
         if (!self.loading) {
             self.loading = true;
         }
-        CryptoCurrencyKit.fetchTickers { [weak self] response in
-            switch response {
-            case .success(let data):
-                for i in 0...data.count - 1 {
-                    let image = UIImage(named: "Images/" + "\(data[i].symbol.lowercased())" + ".png")
-                    if (image != nil) {
-                        self?.coins.append(Coin(ticker: data[i], image: image!));
-                        if (self!.counter < 2) {
-                            self?.prevLength = (self?.coins.count)!;
-                        }
-                        if ((self?.coins.count)! > self!.prevLength) {
-                            self?.coins.removeSubrange((0...self!.prevLength - 1));
-                        }
+        CryptoData.getCryptoData { (ticker, error) in
+            if let error = error {
+                print(error.localizedDescription)
+            } else {
+                let image = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")
+                if (image != nil) {
+                    self.coins.append(Coin(ticker: ticker!, image: image!));
+                    if (self.counter < 2) {
+                        self.prevLength = (self.coins.count);
+                    }
+                    if ((self.coins.count) > self.prevLength) {
+                        self.coins.removeSubrange((0...self.prevLength - 1));
                     }
                 }
-            case .failure(let error):
-                print(error);
             }
-            self?.loading = false;
-            self?.tableView.reloadData();
+            self.loading = false;
+            self.tableView.reloadData();
         }
     }
     
@@ -146,46 +135,18 @@ class HomeTBVC: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true);
         let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
-            let ticker = self.filterCoins[indexPath.row].ticker;
-            let tickerImage = self.filterCoins[indexPath.row].image;
             infoVC.title = self.filterCoins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker!.name, imageIcon: self.filterCoins[indexPath.row].image!)
-            updateInfoVC(infoVC: infoVC, ticker: ticker!, tickerImage: tickerImage!);
+            infoVC.coin = self.filterCoins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
-            let ticker = self.coins[indexPath.row].ticker;
-            let tickerImage = self.coins[indexPath.row].image;
             infoVC.title = self.coins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker!.name, imageIcon: self.coins[indexPath.row].image!);
-            updateInfoVC(infoVC: infoVC, ticker: ticker!, tickerImage: tickerImage!);
+            infoVC.coin = self.coins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         }
     }
     // MARK: - Alert view controller
-    
-    private func setChange(change:String) -> String {
-        if (change.first != "-") {
-            let newChange = "+\(change)%";
-            return newChange;
-        }
-        else {
-            let newChange = "\(change)%";
-            return newChange;
-        }
-    }
-    
-    private func updateInfoVC(infoVC:InfoVC, ticker:Ticker, tickerImage:UIImage) {
-        infoVC.name = ticker.name;
-        infoVC.symbol = ticker.symbol;
-        infoVC.image = tickerImage;
-        infoVC.price = "$\(String(round(10000.0 * ticker.priceUSD!) / 10000.0))";
-        infoVC.change = setChange(change: String(ticker.percentChange24h!));
-        infoVC.rank =  "#\(String(ticker.rank))";
-        infoVC.volume24H = "$\(String(ticker.volumeUSD24h!))";
-        infoVC.marketCap = "$\(String(ticker.marketCapUSD!))";
-        infoVC.maxSupply = "$\(String(ticker.totalSupply!))";
-        infoVC.circulation = "$\(String(ticker.availableSupply!))";
-    }
     
     private func alert(title:String, message:String) -> Void {
         let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
@@ -224,7 +185,7 @@ class HomeTBVC: UITableViewController {
         
         image.contentMode = UIView.ContentMode.scaleAspectFit;
         
-        // Adds both the label and image view to the titleView
+        // Adds both the label and image view to the titleView0
         titleView.addSubview(label);
         titleView.addSubview(image);
         

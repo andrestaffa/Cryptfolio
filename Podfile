@@ -1,12 +1,11 @@
 platform :ios, '12.2'
 
 target 'Cryptfolio' do
-    #use_frameworks!
-    use_modular_headers!
+  use_frameworks!
 
-    pod 'CryptoCurrencyKit', '~> 0.3'
-    pod 'SVProgressHUD'
-    pod 'SwiftChart'
-    pod 'Alamofire', '~> 5.0'
+  pod 'SVProgressHUD'
+  pod 'SwiftChart'
+  pod 'Alamofire', '~> 5.0'
+
 
 end

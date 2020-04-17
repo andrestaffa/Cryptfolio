@@ -14,10 +14,11 @@
 		2010F1E823FE113D007B4343 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2010F1E623FE113D007B4343 /* LaunchScreen.storyboard */; };
 		2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F123FE1202007B4343 /* HomeTBVC.swift */; };
 		2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F323FE1240007B4343 /* CustomCell.swift */; };
-		2010F1F623FE12DC007B4343 /* circle.png in Resources */ = {isa = PBXBuildFile; fileRef = 2010F1F523FE12DC007B4343 /* circle.png */; };
 		206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206ABFBE23FE346F00198C12 /* InfoVC.swift */; };
 		209FB61F24077BD400253759 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 209FB61E24077BD400253759 /* Images */; };
-		CDCEB87E50C1B8B52A65AAAA /* libPods-Cryptfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3D7CF61881682E808E843DFC /* libPods-Cryptfolio.a */; };
+		20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E924FF24494FC8002B59B1 /* CryptoData.swift */; };
+		20E9250624495016002B59B1 /* Data.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 20E9250524495016002B59B1 /* Data.bundle */; };
+		EE25ACA9DB738521E94F8216 /* Pods_Cryptfolio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6ACA69EAA2994A3F44B90205 /* Pods_Cryptfolio.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,14 +32,15 @@
 		2010F1E923FE113D007B4343 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2010F1F123FE1202007B4343 /* HomeTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeTBVC.swift; sourceTree = "<group>"; };
 		2010F1F323FE1240007B4343 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
-		2010F1F523FE12DC007B4343 /* circle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = circle.png; sourceTree = "<group>"; };
 		202A15892404EA5E003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		202A15902404EA93003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		206ABFBE23FE346F00198C12 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
 		20726D5C2404E9810042C9E9 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		209FB61E24077BD400253759 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
+		20E924FF24494FC8002B59B1 /* CryptoData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoData.swift; sourceTree = "<group>"; };
+		20E9250524495016002B59B1 /* Data.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Data.bundle; sourceTree = "<group>"; };
 		39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.debug.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.debug.xcconfig"; sourceTree = "<group>"; };
-		3D7CF61881682E808E843DFC /* libPods-Cryptfolio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Cryptfolio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6ACA69EAA2994A3F44B90205 /* Pods_Cryptfolio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cryptfolio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,7 +48,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CDCEB87E50C1B8B52A65AAAA /* libPods-Cryptfolio.a in Frameworks */,
+				EE25ACA9DB738521E94F8216 /* Pods_Cryptfolio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -77,10 +79,11 @@
 				2010F1DA23FE113C007B4343 /* AppDelegate.swift */,
 				2010F1F123FE1202007B4343 /* HomeTBVC.swift */,
 				206ABFBE23FE346F00198C12 /* InfoVC.swift */,
-				2010F1DE23FE113C007B4343 /* Main.storyboard */,
 				2010F1F323FE1240007B4343 /* CustomCell.swift */,
+				20E924FF24494FC8002B59B1 /* CryptoData.swift */,
+				2010F1DE23FE113C007B4343 /* Main.storyboard */,
+				20E9250524495016002B59B1 /* Data.bundle */,
 				209FB61E24077BD400253759 /* Images */,
-				2010F1F523FE12DC007B4343 /* circle.png */,
 				2010F1E423FE113D007B4343 /* Assets.xcassets */,
 				2010F1E623FE113D007B4343 /* LaunchScreen.storyboard */,
 				2010F1E923FE113D007B4343 /* Info.plist */,
@@ -104,7 +107,7 @@
 				202A15902404EA93003C1EB3 /* Alamofire.framework */,
 				202A15892404EA5E003C1EB3 /* Alamofire.framework */,
 				20726D5C2404E9810042C9E9 /* Alamofire.framework */,
-				3D7CF61881682E808E843DFC /* libPods-Cryptfolio.a */,
+				6ACA69EAA2994A3F44B90205 /* Pods_Cryptfolio.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -120,7 +123,7 @@
 				2010F1D323FE113C007B4343 /* Sources */,
 				2010F1D423FE113C007B4343 /* Frameworks */,
 				2010F1D523FE113C007B4343 /* Resources */,
-				460CDB25332288FFF29DAEAD /* [CP] Copy Pods Resources */,
+				FBE34C641B424457C96A5056 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -172,8 +175,8 @@
 				209FB61F24077BD400253759 /* Images in Resources */,
 				2010F1E823FE113D007B4343 /* LaunchScreen.storyboard in Resources */,
 				2010F1E523FE113D007B4343 /* Assets.xcassets in Resources */,
-				2010F1F623FE12DC007B4343 /* circle.png in Resources */,
 				2010F1E023FE113C007B4343 /* Main.storyboard in Resources */,
+				20E9250624495016002B59B1 /* Data.bundle in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,21 +205,21 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		460CDB25332288FFF29DAEAD /* [CP] Copy Pods Resources */ = {
+		FBE34C641B424457C96A5056 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -228,6 +231,7 @@
 			files = (
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
+				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
 				2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */,
 				2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */,
 				206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */,

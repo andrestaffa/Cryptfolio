@@ -1,4 +1,4 @@
-//
+	//
 //  InfoVC.swift
 //  Cryptfolio
 //
@@ -26,17 +26,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     @IBOutlet weak var description_view: UITextView!
     @IBOutlet weak var chartPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
-   
-    public var name =  "";
-    public var image = UIImage();
-    public var symbol = "";
-    public var price = "";
-    public var change = "";
-    public var rank = ""
-    public var volume24H = "";
-    public var marketCap = "";
-    public var maxSupply = "";
-    public var circulation = "";
+    
+    public var coin:Coin?;
     
     private var dataPoints = Array<Double>();
     private var timestamps = Array<Double>();
@@ -44,39 +35,52 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        if traitCollection.userInterfaceStyle == .light {
-            print("Light mode")
-        } else {
-            print("Dark mode")
-        }
-        
+
         scrollView.delegate = self;
         chart_view.delegate = self;
         
         self.navigationController?.navigationBar.isTranslucent = true;
         
-        
-        self.name_lbl.text = self.name;
-        self.crypto_img.image = self.image;
-        self.symbol_lbl.text = self.symbol;
-        self.price_lbl.text = self.price;
-        self.change_lbl.text = self.change;
-        self.rank_lbl.text = self.rank;
-        self.volume24H_lbl.text = self.volume24H;
-        self.marketCap_lbl.text = self.marketCap;
-        self.maxSupply_lbl.text = self.maxSupply;
-        self.circulation_lbl.text = self.circulation;
-        
-        if (self.change.first == "-") {
-            self.change_lbl.textColor = ChartColors.darkRedColor();
-        } else {
-            self.change_lbl.textColor = ChartColors.greenColor();
-        }
+        updateInfoVC(ticker: self.coin!.ticker!, tickerImage: self.coin!.image!);
         
         self.chartPrice_lbl.isHidden = true;
         self.dayChart();
         
+    }
+    
+    // MARK: - Methods for setting up all fields on the screen
+    
+    private func updateInfoVC(ticker:Ticker, tickerImage:UIImage) {
+        self.name_lbl.text = ticker.name;
+        self.symbol_lbl.text = ticker.symbol;
+        self.crypto_img.image = tickerImage;
+        self.price_lbl.text = "$\(String(round(10000.0 * ticker.price) / 10000.0))";
+        self.change_lbl.text = setChange(change: String(round(100.0 * ticker.changePrecent24H) / 100.0));
+        setChange(change: self.change_lbl);
+        self.rank_lbl.text =  "#" + "\(String(ticker.rank))";
+        self.volume24H_lbl.text = "$\(String(Int(ticker.volume24H)))";
+        self.marketCap_lbl.text = "$\(String(Int(ticker.marketCap)))";
+        self.maxSupply_lbl.text = "$\(String(Int(ticker.circulation)))";
+        self.circulation_lbl.text = "$\(String(Int(ticker.circulation)))";
+    }
+    
+    private func setChange(change:String) -> String {
+        if (change.first != "-") {
+            let newChange = "+\(change)%";
+            return newChange;
+        }
+        else {
+            let newChange = "\(change)%";
+            return newChange;
+        }
+    }
+    
+    private func setChange(change:UILabel) -> Void {
+        if (change_lbl.text?.first != "-") {
+            change_lbl.textColor = ChartColors.greenColor();
+        } else {
+            change_lbl.textColor = ChartColors.redColor();
+        }
     }
     
     // MARK: - Methods describing how all charts are being displayed dependent on the timestap
@@ -108,7 +112,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     
     private func updateGraph(timePeriod:String, limit:String, divisor:Int) {
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
-        execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histo" + "\(timePeriod)" + "?fsym=" + "\(self.symbol.uppercased())" + "&tsym=USD&limit=" + "\(limit)")!) { (data, error) in
+        execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histo" + "\(timePeriod)" + "?fsym=" + "\(self.symbol_lbl.text!.uppercased())" + "&tsym=USD&limit=" + "\(limit)")!) { (data, error) in
             if let error = error {
                 print(error.localizedDescription)
             } else {
@@ -136,7 +140,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
             series.color = ChartColors.greenColor();
         }
         self.chart_view.showXLabelsAndGrid = false;
-        self.chart_view.labelColor = UIColor.white;
+        if traitCollection.userInterfaceStyle == .light {
+            self.chart_view.labelColor = UIColor.black;
+        } else {
+            self.chart_view.labelColor = UIColor.white;
+        }
         self.chart_view.add(series);
     }
     
