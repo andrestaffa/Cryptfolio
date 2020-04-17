@@ -62,6 +62,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
         self.marketCap_lbl.text = "$\(String(Int(ticker.marketCap)))";
         self.maxSupply_lbl.text = "$\(String(Int(ticker.circulation)))";
         self.circulation_lbl.text = "$\(String(Int(ticker.circulation)))";
+        self.description_view.text = ticker.description;
     }
     
     private func setChange(change:String) -> String {

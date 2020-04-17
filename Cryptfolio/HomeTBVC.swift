@@ -55,6 +55,7 @@ class HomeTBVC: UITableViewController {
         navigationItem.searchController = searchController;
         definesPresentationContext = true;
         
+        
         self.title = "Explore";
         self.getData();
 

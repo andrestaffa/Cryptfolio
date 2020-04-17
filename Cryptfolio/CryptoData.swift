@@ -18,13 +18,15 @@ public struct Ticker {
     let volume24H:Double;
     let marketCap:Double;
     let circulation:Double;
+    let description:String
 }
 
 public class CryptoData {
     
     public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
-        let symbols = readTextToArray(path: "Data.bundle/cryptoTickers")
-        let names = readTextToArray(path: "Data.bundle/cryptoNames")
+        let symbols = readTextToArray(path: "Data.bundle/cryptoTickers");
+        let names = readTextToArray(path: "Data.bundle/cryptoNames");
+        let descriptions = readTextToArray(path: "Data.bundle/cryptoDescriptions");
         var longString:String = "";
         for symbol in symbols! {
             longString += symbol + ",";
@@ -43,8 +45,8 @@ public class CryptoData {
                     let volume24H:Double = (USD_lbl["VOLUME24HOUR"] as? Double)!;
                     let marketCap:Double = (USD_lbl["MKTCAP"] as? Double)!;
                     let circulation:Double = (USD_lbl["SUPPLY"] as? Double)!;
-                    let ticker = Ticker(name: names![index], symbol: symbols![index], rank: index+1, price: price, changePrecent24H: changePercent24H, volume24H: volume24H, marketCap: marketCap, circulation: circulation)
-                    completion(ticker, nil)
+                    let ticker = Ticker(name: names![index], symbol: symbols![index], rank: index+1, price: price, changePrecent24H: changePercent24H, volume24H: volume24H, marketCap: marketCap, circulation: circulation, description: descriptions![index])
+                    completion(ticker, nil);
                 }
                 
              } else if let error = response.error {
@@ -58,22 +60,21 @@ public class CryptoData {
         do {
             // This solution assumes  you've got the file in your bundle
             if let path = Bundle.main.path(forResource: path, ofType: "txt"){
-                let data = try String(contentsOfFile:path, encoding: String.Encoding.utf8)
-                arrayOfStrings = data.components(separatedBy: "\n")
+                let data = try String(contentsOfFile:path, encoding: String.Encoding.utf8);
+                arrayOfStrings = data.components(separatedBy: "\n");
                 arrayOfStrings!.remove(at: arrayOfStrings!.count - 1);
                 for index in 0...arrayOfStrings!.count - 1 {
                     arrayOfStrings![index].removeLast();
                 }
-                return arrayOfStrings
+                return arrayOfStrings;
             }
         } catch let err as NSError {
-            arrayOfStrings = [String()]
-            print(err)
+            arrayOfStrings = [String()];
+            print(err);
             return arrayOfStrings;
         }
-        arrayOfStrings = [String()]
+        arrayOfStrings = [String()];
         return arrayOfStrings;
     }
-    
     
 }
