@@ -10,8 +10,23 @@ import UIKit
 import SwiftChart;
 import Alamofire;
 
-class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
+public class CoinData {
+    
+    public let webImage:UIImage?
+    public let title:String
+    public let linkName:String
+    
+    init(webImage:UIImage, title:String, linkName:String) {
+        self.webImage = webImage;
+        self.title = title;
+        self.linkName = linkName;
+    }
+    
+}
 
+    
+class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableViewDelegate, UITableViewDataSource {
+        
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var crypto_img: UIImageView!
     @IBOutlet weak var name_lbl: UILabel!
@@ -26,8 +41,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
     @IBOutlet weak var description_view: UITextView!
     @IBOutlet weak var chartPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
+    @IBOutlet weak var tableViewNews: UITableView!
     
     public var coin:Coin?;
+    private var coinData = Array<CoinData>();
     
     private var dataPoints = Array<Double>();
     private var timestamps = Array<Double>();
@@ -38,14 +55,62 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
 
         scrollView.delegate = self;
         chart_view.delegate = self;
+        tableViewNews.delegate = self;
+        tableViewNews.dataSource = self;
         
         self.navigationController?.navigationBar.isTranslucent = true;
         
         updateInfoVC(ticker: self.coin!.ticker!, tickerImage: self.coin!.image!);
+    
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "Blockchair", linkName: "blockchair.com/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "-"))" + "/"));
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/reddit.png")!, title: "Reddit", linkName: "reddit.com/r/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "_"))" + "/"));
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(self.coin!.ticker!.name.lowercased())" + "lang=en"))
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(self.coin!.ticker!.symbol.lowercased())"));
         
         self.chartPrice_lbl.isHidden = true;
         self.dayChart();
         
+    }
+    
+    // MARK: - Table view data source methodd
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return self.coinData.count;
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "infoVCCell", for: indexPath) as! InfoVCCustomCell;
+        cell.websiteImage.image = self.coinData[indexPath.row].webImage;
+        cell.titlePageLbl.text = self.coinData[indexPath.row].title;
+        cell.linkLbl.text = self.coinData[indexPath.row].linkName;
+        return cell;
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true);
+        switch indexPath.row {
+        case 0:
+            openLink(linkToSite: "https://blockchair.com/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "-"))" + "/");
+            break;
+        case 1:
+            openLink(linkToSite: "https://www.reddit.com/r/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "_"))" + "/");
+            break;
+        case 2:
+            openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
+            break;
+        case 3:
+            openLink(linkToSite: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker!.symbol.lowercased())");
+            break;
+        default:
+            break;
+        }
+    }
+    
+    private func openLink(linkToSite:String) {
+        let link = linkToSite;
+        if let url = URL(string: link) {
+            UIApplication.shared.openURL(url)
+        }
     }
     
     // MARK: - Methods for setting up all fields on the screen
@@ -238,6 +303,18 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate {
                 }
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex);
                 self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(1000.0 * value!) / 1000.0))";
+                if (left < self.view.frame.width / 6) {
+                    self.chartPrice_lbl.frame.origin.x = (self.view.frame.width / 6) - 175.0;
+                }
+                if (left > self.view.frame.width / 1.3) {
+                    self.chartPrice_lbl.frame.origin.x = (self.view.frame.width / 1.3) - 175.0
+                }
+                if (left >= 66.5 && left <= 296.0) {
+                    self.chartPrice_lbl.frame.origin.x = left - 175.0;
+                }
+                let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light);
+                impactFeedbackgenerator.prepare()
+                impactFeedbackgenerator.impactOccurred()
             }
         }
     }
