@@ -61,11 +61,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.navigationController?.navigationBar.isTranslucent = true;
         
         updateInfoVC(ticker: self.coin!.ticker!, tickerImage: self.coin!.image!);
-    
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "Blockchair", linkName: "blockchair.com/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "-"))" + "/"));
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/reddit.png")!, title: "Reddit", linkName: "reddit.com/r/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "_"))" + "/"));
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(self.coin!.ticker!.name.lowercased())" + "lang=en"))
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(self.coin!.ticker!.symbol.lowercased())"));
+        
         
         self.chartPrice_lbl.isHidden = true;
         self.dayChart();
@@ -90,10 +86,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableView.deselectRow(at: indexPath, animated: true);
         switch indexPath.row {
         case 0:
-            openLink(linkToSite: "https://blockchair.com/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "-"))" + "/");
+            openLink(linkToSite: self.coin!.ticker!.website);
             break;
         case 1:
-            openLink(linkToSite: "https://www.reddit.com/r/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: "_"))" + "/");
+            openLink(linkToSite: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker!.symbol.lowercased())" + "/forum");
             break;
         case 2:
             openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
@@ -110,6 +106,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         let link = linkToSite;
         if let url = URL(string: link) {
             UIApplication.shared.openURL(url)
+        } else {
+            print("Link does not exist.")
         }
     }
     
@@ -125,9 +123,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.rank_lbl.text =  "#" + "\(String(ticker.rank))";
         self.volume24H_lbl.text = "$\(String(Int(ticker.volume24H)))";
         self.marketCap_lbl.text = "$\(String(Int(ticker.marketCap)))";
-        self.maxSupply_lbl.text = "$\(String(Int(ticker.circulation)))";
         self.circulation_lbl.text = "$\(String(Int(ticker.circulation)))";
+        self.maxSupply_lbl.text = "$\(String(Int(ticker.circulation)))";
         self.description_view.text = ticker.description;
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "CryptoCompare", linkName: "cryptocompare.com/coins/" + "\(ticker.symbol.lowercased())" + "/forum"));
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"))
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(ticker.symbol.lowercased())"));
     }
     
     private func setChange(change:String) -> String {

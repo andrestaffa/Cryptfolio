@@ -19,41 +19,75 @@ public struct Ticker {
     let marketCap:Double;
     let circulation:Double;
     let description:String
+    let website:String;
 }
 
 public class CryptoData {
     
-    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
-        let symbols = readTextToArray(path: "Data.bundle/cryptoTickers");
-        let names = readTextToArray(path: "Data.bundle/cryptoNames");
-        let descriptions = readTextToArray(path: "Data.bundle/cryptoDescriptions");
-        var longString:String = "";
-        for symbol in symbols! {
-            longString += symbol + ",";
+//    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
+//        let symbols = readTextToArray(path: "Data.bundle/cryptoTickers");
+//        let names = readTextToArray(path: "Data.bundle/cryptoNames");
+//        let descriptions = readTextToArray(path: "Data.bundle/cryptoDescriptionsNew");
+//        let websites = readTextToArray(path: "Data.bundle/cryptoWebsites");
+//        let reddit = readTextToArray(path: "Data.bundle/cryptoReddit");
+//        var longString:String = "";
+//        for symbol in symbols! {
+//            longString += symbol + ",";
+//        }
+//        longString.removeLast();
+//        let url:URL = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=" + longString + "&tsyms=USD")!
+//         AF.request(url).responseJSON { response in
+//             if let json = response.value {
+//                for index in 0...symbols!.count - 1 {
+//                    let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+//                    let dataObject:Dictionary = jsonObject["RAW"] as! Dictionary<String, Any>;
+//                    let coin:Dictionary = dataObject[symbols![index]] as! Dictionary<String, Any>;
+//                    let USD_lbl:Dictionary = coin["USD"] as! Dictionary<String, Any>;
+//                    let price:Double = (USD_lbl["PRICE"] as? Double)!;
+//                    let changePercent24H:Double = (USD_lbl["CHANGEPCT24HOUR"] as? Double)!;
+//                    let volume24H:Double = (USD_lbl["VOLUME24HOUR"] as? Double)!;
+//                    let marketCap:Double = (USD_lbl["MKTCAP"] as? Double)!;
+//                    let circulation:Double = (USD_lbl["SUPPLY"] as? Double)!;
+//                    let ticker = Ticker(name: names![index], symbol: symbols![index], rank: index+1, price: price, changePrecent24H: changePercent24H, volume24H: volume24H, marketCap: marketCap, circulation: circulation, description: descriptions![index], website: websites![index], redditLink: reddit![index]);
+//                    completion(ticker, nil);
+//                }
+//
+//             } else if let error = response.error {
+//                 completion(nil, error);
+//             }
+//         }
+//     }
+    
+    public static func getCryptoData(completion:@escaping (Ticker?, Error?) ->Void) -> Void {
+        let url = URL(string: "https://api.coinranking.com/v1/public/coins?limit=100");
+        if (url == nil) {
+            return;
         }
-        longString.removeLast();
-        let url:URL = URL(string: "https://min-api.cryptocompare.com/data/pricemultifull?fsyms=" + longString + "&tsyms=USD")!
-         AF.request(url).responseJSON { response in
-             if let json = response.value {
-                for index in 0...symbols!.count - 1 {
-                    let jsonObject:Dictionary = json as! Dictionary<String, Any>;
-                    let dataObject:Dictionary = jsonObject["RAW"] as! Dictionary<String, Any>;
-                    let coin:Dictionary = dataObject[symbols![index]] as! Dictionary<String, Any>;
-                    let USD_lbl:Dictionary = coin["USD"] as! Dictionary<String, Any>;
-                    let price:Double = (USD_lbl["PRICE"] as? Double)!;
-                    let changePercent24H:Double = (USD_lbl["CHANGEPCT24HOUR"] as? Double)!;
-                    let volume24H:Double = (USD_lbl["VOLUME24HOUR"] as? Double)!;
-                    let marketCap:Double = (USD_lbl["MKTCAP"] as? Double)!;
-                    let circulation:Double = (USD_lbl["SUPPLY"] as? Double)!;
-                    let ticker = Ticker(name: names![index], symbol: symbols![index], rank: index+1, price: price, changePrecent24H: changePercent24H, volume24H: volume24H, marketCap: marketCap, circulation: circulation, description: descriptions![index])
+        AF.request(url!).responseJSON { response in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
+                let coins = data["coins"] as! [[String: Any]];
+                for i in 0...coins.count - 1 {
+                    let name = coins[i]["name"] as! String;
+                    let symbol = coins[i]["symbol"] as! String;
+                    let rank = coins[i]["rank"] as! Int;
+                    let priceString = coins[i]["price"] as! String;
+                    let price  = Double(priceString);
+                    let change =  coins[i]["change"] as! Double;
+                    let volume = coins[i]["volume"] as! Double;
+                    let marketCap = coins[i]["marketCap"] as! Double;
+                    let circulation = coins[i]["circulatingSupply"] as! Double;
+                    let description = coins[i]["description"] as? String;
+                    let website = coins[i]["websiteUrl"] as? String;
+                    let ticker = Ticker(name: name, symbol: symbol, rank: rank, price: price!, changePrecent24H: change, volume24H: volume, marketCap: marketCap, circulation: circulation, description: description ?? "No Description Available", website: website ?? "No Website Available")
                     completion(ticker, nil);
                 }
-                
-             } else if let error = response.error {
-                 completion(nil, error);
-             }
-         }
-     }
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
     
     private static func readTextToArray(path:String) -> Array<String>? {
         var arrayOfStrings: Array<String>?

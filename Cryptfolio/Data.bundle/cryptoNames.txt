@@ -95,5 +95,5 @@ RIF Token
 Ren
 iExec RLC
 aelf
-Dragon Coins
+Decentraland
 Decentraland
