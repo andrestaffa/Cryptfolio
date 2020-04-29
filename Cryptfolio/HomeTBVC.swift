@@ -136,11 +136,17 @@ class HomeTBVC: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true);
         let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
+            if (self.filterCoins[indexPath.row].ticker?.description == "No Description Available") {
+                // TODO: - push to other InfoVC
+            }
             infoVC.title = self.filterCoins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker!.name, imageIcon: self.filterCoins[indexPath.row].image!)
             infoVC.coin = self.filterCoins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
+            if (self.coins[indexPath.row].ticker?.description == "No Description Available") {
+                // TODO: - push to other InfoVC
+            }
             infoVC.title = self.coins[indexPath.row].ticker?.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker!.name, imageIcon: self.coins[indexPath.row].image!);
             infoVC.coin = self.coins[indexPath.row];
@@ -150,8 +156,10 @@ class HomeTBVC: UITableViewController {
     // MARK: - Alert view controller
     
     private func alert(title:String, message:String) -> Void {
-        let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
-        alert.show();
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert);
+        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
+        alert.addAction(defaultButton);
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK: - Navigation controller custom image

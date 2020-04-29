@@ -37,7 +37,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var volume24H_lbl: UILabel!
     @IBOutlet weak var marketCap_lbl: UILabel!
     @IBOutlet weak var maxSupply_lbl: UILabel!
-    @IBOutlet weak var circulation_lbl: UILabel!
+    @IBOutlet weak var allTimeHigh_lbl: UILabel!
+    @IBOutlet weak var daysRange_lbl: UILabel!
     @IBOutlet weak var description_view: UITextView!
     @IBOutlet weak var chartPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
@@ -105,10 +106,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     private func openLink(linkToSite:String) {
         let link = linkToSite;
         if let url = URL(string: link) {
-            UIApplication.shared.openURL(url)
+            UIApplication.shared.open(url);
         } else {
-            print("Link does not exist.")
+            displayAlert(title: "Oops...", message: "Link does not exist")
         }
+    }
+    
+    func displayAlert(title:String, message:String) {
+        let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
+        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
+        alert.addAction(defaultButton)
+        present(alert, animated: true, completion: nil);
     }
     
     // MARK: - Methods for setting up all fields on the screen
@@ -121,14 +129,15 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.change_lbl.text = setChange(change: String(round(100.0 * ticker.changePrecent24H) / 100.0));
         setChange(change: self.change_lbl);
         self.rank_lbl.text =  "#" + "\(String(ticker.rank))";
-        self.volume24H_lbl.text = "$\(String(Int(ticker.volume24H)))";
-        self.marketCap_lbl.text = "$\(String(Int(ticker.marketCap)))";
-        self.circulation_lbl.text = "$\(String(Int(ticker.circulation)))";
-        self.maxSupply_lbl.text = "$\(String(Int(ticker.circulation)))";
+        self.volume24H_lbl.text = formatMoney(money: ticker.volume24H, isMoney: true);
+        self.marketCap_lbl.text = formatMoney(money: ticker.marketCap, isMoney: true);
+        self.allTimeHigh_lbl.text = "$\(String(round(10000.0 * ticker.allTimeHigh) / 10000.0))";
+        self.daysRange_lbl.text = "\(String(round(1000.0 * ticker.history24h.min()!) / 1000.0))" + " - " + "\(String(round(1000.0 * ticker.history24h.max()!) / 1000.0))";
+        self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
         self.description_view.text = ticker.description;
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "CryptoCompare", linkName: "cryptocompare.com/coins/" + "\(ticker.symbol.lowercased())" + "/forum"));
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"))
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(ticker.symbol.lowercased())"));
     }
     
@@ -149,6 +158,80 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         } else {
             change_lbl.textColor = ChartColors.redColor();
         }
+    }
+    
+    private func formatMoney(money:Double, isMoney:Bool) -> String {
+        var result:String = String(Int(money));
+        switch result.count {
+        case 15:
+            for _ in 1...15 - 5 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "T";
+        case 14:
+            for _ in 1...14 - 4 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "T";
+            break;
+        case 13:
+            for _ in 1...13 - 3 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "T";
+            break;
+        case 12:
+            for _ in 1...12 - 5 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "B";
+            break;
+        case 11:
+            for _ in 1...11 - 4 {
+                result.removeLast()
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "B";
+            break;
+        case 10:
+            for _ in 1...10 - 3 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "B";
+            break;
+        case 9:
+            for _ in 1...9 - 5 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "M";
+            break;
+        case 8:
+            for _ in 1...8 - 4 {
+                result.removeLast()
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "M";
+            break;
+        case 7:
+            for _ in 1...7 - 3 {
+                result.removeLast();
+            }
+            result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+            result = result + "M";
+            break;
+        default:
+            break;
+        }
+        if (isMoney) {
+            result.insert("$", at: result.startIndex);
+        }
+        return result;
     }
     
     // MARK: - Methods describing how all charts are being displayed dependent on the timestap
@@ -193,7 +276,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                         self.timestamps.append(data![i]["time"] as! Double);
                     }
                 }
-                self.chartSetup(data: self.dataPoints, isDay: isDay);
+                if (isDay) {
+                    self.chartSetup(data: self.coin!.ticker!.history24h, isDay: isDay)
+                } else {
+                    self.chartSetup(data: self.dataPoints, isDay: isDay);
+                }
             }
         }
     }
@@ -237,16 +324,22 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         switch (sender.selectedSegmentIndex) {
         case 0:
             self.dayChart();
+            self.vibrate(style: .light);
         case 1:
             self.weekChart();
+            self.vibrate(style: .light);
         case 2:
             self.oneMonthChart();
+            self.vibrate(style: .light);
         case 3:
             self.threeMonthChart();
+            self.vibrate(style: .light);
         case 4:
             self.sixMonthChart();
+            self.vibrate(style: .light);
         case 5:
             self.yearChart();
+            self.vibrate(style: .light);
         default:
             print("Not a date");
         }
@@ -283,6 +376,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
+    
     // MARK: - Scroll view methods
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -304,7 +398,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self.chartPrice_lbl.isHidden = false;
                 }
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex);
-                self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(1000.0 * value!) / 1000.0))";
+                self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(10000.0 * value!) / 10000.0))";
                 if (left < self.view.frame.width / 6) {
                     self.chartPrice_lbl.frame.origin.x = (self.view.frame.width / 6) - 175.0;
                 }
@@ -314,9 +408,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 if (left >= 66.5 && left <= 296.0) {
                     self.chartPrice_lbl.frame.origin.x = left - 175.0;
                 }
-                let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light);
-                impactFeedbackgenerator.prepare()
-                impactFeedbackgenerator.impactOccurred()
             }
         }
     }
@@ -327,6 +418,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     func didEndTouchingChart(_ chart: Chart) {
         self.chartPrice_lbl.isHidden = true;
+    }
+    
+    private func vibrate(style:UIImpactFeedbackGenerator.FeedbackStyle) -> Void {
+        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: style);
+        impactFeedbackgenerator.prepare()
+        impactFeedbackgenerator.impactOccurred()
     }
 
 }

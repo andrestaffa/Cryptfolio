@@ -20,6 +20,8 @@ public struct Ticker {
     let circulation:Double;
     let description:String
     let website:String;
+    let allTimeHigh:Double
+    let history24h:[Double]
 }
 
 public class CryptoData {
@@ -80,7 +82,12 @@ public class CryptoData {
                     let circulation = coins[i]["circulatingSupply"] as! Double;
                     let description = coins[i]["description"] as? String;
                     let website = coins[i]["websiteUrl"] as? String;
-                    let ticker = Ticker(name: name, symbol: symbol, rank: rank, price: price!, changePrecent24H: change, volume24H: volume, marketCap: marketCap, circulation: circulation, description: description ?? "No Description Available", website: website ?? "No Website Available")
+                    let allTimeHigh = coins[i]["allTimeHigh"] as! Dictionary<String, Any>;
+                    let allTimeHighPriceString = allTimeHigh["price"] as! String
+                    let allTimeHighPriceDouble = Double(allTimeHighPriceString);
+                    let history24hString = coins[i]["history"] as! [String];
+                    let historyDouble = history24hString.map { Double($0) } as! [Double]
+                    let ticker = Ticker(name: name, symbol: symbol, rank: rank, price: price!, changePrecent24H: change, volume24H: volume, marketCap: marketCap, circulation: circulation, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
                     completion(ticker, nil);
                 }
             } else if let error = response.error {
