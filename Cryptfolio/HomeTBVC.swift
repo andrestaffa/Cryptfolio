@@ -9,27 +9,18 @@
 import UIKit
 import SVProgressHUD
 
-// Coin class
-public class Coin {
-    public let ticker:Ticker?;
-    public let image:UIImage?;
-    
-    init(ticker:Ticker, image:UIImage) {
-        self.ticker = ticker;
-        self.image = image;
-    }
-    
-}
-
 class HomeTBVC: UITableViewController {
 
-    // Member vairables
+    // Private member vairables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
     private var loading = true;
     private var maxCoins = 20;
     private var counter = 0;
     private var prevLength = 0;
+    
+    // Public member variables
+    public var isAdding = false;
     
     // Define scroll view properties
     private let searchController = UISearchController(searchResultsController: nil)
@@ -42,11 +33,22 @@ class HomeTBVC: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        if (self.isAdding) {
+            //self.navigationController?.navigationBar.prefersLargeTitles = false;
+            self.navigationItem.rightBarButtonItem = nil;
+            self.navigationController?.navigationBar.backItem?.title = "Back"
+            self.title = "Add Coin";
+        } else {
+            self.navigationController?.navigationBar.prefersLargeTitles = true;
+            self.navigationController?.navigationBar.isHidden = false;
+            navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem:UIBarButtonItem.SystemItem.refresh, target: self, action:#selector(refresh))
+            self.title = "Explore";
+        }
 
         // Configure navigation controller
         self.clearsSelectionOnViewWillAppear = false;
         self.navigationController?.navigationBar.isTranslucent = true;
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem:UIBarButtonItem.SystemItem.refresh, target: self, action:#selector(refresh))
         
         // Configure searchView
         searchController.searchResultsUpdater = self;
@@ -55,8 +57,6 @@ class HomeTBVC: UITableViewController {
         navigationItem.searchController = searchController;
         definesPresentationContext = true;
         
-        
-        self.title = "Explore";
         self.getData();
 
     }
@@ -67,6 +67,7 @@ class HomeTBVC: UITableViewController {
         self.tableView.reloadData();
         self.getData();
         self.tableView.reloadData()
+        UserDefaults.standard.removeObject(forKey: "indexArray");
     }
     
     // MARK: - Data gathering
@@ -80,9 +81,10 @@ class HomeTBVC: UITableViewController {
             if let error = error {
                 print(error.localizedDescription)
             } else {
-                let image = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")
-                if (image != nil) {
-                    self.coins.append(Coin(ticker: ticker!, image: image!));
+                let imageUI = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")
+                if (imageUI != nil) {
+                    let image = Image(withImage: imageUI!);
+                    self.coins.append(Coin(ticker: ticker!, image: image));
                     if (self.counter < 2) {
                         self.prevLength = (self.coins.count);
                     }
@@ -116,16 +118,22 @@ class HomeTBVC: UITableViewController {
             SVProgressHUD.show(withStatus: "Loading...")
             cell.name_lbl.isHidden = true;
             cell.crypto_img.isHidden = true;
+            cell.add_lbl.isHidden = true;
         } else {
             SVProgressHUD.dismiss();
             if (self.isFiltering) {
-                cell.name_lbl.text = self.filterCoins[indexPath.row].ticker?.name;
-                cell.crypto_img.image = self.filterCoins[indexPath.row].image;
+                cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
+                cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
             } else {
                 cell.name_lbl.isHidden = false;
                 cell.crypto_img.isHidden = false;
-                cell.name_lbl.text = self.coins[indexPath.row].ticker?.name;
-                cell.crypto_img.image = self.coins[indexPath.row].image;
+                if (!self.isAdding) {
+                    cell.add_lbl.isHidden = true;
+                } else {
+                    cell.add_lbl.isHidden = false;
+                }
+                cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
+                cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
             }
             
         }
@@ -134,23 +142,63 @@ class HomeTBVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
-        let infoVC = storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
+        let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
-            if (self.filterCoins[indexPath.row].ticker?.description == "No Description Available") {
-                // TODO: - push to other InfoVC
+            setDesciption(ticker: &self.filterCoins[indexPath.row].ticker);
+            if (self.isAdding) {
+                let encoder = JSONEncoder()
+                if let encoded = try? encoder.encode(self.filterCoins[indexPath.row]) {
+                    let defaults = UserDefaults.standard
+                    defaults.set(encoded, forKey: "coinKey")
+                }
+                self.navigationController?.popViewController(animated: true);
+                return;
             }
-            infoVC.title = self.filterCoins[indexPath.row].ticker?.name;
-            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker!.name, imageIcon: self.filterCoins[indexPath.row].image!)
+            infoVC.title = self.filterCoins[indexPath.row].ticker.name;
+            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker.name, imageIcon: self.filterCoins[indexPath.row].image.getImage()!)
             infoVC.coin = self.filterCoins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
-            if (self.coins[indexPath.row].ticker?.description == "No Description Available") {
-                // TODO: - push to other InfoVC
+            setDesciption(ticker: &self.coins[indexPath.row].ticker);
+            if (self.isAdding) {
+                let encoder = JSONEncoder()
+                if let encoded = try? encoder.encode(self.coins[indexPath.row]) {
+                    let defaults = UserDefaults.standard
+                    defaults.set(encoded, forKey: "coinKey")
+                }
+                self.navigationController?.popViewController(animated: true);
+                return;
             }
-            infoVC.title = self.coins[indexPath.row].ticker?.name;
-            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker!.name, imageIcon: self.coins[indexPath.row].image!);
+            infoVC.title = self.coins[indexPath.row].ticker.name;
+            infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker.name, imageIcon: self.coins[indexPath.row].image.getImage()!);
             infoVC.coin = self.coins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
+        }
+    }
+    
+    private func setDesciption(ticker:inout Ticker) -> Void {
+        if (ticker.description == "No Description Available") {
+            switch ticker.name {
+            case "Huobi Token":
+                ticker.description = "Huobi Token (HT) is an exchange based token and native currency of the Huobi crypto exchange. The HT can be used to purchase monthly VIP status plans for transaction fee discounts, vote on exchange decisions, gain early access to special Huobi events, receive crypto rewards from seasonal buybacks and trade with other cryptocurrencies listed on the Huobi exchange.";
+                break;
+            case "Paxos Standard":
+                ticker.description = "Paxos Standard (PAX) is a stablecoin that allows users to exchange US dollars for Paxos Standard Tokens to 'transact at the speed of the internet'. It aims to meld the stability of the dollar with blockchain technology. Paxos, the company behind PAX, has a charter from the New York State Department of Financial Services, which allows it to offer regulated services in the cryptoasset space.";
+                break;
+            case "Multi-Collateral Dai":
+                ticker.description = "Dai is decentralized and backed by collateral. The Maker Protocol, which allows anyone anywhere in the world to generate Dai, aims to facilitate greater security, transparency, and trust.";
+                break;
+            case "Kyber Network":
+                ticker.description = "Kyber Network’s on-chain liquidity protocol allows decentralized token swaps to be integrated into any application, enabling value exchange to be performed seamlessly between all parties in the ecosystem. Tapping on the protocol, developers can build payment flows and financial apps, including instant token swap services, erc20 payments, and innovative financial dapps - helping to build a world where any token is usable anywhere.";
+                break;
+            case "Matic Network":
+                ticker.description = "Matic Network describes itself as is a Layer 2 scaling solution that uses sidechains for off-chain computation while ensuring asset security using the Plasma framework and a decentralized network of Proof-of-Stake (PoS) validators. Matic aims to be the de-facto platform on which developers will deploy and run decentralized applications in a secure and decentralized manner.";
+                break;
+            case "TrueUSD":
+                ticker.description = "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
+            default:
+                break;
+            }
         }
     }
     // MARK: - Alert view controller
@@ -207,7 +255,7 @@ class HomeTBVC: UITableViewController {
     
     func filterContentForSearchText(_ searchText: String) {
         self.filterCoins = self.coins.filter({ (coin) -> Bool in
-            let filterContext = (coin.ticker?.name.lowercased().contains(searchText.lowercased()))! || ((coin.ticker?.symbol.lowercased().contains(searchText.lowercased()))!);
+            let filterContext = (coin.ticker.name.lowercased().contains(searchText.lowercased())) || ((coin.ticker.symbol.lowercased().contains(searchText.lowercased())));
             return filterContext;
         })
         self.tableView.reloadData();

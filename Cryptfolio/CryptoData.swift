@@ -9,16 +9,16 @@
 import Foundation;
 import Alamofire;
 
-public struct Ticker {
+public struct Ticker : Codable {
     let name:String;
     let symbol:String;
     let rank:Int;
-    let price:Double;
+    var price:Double;
     let changePrecent24H:Double;
     let volume24H:Double;
     let marketCap:Double;
     let circulation:Double;
-    let description:String
+    var description:String
     let website:String;
     let allTimeHigh:Double
     let history24h:[Double]
@@ -60,7 +60,51 @@ public class CryptoData {
 //         }
 //     }
     
-    public static func getCryptoData(completion:@escaping (Ticker?, Error?) ->Void) -> Void {
+    
+    public static func getCryptoData(index:Int, completion:@escaping (Ticker?, Error?) -> Void) -> Void {
+        if (index < 0) {
+            print("Index must be greater or eqaul to 0");
+            return;
+        }
+        let url = URL(string: "https://api.coinranking.com/v1/public/coins?limit=100");
+        if (url == nil) {
+            return;
+        }
+        AF.request(url!).responseJSON { response in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
+                let coins = data["coins"] as! [[String: Any]];
+                let name = coins[index]["name"] as? String;
+                let symbol = coins[index]["symbol"] as? String;
+                let rank = coins[index]["rank"] as? Int;
+                let priceString = coins[index]["price"] as? String;
+                let price  = Double(priceString ?? "0.0");
+                let change =  coins[index]["change"] as? Double;
+                let volume = coins[index]["volume"] as? Double;
+                let marketCap = coins[index]["marketCap"] as? Double;
+                let circulation = coins[index]["circulatingSupply"] as? Double;
+                let description = coins[index]["description"] as? String;
+                let website = coins[index]["websiteUrl"] as? String;
+                let allTimeHigh = coins[index]["allTimeHigh"] as! Dictionary<String, Any>;
+                let allTimeHighPriceString = allTimeHigh["price"] as? String
+                let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
+                let history24hString = coins[index]["history"] as? [String];
+                var historyDouble = [Double]();
+                if (history24hString != nil) {
+                    historyDouble = history24hString!.map { Double($0) } as! [Double]
+                } else {
+                    historyDouble = [Double]();
+                }
+                let ticker = Ticker(name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: circulation ?? 0.0, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
+                completion(ticker, nil);
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
+    
+    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) -> Void {
         let url = URL(string: "https://api.coinranking.com/v1/public/coins?limit=100");
         if (url == nil) {
             return;
@@ -71,23 +115,28 @@ public class CryptoData {
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
                 let coins = data["coins"] as! [[String: Any]];
                 for i in 0...coins.count - 1 {
-                    let name = coins[i]["name"] as! String;
-                    let symbol = coins[i]["symbol"] as! String;
-                    let rank = coins[i]["rank"] as! Int;
-                    let priceString = coins[i]["price"] as! String;
-                    let price  = Double(priceString);
-                    let change =  coins[i]["change"] as! Double;
-                    let volume = coins[i]["volume"] as! Double;
-                    let marketCap = coins[i]["marketCap"] as! Double;
-                    let circulation = coins[i]["circulatingSupply"] as! Double;
+                    let name = coins[i]["name"] as? String;
+                    let symbol = coins[i]["symbol"] as? String;
+                    let rank = coins[i]["rank"] as? Int;
+                    let priceString = coins[i]["price"] as? String;
+                    let price  = Double(priceString ?? "0.0");
+                    let change =  coins[i]["change"] as? Double;
+                    let volume = coins[i]["volume"] as? Double;
+                    let marketCap = coins[i]["marketCap"] as? Double;
+                    let circulation = coins[i]["circulatingSupply"] as? Double;
                     let description = coins[i]["description"] as? String;
                     let website = coins[i]["websiteUrl"] as? String;
                     let allTimeHigh = coins[i]["allTimeHigh"] as! Dictionary<String, Any>;
-                    let allTimeHighPriceString = allTimeHigh["price"] as! String
-                    let allTimeHighPriceDouble = Double(allTimeHighPriceString);
-                    let history24hString = coins[i]["history"] as! [String];
-                    let historyDouble = history24hString.map { Double($0) } as! [Double]
-                    let ticker = Ticker(name: name, symbol: symbol, rank: rank, price: price!, changePrecent24H: change, volume24H: volume, marketCap: marketCap, circulation: circulation, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
+                    let allTimeHighPriceString = allTimeHigh["price"] as? String
+                    let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
+                    let history24hString = coins[i]["history"] as? [String];
+                    var historyDouble = [Double]();
+                    if (history24hString != nil) {
+                        historyDouble = history24hString!.map { Double($0) } as! [Double]
+                    } else {
+                        historyDouble = [Double]();
+                    }
+                    let ticker = Ticker(name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: circulation ?? 0.0, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
                     completion(ticker, nil);
                 }
             } else if let error = response.error {

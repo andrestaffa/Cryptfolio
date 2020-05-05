@@ -30,7 +30,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var scrollView: UIScrollView!
     @IBOutlet weak var crypto_img: UIImageView!
     @IBOutlet weak var name_lbl: UILabel!
-    @IBOutlet weak var symbol_lbl: UILabel!
+    @IBOutlet weak var symbol_lbl: UILabel! 
     @IBOutlet weak var price_lbl: UILabel!
     @IBOutlet weak var change_lbl: UILabel!
     @IBOutlet weak var rank_lbl: UILabel!
@@ -43,9 +43,16 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var chartPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
     @IBOutlet weak var tableViewNews: UITableView!
+    @IBOutlet weak var view1: UIView!
+    @IBOutlet weak var view2: UIView!
+    @IBOutlet weak var view3: UIView!
+    @IBOutlet weak var view4: UIView!
+    @IBOutlet weak var view5: UIView!
+    @IBOutlet weak var view6: UIView!
     
     public var coin:Coin?;
     private var coinData = Array<CoinData>();
+    private var views = Array<UIView>();
     
     private var dataPoints = Array<Double>();
     private var timestamps = Array<Double>();
@@ -61,7 +68,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
         self.navigationController?.navigationBar.isTranslucent = true;
         
-        updateInfoVC(ticker: self.coin!.ticker!, tickerImage: self.coin!.image!);
+        updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
         
         
         self.chartPrice_lbl.isHidden = true;
@@ -87,16 +94,16 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableView.deselectRow(at: indexPath, animated: true);
         switch indexPath.row {
         case 0:
-            openLink(linkToSite: self.coin!.ticker!.website);
+            openLink(linkToSite: self.coin!.ticker.website);
             break;
         case 1:
-            openLink(linkToSite: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker!.symbol.lowercased())" + "/forum");
+            openLink(linkToSite: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum");
             break;
         case 2:
-            openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker!.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
+            openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
             break;
         case 3:
-            openLink(linkToSite: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker!.symbol.lowercased())");
+            openLink(linkToSite: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())");
             break;
         default:
             break;
@@ -139,6 +146,21 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "CryptoCompare", linkName: "cryptocompare.com/coins/" + "\(ticker.symbol.lowercased())" + "/forum"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(ticker.symbol.lowercased())"));
+        self.views.append(self.view1);
+        self.views.append(self.view2);
+        self.views.append(self.view3);
+        self.views.append(self.view4);
+        self.views.append(self.view5);
+        self.views.append(self.view6);
+        if (traitCollection.userInterfaceStyle == .light) {
+            for view in self.views {
+                view.backgroundColor = UIColor.init(red: 192/255, green: 192/255, blue: 192/255, alpha: 1);
+            }
+        } else {
+            for view in self.views {
+                view.backgroundColor = UIColor.init(red: 105/255, green: 105/255, blue: 105/255, alpha: 1);
+            }
+        }
     }
     
     private func setChange(change:String) -> String {
@@ -277,7 +299,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     }
                 }
                 if (isDay) {
-                    self.chartSetup(data: self.coin!.ticker!.history24h, isDay: isDay)
+                    self.chartSetup(data: self.coin!.ticker.history24h, isDay: isDay)
                 } else {
                     self.chartSetup(data: self.dataPoints, isDay: isDay);
                 }

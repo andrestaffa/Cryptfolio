@@ -12,6 +12,7 @@ class CustomCell: UITableViewCell {
 
     @IBOutlet weak var crypto_img: UIImageView!
     @IBOutlet weak var name_lbl: UILabel!
+    @IBOutlet weak var add_lbl: UILabel!
     
     override func awakeFromNib() {
         super.awakeFromNib()
