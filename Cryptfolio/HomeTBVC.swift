@@ -14,6 +14,7 @@ class HomeTBVC: UITableViewController {
     // Private member vairables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
+    private var indexArray = [Int]();
     private var loading = true;
     private var maxCoins = 20;
     private var counter = 0;
@@ -67,7 +68,6 @@ class HomeTBVC: UITableViewController {
         self.tableView.reloadData();
         self.getData();
         self.tableView.reloadData()
-        UserDefaults.standard.removeObject(forKey: "indexArray");
     }
     
     // MARK: - Data gathering
@@ -149,11 +149,17 @@ class HomeTBVC: UITableViewController {
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(self.filterCoins[indexPath.row]) {
                     let defaults = UserDefaults.standard
-                    defaults.set(encoded, forKey: "coinKey")
+                    defaults.set(encoded, forKey: UserDefaultKeys.coinKey)
                 }
+                loadIndexArray();
+                if (!self.indexArray.contains(self.filterCoins[indexPath.row].ticker.rank)) {
+                    self.indexArray.append(self.filterCoins[indexPath.row].ticker.rank);
+                }
+                saveIndexArray();
                 self.navigationController?.popViewController(animated: true);
                 return;
             }
+            // TODO: - CryptoData(index:Int) update when pressed (self.filterCoins)
             infoVC.title = self.filterCoins[indexPath.row].ticker.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.filterCoins[indexPath.row].ticker.name, imageIcon: self.filterCoins[indexPath.row].image.getImage()!)
             infoVC.coin = self.filterCoins[indexPath.row];
@@ -164,16 +170,35 @@ class HomeTBVC: UITableViewController {
                 let encoder = JSONEncoder()
                 if let encoded = try? encoder.encode(self.coins[indexPath.row]) {
                     let defaults = UserDefaults.standard
-                    defaults.set(encoded, forKey: "coinKey")
+                    defaults.set(encoded, forKey: UserDefaultKeys.coinKey)
                 }
+                loadIndexArray();
+                if (!self.indexArray.contains(self.coins[indexPath.row].ticker.rank)) {
+                    self.indexArray.append(self.coins[indexPath.row].ticker.rank);
+                }
+                saveIndexArray();
                 self.navigationController?.popViewController(animated: true);
                 return;
             }
+            // TODO: - CryptoData(index:Int) update when pressed (self.coins)
             infoVC.title = self.coins[indexPath.row].ticker.name;
             infoVC.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coins[indexPath.row].ticker.name, imageIcon: self.coins[indexPath.row].image.getImage()!);
             infoVC.coin = self.coins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         }
+    }
+    
+    private func loadIndexArray() {
+        let tempIndexArray = UserDefaults.standard.array(forKey: UserDefaultKeys.indexArrayKey) as? [Int];
+        if (tempIndexArray != nil) {
+            self.indexArray = tempIndexArray!;
+        } else {
+            self.indexArray = [Int]();
+        }
+    }
+    
+    private func saveIndexArray() {
+        UserDefaults.standard.set(self.indexArray, forKey: UserDefaultKeys.indexArrayKey);
     }
     
     private func setDesciption(ticker:inout Ticker) -> Void {

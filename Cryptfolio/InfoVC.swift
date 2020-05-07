@@ -9,6 +9,7 @@
 import UIKit
 import SwiftChart;
 import Alamofire;
+import EzPopup;
 
 public class CoinData {
     
@@ -50,7 +51,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var view5: UIView!
     @IBOutlet weak var view6: UIView!
     
+    // Public member variables
     public var coin:Coin?;
+    public var isTradingMode:Bool = false;
+    
+    // Private member variables
     private var coinData = Array<CoinData>();
     private var views = Array<UIView>();
     
@@ -66,6 +71,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableViewNews.delegate = self;
         tableViewNews.dataSource = self;
         
+        if (self.isTradingMode) {
+            self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(trade))
+        } else {
+            self.navigationItem.setRightBarButton(nil, animated: true);
+        }
         self.navigationController?.navigationBar.isTranslucent = true;
         
         updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
@@ -76,9 +86,16 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
     }
     
+    @objc func trade() {
+        let tradeVC = storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
+        tradeVC.ticker = self.coin!.ticker;
+        self.present(tradeVC, animated: true, completion: nil);
+    }
+    
     // MARK: - Table view data source methodd
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        tableView.separatorStyle = .none;
         return self.coinData.count;
     }
     
