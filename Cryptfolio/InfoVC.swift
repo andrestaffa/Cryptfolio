@@ -9,7 +9,6 @@
 import UIKit
 import SwiftChart;
 import Alamofire;
-import EzPopup;
 
 public class CoinData {
     

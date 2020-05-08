@@ -28,6 +28,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tableVIew.reloadData();
+        self.tabBarController?.tabBar.isHidden = false;
         
         // load in indexArray
         let tempArray = UserDefaults.standard.value(forKey: UserDefaultKeys.indexArrayKey) as? [Int];
@@ -39,9 +40,48 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         print("Index Array: " + "\(self.indexArray)");
         writeCoinArray();
         
+        // load in available funds
+        let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        if (availableFunds != nil) {
+            self.availableFunds_lbl.text = "$\(String(round(100.0 * availableFunds!) / 100.0))"
+        } else {
+            self.availableFunds_lbl.text = "$0.00";
+        }
         
-        // load in available funds and main portfolio amount
-        
+        // load in main portfolio amount (update with the all the users holdings)
+        let mainPortfolio = UserDefaults.standard.value(forKey: UserDefaultKeys.mainPortfolioKey) as? Double;
+        if (mainPortfolio != nil) {
+            self.mainPortfolio_lbl.text = "$\(String(round(100.0 * mainPortfolio!) / 100.0))"
+            
+            // load in holdings array
+            let defaults = UserDefaults.standard;
+            if let savedHolding = defaults.object(forKey: UserDefaultKeys.holdingsKey) as? Data {
+                let decoder = JSONDecoder()
+                if let loadedHolding = try? decoder.decode([Holding].self, from: savedHolding) {
+                    // USE "loadedHoldings" to calculate portfolio on load up. Use percentChange * estCost.
+                    // VERY CHALLENGING TO UPDATE MAIN PORTFOLIO
+                    for index in 0...loadedHolding.count - 1 {
+                        CryptoData.getCryptoData(index: loadedHolding[index].ticker.rank - 1) { (ticker, error) in
+                            if let error = error {
+                                print(error.localizedDescription);
+                            } else {
+                                let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
+                                let portPercentChange = priceDifference / loadedHolding[index].ticker.price;
+                                let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
+                                print("Price Difference: \(priceDifference)");
+                                print("Portfolio Percent Change: \(portPercentChange)")
+                                print("Bought at price: \(loadedHolding[index].ticker.price)");
+                                print("Bought at percent change at: \(loadedHolding[index].ticker.changePrecent24H)")
+                                self.mainPortfolio_lbl.text = "$\(String(round(100.0 * updatedChange) / 100.0))"
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } else {
+            self.mainPortfolio_lbl.text = "$0.00";
+        }
         
     }
     
@@ -49,12 +89,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.prefersLargeTitles = true;
+        self.tabBarController?.tabBar.isHidden = false;
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
         
         let barItems:[UIBarButtonItem] = [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped)), self.editButtonItem];
         self.navigationItem.rightBarButtonItems = barItems;
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(openOrderHistory));
+        self.navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(goToHoldingsVC));
         
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
@@ -71,15 +112,17 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc private func availFundsTapped() -> Void {
-        print("go to addFundsVC")
+        let addFundsVC = storyboard?.instantiateViewController(withIdentifier: "addFundsVC") as! AddFundsVC;
+        addFundsVC.title = "Add Funds";
+        self.navigationController?.pushViewController(addFundsVC, animated: true);
     }
     
     @objc private func mainPortTapped() -> Void {
         print("go to mainPortFolioVC")
     }
     
-    @objc private func openOrderHistory() -> Void {
-        print("go to openOrderHistoryVC");
+    @objc private func goToHoldingsVC() -> Void {
+        print("go to holdingsVC");
     }
     
     @objc private func addTapped() {

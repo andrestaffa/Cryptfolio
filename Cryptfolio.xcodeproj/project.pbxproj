@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2007D42C2464E5D200D422E6 /* Holding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2007D42B2464E5D200D422E6 /* Holding.swift */; };
 		2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1DA23FE113C007B4343 /* AppDelegate.swift */; };
 		2010F1E023FE113C007B4343 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2010F1DE23FE113C007B4343 /* Main.storyboard */; };
 		2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1E123FE113C007B4343 /* Cryptfolio.xcdatamodeld */; };
@@ -18,6 +19,7 @@
 		204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */; };
 		2053C4CF245F851B00A04769 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2053C4CE245F851B00A04769 /* Coin.swift */; };
 		206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206ABFBE23FE346F00198C12 /* InfoVC.swift */; };
+		208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208A2F5424649382004D2B39 /* AddFundsVC.swift */; };
 		209FB61F24077BD400253759 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 209FB61E24077BD400253759 /* Images */; };
 		20AF258424633AC4000265A5 /* TradeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF258324633AC4000265A5 /* TradeVC.swift */; };
 		20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF2585246375E1000265A5 /* UserDefaultKeys.swift */; };
@@ -29,6 +31,7 @@
 
 /* Begin PBXFileReference section */
 		1DFA243DDE5BA8FC526E1876 /* Pods-Cryptfolio.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.release.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.release.xcconfig"; sourceTree = "<group>"; };
+		2007D42B2464E5D200D422E6 /* Holding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Holding.swift; sourceTree = "<group>"; };
 		2010F1D723FE113C007B4343 /* Cryptfolio.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cryptfolio.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		2010F1DA23FE113C007B4343 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		2010F1DF23FE113C007B4343 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -45,6 +48,7 @@
 		2053C4CE245F851B00A04769 /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
 		206ABFBE23FE346F00198C12 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
 		20726D5C2404E9810042C9E9 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		208A2F5424649382004D2B39 /* AddFundsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFundsVC.swift; sourceTree = "<group>"; };
 		209FB61E24077BD400253759 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		20AF258324633AC4000265A5 /* TradeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeVC.swift; sourceTree = "<group>"; };
 		20AF2585246375E1000265A5 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
@@ -93,10 +97,12 @@
 				206ABFBE23FE346F00198C12 /* InfoVC.swift */,
 				204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */,
 				20AF258324633AC4000265A5 /* TradeVC.swift */,
+				208A2F5424649382004D2B39 /* AddFundsVC.swift */,
 				2010F1F323FE1240007B4343 /* CustomCell.swift */,
 				20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */,
 				2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */,
 				2053C4CE245F851B00A04769 /* Coin.swift */,
+				2007D42B2464E5D200D422E6 /* Holding.swift */,
 				20E924FF24494FC8002B59B1 /* CryptoData.swift */,
 				20AF2585246375E1000265A5 /* UserDefaultKeys.swift */,
 				2010F1DE23FE113C007B4343 /* Main.storyboard */,
@@ -250,9 +256,11 @@
 				2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */,
 				2053C4CF245F851B00A04769 /* Coin.swift in Sources */,
 				20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */,
+				208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */,
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
 				20AF258424633AC4000265A5 /* TradeVC.swift in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
+				2007D42C2464E5D200D422E6 /* Holding.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
 				20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */,

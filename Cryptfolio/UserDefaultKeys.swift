@@ -14,5 +14,8 @@ public class UserDefaultKeys {
     public static let coinKey = "coinKey";
     public static let coinArrayKey = "coinArrayKey";
     public static let indexArrayKey = "indexArray";
+    public static let availableFundsKey = "availableFundsKey";
+    public static let mainPortfolioKey = "mainPortfolioKey";
+    public static let holdingsKey = "holdingsKey"
     
 }
