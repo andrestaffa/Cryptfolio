@@ -29,7 +29,7 @@ class AddFundsVC: UIViewController {
         // load in available funds
         let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (availableFunds != nil) {
-            self.availableFunds_lbl.text = "$\(String(round(100.0 * availableFunds!) / 100.0))";
+            self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))";
         } else {
             self.availableFunds_lbl.text = "$0.00";
         }

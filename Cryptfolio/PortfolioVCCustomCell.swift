@@ -13,7 +13,9 @@ class PortfolioVCCustomCell: UITableViewCell {
 
     @IBOutlet weak var name_lbl: UILabel!
     @IBOutlet weak var crypto_img: UIImageView!
-    @IBOutlet weak var change_img: UIImageView!
+    @IBOutlet weak var price_lbl: UILabel!
+    @IBOutlet weak var priceChange_lbl: UILabel!
+    @IBOutlet weak var percentChange_lbl: UILabel!
     
     
     override func awakeFromNib() {

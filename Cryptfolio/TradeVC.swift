@@ -13,6 +13,8 @@ class TradeVC: UIViewController {
     @IBOutlet weak var marketPrice_lbl: UILabel!
     @IBOutlet weak var availableFunds_lbl: UILabel!
     @IBOutlet weak var amount_txt: UITextField!
+    @IBOutlet weak var ownedCoinStatic_lbl: UILabel!
+    @IBOutlet weak var ownedCoin_lbl: UILabel!
     @IBOutlet weak var cost_lbl: UILabel!
     @IBOutlet weak var overview_txtView: UITextView!
     @IBOutlet weak var buy_btn: UIButton!
@@ -30,9 +32,25 @@ class TradeVC: UIViewController {
         // load in available funds
         let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (availableFunds != nil) {
-            self.availableFunds_lbl.text = "$\(String(round(100.0 * availableFunds!) / 100.0))";
+            self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))";
         } else {
             self.availableFunds_lbl.text = "$0.00";
+        }
+        
+        // load in holdings array if it exists
+        let defaults = UserDefaults.standard;
+        if let savedHoldings = defaults.object(forKey: UserDefaultKeys.holdingsKey) as? Data {
+            let decoder = JSONDecoder()
+            if let loadedHoldings = try? decoder.decode([Holding].self, from: savedHoldings) {
+                for holding in loadedHoldings {
+                    if (holding.ticker.name == self.ticker!.name) {
+                        self.ownedCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))"
+                        break;
+                    }
+                }
+            }
+        } else {
+            self.ownedCoin_lbl.text = "0.00"
         }
         
     }
@@ -49,6 +67,9 @@ class TradeVC: UIViewController {
         let amountTap = UITapGestureRecognizer(target: self, action: #selector(amountTapped));
         self.availableFunds_lbl.addGestureRecognizer(amountTap);
         
+        self.ownedCoin_lbl.text = "0.00"
+        self.ownedCoinStatic_lbl.text = "Owned \(ticker!.symbol.uppercased())"
+        
         // TODO: - Add a View Controller where the user can view their order history and see their holdings
         
     }
@@ -57,15 +78,41 @@ class TradeVC: UIViewController {
         var temp = self.availableFunds_lbl.text!;
         temp.removeFirst();
         let tempDouble = Double(temp);
-        let result = round(100.0 * tempDouble! / ticker!.price) / 100.0;
+        let result = tempDouble! / ticker!.price;
         self.amount_txt.text = "\(result)";
     }
     
     @objc private func dismissKeyboard() -> Void {
+        let amountDouble = Double(self.amount_txt.text!);
         if (self.amount_txt.text!.isEmpty) {
             self.view.endEditing(true);
             self.cost_lbl.text = "$ - "
             self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            return;
+        }
+        if (amountDouble == nil) {
+            self.view.endEditing(true);
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
+        if (amountDouble!.isLess(than: 0.0)) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
+        if (amountDouble!.isZero) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
+        if (amountDouble!.isZero) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
             return;
         }
         updateInfo();
@@ -73,8 +120,8 @@ class TradeVC: UIViewController {
     }
     
     private func setUpVC() {
-        self.marketPrice_lbl.text = "$\(String(round(100.0 * ticker!.price) / 100.0))";
-        self.amount_txt.placeholder = "Amount " + "\(self.ticker!.symbol.uppercased())";
+        self.marketPrice_lbl.text = "$\(String(format: "%.2f", self.ticker!.price))";
+        self.amount_txt.placeholder = "Enter amount of \(self.ticker!.symbol.uppercased()) to buy/sell";
         self.cost_lbl.text = "$ - "
         self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
     }
@@ -86,7 +133,7 @@ class TradeVC: UIViewController {
             return;
         }
         let result:Double = amountDouble! * self.ticker!.price;
-        self.cost_lbl.text = "$\(String(round(100.0 * result) / 100.0))"
+        self.cost_lbl.text = "$\(String(format: "%.2f", result))"
         self.overview_txtView.text = "You are about to sumbit an order for \(self.amount_txt.text!) coin(s) of \(self.ticker!.name) for $\(String(round(10000.0 * self.ticker!.price) / 10000.0)) each. This order will execute at the best available price."
     }
     
@@ -95,12 +142,30 @@ class TradeVC: UIViewController {
     }
     
     @IBAction func buyPressed(_ sender: Any) {
-        
+        let doubleAmount = Double(self.amount_txt.text!);
+        if (self.amount_txt.text!.isEmpty) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
+        if (doubleAmount == nil) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
+        if (doubleAmount!.isZero) {
+            self.cost_lbl.text = "$ - "
+            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            return;
+        }
         // check if user has enough funds
           // get available funds
           // check if the user has enough
         let amountDouble = Double(self.amount_txt.text!);
-        if (amountDouble == nil) {
+        if (amountDouble == nil || amountDouble!.isLess(than: 0.0)) {
             displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
             return;
         }
@@ -111,7 +176,7 @@ class TradeVC: UIViewController {
             tempCost.removeFirst();
             let tempCostDouble = Double(tempCost)
             if (currentFunds!.isLess(than: tempCostDouble!)) {
-                displayAlert(title: "Sorry", message: "Insuffienet Funds");
+                displayAlert(title: "Sorry", message: "Insufficient funds");
                 return;
             } else {
                 let updatedFunds:Double = currentFunds! - tempCostDouble!;
@@ -162,12 +227,10 @@ class TradeVC: UIViewController {
                 
             }
         } else {
-            displayAlert(title: "Sorry", message: "Insuffienet Funds");
+            displayAlert(title: "Sorry", message: "Insufficient funds");
             return;
         }
         self.dismiss(animated: true, completion: nil);
-        
-        
     }
     
     @IBAction func sellPressed(_ sender: Any) {
