@@ -22,4 +22,12 @@ public class Holding: NSObject, Codable {
         // possible date
     }
     
+    public func hasCoin() -> Bool {
+        if (!self.amountOfCoin.isLessThanOrEqualTo(0.0)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
 }

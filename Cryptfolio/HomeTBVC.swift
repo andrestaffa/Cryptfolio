@@ -72,7 +72,7 @@ class HomeTBVC: UITableViewController {
     @objc private func refresh() {
         self.tableView.reloadData();
         self.getData();
-        self.tableView.reloadData()
+        self.tableView.reloadData();
     }
     
     // MARK: - Data gathering
@@ -109,8 +109,14 @@ class HomeTBVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if (self.loading) {
+            if let navBarItem = self.navigationItem.rightBarButtonItem {
+                navBarItem.isEnabled = false;
+            }
             return 1;
         } else {
+            if let navBarItem = self.navigationItem.rightBarButtonItem {
+                navBarItem.isEnabled = true;
+            }
             if (self.isFiltering) {
                 return filterCoins.count;
             } else {
@@ -152,16 +158,7 @@ class HomeTBVC: UITableViewController {
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
             if (self.isAdding) {
-                let encoder = JSONEncoder()
-                if let encoded = try? encoder.encode(self.filterCoins[indexPath.row]) {
-                    let defaults = UserDefaults.standard
-                    defaults.set(encoded, forKey: UserDefaultKeys.coinKey)
-                }
-                loadIndexArray();
-                if (!self.indexArray.contains(self.filterCoins[indexPath.row].ticker.rank)) {
-                    self.indexArray.append(self.filterCoins[indexPath.row].ticker.rank);
-                }
-                saveIndexArray();
+                DataStorageHandler.saveObject(type: self.filterCoins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;
             }
@@ -169,35 +166,13 @@ class HomeTBVC: UITableViewController {
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
             if (self.isAdding) {
-                let encoder = JSONEncoder()
-                if let encoded = try? encoder.encode(self.coins[indexPath.row]) {
-                    let defaults = UserDefaults.standard
-                    defaults.set(encoded, forKey: UserDefaultKeys.coinKey)
-                }
-                loadIndexArray();
-                if (!self.indexArray.contains(self.coins[indexPath.row].ticker.rank)) {
-                    self.indexArray.append(self.coins[indexPath.row].ticker.rank);
-                }
-                saveIndexArray();
+                DataStorageHandler.saveObject(type: self.coins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;
             }
             infoVC.coin = self.coins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         }
-    }
-    
-    private func loadIndexArray() {
-        let tempIndexArray = UserDefaults.standard.array(forKey: UserDefaultKeys.indexArrayKey) as? [Int];
-        if (tempIndexArray != nil) {
-            self.indexArray = tempIndexArray!;
-        } else {
-            self.indexArray = [Int]();
-        }
-    }
-    
-    private func saveIndexArray() {
-        UserDefaults.standard.set(self.indexArray, forKey: UserDefaultKeys.indexArrayKey);
     }
     
     // MARK: - Alert view controller

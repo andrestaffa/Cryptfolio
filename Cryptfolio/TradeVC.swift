@@ -30,27 +30,28 @@ class TradeVC: UIViewController {
         super.viewWillAppear(animated);
         
         // load in available funds
-        let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        var availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (availableFunds != nil) {
+            var tempString = String(availableFunds!);
+            if (tempString.first == "-" ) {
+                tempString.removeFirst();
+                availableFunds = Double(tempString);
+            }
             self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))";
         } else {
             self.availableFunds_lbl.text = "$0.00";
         }
         
         // load in holdings array if it exists
-        let defaults = UserDefaults.standard;
-        if let savedHoldings = defaults.object(forKey: UserDefaultKeys.holdingsKey) as? Data {
-            let decoder = JSONDecoder()
-            if let loadedHoldings = try? decoder.decode([Holding].self, from: savedHoldings) {
-                for holding in loadedHoldings {
-                    if (holding.ticker.name == self.ticker!.name) {
-                        self.ownedCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))"
-                        break;
-                    }
+        if let loadedholdings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            for holding in loadedholdings {
+                if (holding.ticker.name == self.ticker!.name) {
+                    self.ownedCoin_lbl.text = "\(String(format: "%.3f", holding.amountOfCoin))";
+                    break;
                 }
             }
         } else {
-            self.ownedCoin_lbl.text = "0.00"
+            self.ownedCoin_lbl.text = "0.00";
         }
         
     }
@@ -67,6 +68,10 @@ class TradeVC: UIViewController {
         let amountTap = UITapGestureRecognizer(target: self, action: #selector(amountTapped));
         self.availableFunds_lbl.addGestureRecognizer(amountTap);
         
+        self.ownedCoin_lbl.isUserInteractionEnabled = true;
+        let ownedTap = UITapGestureRecognizer(target: self, action: #selector(ownedTapped));
+        self.ownedCoin_lbl.addGestureRecognizer(ownedTap);
+        
         self.ownedCoin_lbl.text = "0.00"
         self.ownedCoinStatic_lbl.text = "Owned \(ticker!.symbol.uppercased())"
         
@@ -75,11 +80,23 @@ class TradeVC: UIViewController {
     }
     
     @objc private func amountTapped() -> Void {
-        var temp = self.availableFunds_lbl.text!;
-        temp.removeFirst();
-        let tempDouble = Double(temp);
-        let result = tempDouble! / ticker!.price;
-        self.amount_txt.text = "\(result)";
+        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        if (currentFunds != nil) {
+            let result = currentFunds! / self.ticker!.price;
+            self.amount_txt.text = "\(result)"
+            self.updateInfo();
+        }
+    }
+    
+    @objc private func ownedTapped() -> Void {
+        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            for holding in loadedHoldings {
+                if (holding.ticker.name == self.ticker!.name) {
+                    self.amount_txt.text = "\(holding.amountOfCoin)";
+                    updateInfo();
+                }
+            }
+        }
     }
     
     @objc private func dismissKeyboard() -> Void {
@@ -92,27 +109,19 @@ class TradeVC: UIViewController {
         }
         if (amountDouble == nil) {
             self.view.endEditing(true);
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            incorrectInputLayout()
             return;
         }
         if (amountDouble!.isLess(than: 0.0)) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            incorrectInputLayout()
             return;
         }
         if (amountDouble!.isZero) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            incorrectInputLayout()
             return;
         }
         if (amountDouble!.isZero) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            incorrectInputLayout()
             return;
         }
         updateInfo();
@@ -127,6 +136,9 @@ class TradeVC: UIViewController {
     }
     
     private func updateInfo() {
+        if (self.amount_txt.text!.first == "-") {
+            self.amount_txt.text!.removeFirst();
+        }
         let amountDouble = Double(self.amount_txt.text!);
         if (amountDouble == nil) {
             displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
@@ -137,128 +149,71 @@ class TradeVC: UIViewController {
         self.overview_txtView.text = "You are about to sumbit an order for \(self.amount_txt.text!) coin(s) of \(self.ticker!.name) for $\(String(round(10000.0 * self.ticker!.price) / 10000.0)) each. This order will execute at the best available price."
     }
     
+    private func incorrectInputLayout() -> Void {
+        self.cost_lbl.text = "$ - "
+        self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+        displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+    }
+    
     @IBAction func exitPressed(_ sender: Any) {
         self.dismiss(animated: true, completion: nil);
     }
     
     @IBAction func buyPressed(_ sender: Any) {
+        
+        // get the amount of coin being bought
+        
         let doubleAmount = Double(self.amount_txt.text!);
-        if (self.amount_txt.text!.isEmpty) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
-            return;
-        }
-        if (doubleAmount == nil) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
-            return;
-        }
-        if (doubleAmount!.isZero) {
-            self.cost_lbl.text = "$ - "
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
-            return;
-        }
-        // check if user has enough funds
-          // get available funds
-          // check if the user has enough
-        let amountDouble = Double(self.amount_txt.text!);
-        if (amountDouble == nil || amountDouble!.isLess(than: 0.0)) {
-            displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+        if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0)) {
+            incorrectInputLayout()
             return;
         }
         
-        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
-        if (currentFunds != nil) {
-            var tempCost = self.cost_lbl.text!;
-            tempCost.removeFirst();
-            let tempCostDouble = Double(tempCost)
-            if (currentFunds!.isLess(than: tempCostDouble!)) {
-                displayAlert(title: "Sorry", message: "Insufficient funds");
-                return;
-            } else {
-                let updatedFunds:Double = currentFunds! - tempCostDouble!;
-                UserDefaults.standard.set(updatedFunds, forKey: UserDefaultKeys.availableFundsKey);
-                // update main portfolio
-                let mainPortfolio = UserDefaults.standard.value(forKey: UserDefaultKeys.mainPortfolioKey) as? Double;
-                if (mainPortfolio != nil) {
-                    let updatedMainPortfolio:Double = mainPortfolio! + tempCostDouble!;
-                    UserDefaults.standard.set(updatedMainPortfolio, forKey: UserDefaultKeys.mainPortfolioKey);
+//        var tempCost = self.cost_lbl.text!;
+//        tempCost.removeFirst();
+//        let tempCostDouble = Double(tempCost);
+        
+        // buy the specified coin
+        if (doubleAmount != nil && self.ticker != nil) {
+            CryptoData.getCoinData(id: self.ticker!.id) { (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
                 } else {
-                    UserDefaults.standard.set(tempCostDouble, forKey: UserDefaultKeys.mainPortfolioKey);
-                }
-                
-                // load in holdings array if it exists
-                let defaults = UserDefaults.standard;
-                if let savedHoldings = defaults.object(forKey: UserDefaultKeys.holdingsKey) as? Data {
-                    let decoder = JSONDecoder()
-                    if let loadedHoldings = try? decoder.decode([Holding].self, from: savedHoldings) {
-                        self.holdings = loadedHoldings;
+                    let result = doubleAmount! * ticker!.price;
+                    if (OrderHandler.buy(amountCost: result, amountOfCoin: doubleAmount!, ticker: ticker!)) {
+                        self.dismiss(animated: true, completion: nil);
                     }
                 }
-                
-                let hold = Holding(ticker: self.ticker!, amountOfCoin: amountDouble!, estCost: tempCostDouble!);
-                if (!self.holdings.contains(where: { (holding) -> Bool in
-                    return holding.ticker.name == hold.ticker.name;
-                })) {
-                    self.holdings.append(hold);
-                } else {
-                    for i in 0...self.holdings.count - 1 {
-                        if (self.holdings[i].ticker.name == hold.ticker.name) {
-                            let prevHolding = self.holdings[i];
-                            prevHolding.amountOfCoin += hold.amountOfCoin;
-                            prevHolding.estCost += hold.estCost;
-                            prevHolding.ticker = hold.ticker;
-                        }
-                    }
-                }
-                
-                // save holdings
-                let encoder = JSONEncoder();
-                if let encoded = try? encoder.encode(self.holdings) {
-                    let defaults = UserDefaults.standard;
-                    defaults.set(encoded, forKey: UserDefaultKeys.holdingsKey);
-                }
-                
-                // TODO: - update order history items
-                // TODO: - update holdings items
-                
             }
-        } else {
-            displayAlert(title: "Sorry", message: "Insufficient funds");
-            return;
         }
-        self.dismiss(animated: true, completion: nil);
+        
     }
     
     @IBAction func sellPressed(_ sender: Any) {
-        print("sell button pressed");
-        // update and save available funds
-        // update and save main portfolio
-        // add sell to order history
+        
+        // get the amount of coin being bought
+        let doubleAmount = Double(self.amount_txt.text!);
+        if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0)) {
+            incorrectInputLayout()
+            return;
+        }
+        
+        // sell the specified coin
+        if (doubleAmount != nil && self.ticker != nil) {
+            CryptoData.getCoinData(id: self.ticker!.id) { (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    let amountCost = doubleAmount! * ticker!.price;
+                    if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: doubleAmount!, ticker: ticker!)) {
+                        self.dismiss(animated: true, completion: nil);
+                    }
+                }
+            }
+        }
+        
     }
     
-    public func styleTextField(textField:inout UITextField!, placeHolder:String, secure:Bool)
-    {
-        textField.attributedPlaceholder = NSAttributedString(string: placeHolder, attributes: [NSAttributedString.Key.foregroundColor: UIColor.white])
-        textField.textColor = UIColor.white
-        textField.layer.cornerRadius = 8.0
-        textField.layer.masksToBounds = true
-        textField.layer.borderColor = UIColor.white.cgColor
-        textField.layer.borderWidth = 1.0
-        textField.isSecureTextEntry = secure
-    }
-    
-    public func styleButton(button:inout UIButton!)
-    {
-        button.layer.cornerRadius = 8.0
-        button.layer.masksToBounds = true
-        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
-        button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
-        button.layer.shadowOpacity = 1.0
-    }
     
     func displayAlert(title:String, message:String) {
         let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);

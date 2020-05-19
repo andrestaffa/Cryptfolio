@@ -50,7 +50,7 @@ class AddFundsVC: UIViewController {
     @IBAction func fiveHPressed(_ sender: Any) { self.amount_lbl.text = "$500.00"; }
     @IBAction func sevenHPressed(_ sender: Any) { self.amount_lbl.text = "$750.00" }
     @IBAction func oneThPressed(_ sender: Any) { self.amount_lbl.text = "$1000.00" }
-    @IBAction func twoThPressed(_ sender: Any) { self.amount_lbl.text = "$2000.00" }
+    @IBAction func twoThPressed(_ sender: Any) { self.amount_lbl.text = "$10000.00" }
     
     
     @IBAction func otherPressed(_ sender: Any) {
@@ -68,7 +68,6 @@ class AddFundsVC: UIViewController {
         var temp = self.amount_lbl.text!;
         temp.removeFirst();
         let amountToAdd = Double(temp);
-        print(amountToAdd!)
         
         // load current value of available Funds
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;

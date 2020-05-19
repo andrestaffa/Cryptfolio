@@ -66,7 +66,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
-        CryptoData.getCryptoData(index: coin!.ticker.rank - 1) { (ticker, error) in
+        
+        CryptoData.getCoinData(id: coin!.ticker.id) { (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
@@ -76,6 +77,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 self.dayChart();
             }
         }
+        
     }
     
     override func viewDidLoad() {
@@ -175,7 +177,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.volume24H_lbl.text = formatMoney(money: ticker.volume24H, isMoney: true);
         self.marketCap_lbl.text = formatMoney(money: ticker.marketCap, isMoney: true);
         self.allTimeHigh_lbl.text = "$\(String(format: "%.2f", ticker.allTimeHigh))";
-        self.daysRange_lbl.text = "\(String(format: "%.3f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.3f", ticker.history24h.max()!))";
+        self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
         self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
         self.description_view.text = ticker.description;
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
@@ -218,6 +220,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             change_lbl.textColor = ChartColors.greenColor();
         } else {
             change_lbl.textColor = ChartColors.redColor();
+        }
+    }
+    
+    private func formatDaysRange(ticker:Ticker) -> String {
+        var priceString = String(ticker.price);
+        priceString.removeFirst();
+        
+        var otherPrice = String(ticker.price);
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        
+        if (String(ticker.price).first == "0" || priceString.first == ".") {
+            return "\(String(format: "%.5f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.5f", ticker.history24h.max()!))"
+        } else if (otherPrice.first == ".") {
+            return "\(String(format: "%.2f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.2f", ticker.history24h.max()!))"
+        } else {
+            return "\(String(format: "%.0f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.0f", ticker.history24h.max()!))"
         }
     }
     

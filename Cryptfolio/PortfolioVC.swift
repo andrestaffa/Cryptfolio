@@ -8,6 +8,7 @@
 
 import UIKit
 import SwiftChart;
+import SVProgressHUD;
 
 class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -26,97 +27,23 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     
     
     private var coins = Array<Coin>();
-    private var indexArray = [Int]();
+    private var isLoading:Bool = true;
     private var priceDifference:Double = 0.0;
     private var portPercentChange:Double = 0.0;
     private static var counter = 0;
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        self.tableVIew.reloadData();
         self.tabBarController?.tabBar.isHidden = false;
         
+        self.updateCells();
+        self.loadData();
+        self.tableVIew.reloadData();
         
-        // load in indexArray
-        let tempArray = UserDefaults.standard.value(forKey: UserDefaultKeys.indexArrayKey) as? [Int];
-        if (tempArray != nil) {
-            self.indexArray = tempArray!;
-        } else {
-            self.indexArray = [Int]();
-        }
-        print("Index Array: " + "\(self.indexArray)");
-        writeCoinArray();
-        
-        // load in available funds
-        let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
-        if (availableFunds != nil) {
-            self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))"
-        } else {
-            self.availableFunds_lbl.text = "$0.00";
-        }
-        
-        // load in main portfolio amount (update with the all the users holdings)
-        let mainPortfolio = UserDefaults.standard.value(forKey: UserDefaultKeys.mainPortfolioKey) as? Double;
-        if (mainPortfolio != nil) {
-            self.mainPortPercentChange_lbl.isHidden = false;
-            self.mainPortTimeStamp_lbl.isHidden = false;
-            self.mainPort_img.isHidden = false;
-            self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", mainPortfolio!))"
-            
-            // load in holdings array
-            let defaults = UserDefaults.standard;
-            if let savedHolding = defaults.object(forKey: UserDefaultKeys.holdingsKey) as? Data {
-                let decoder = JSONDecoder()
-                if let loadedHolding = try? decoder.decode([Holding].self, from: savedHolding) {
-                    // USE "loadedHoldings" to calculate portfolio on load up. Use percentChange * estCost.
-                    // VERY CHALLENGING TO UPDATE MAIN PORTFOLIO
-                    var portPercentChange:Double = 0.0;
-                    for index in 0...loadedHolding.count - 1 {
-                        CryptoData.getCryptoData(index: loadedHolding[index].ticker.rank - 1) { (ticker, error) in
-                            if let error = error {
-                                print(error.localizedDescription);
-                            } else {
-                                let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
-                                portPercentChange += priceDifference / loadedHolding[index].ticker.price
-                                let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
-                                self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
-                                self.portPercentChange =  portPercentChange;
-                                print("Price Difference: \(priceDifference)");
-                                print("Portfolio Percent Change: \(portPercentChange)")
-                                print("Bought at price: \(loadedHolding[index].ticker.price)");
-                                print("Bought at percent change at: \(loadedHolding[index].ticker.changePrecent24H)")
-                                self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedChange))"
-                                if (String(portPercentChange).first == "-") {
-                                    self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightRed.png");
-                                    self.mainPortPercentChange_lbl.textColor = ChartColors.darkRedColor();
-                                    self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", portPercentChange * 100))%"
-                                } else {
-                                    self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightGreen.png");
-                                    if (self.traitCollection.userInterfaceStyle == .dark) {
-                                        self.mainPortPercentChange_lbl.textColor = ChartColors.darkGreenColor();
-                                        self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
-                                    } else {
-                                        self.mainPortPercentChange_lbl.textColor = ChartColors.greenColor();
-                                        self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            
-        } else {
-            self.mainPortfolio_lbl.text = "$0.00";
-            self.mainPortPercentChange_lbl.isHidden = true;
-            self.mainPortTimeStamp_lbl.isHidden = true;
-            self.mainPort_img.isHidden = true;
-        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.tabBarController?.tabBar.isHidden = false;
@@ -125,14 +52,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
 
         // style buttons
         let rightBarItems:[UIBarButtonItem] = [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped)), self.editButtonItem];
-        let leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(goToHoldingsVC));
         for rightBarItem in rightBarItems {
             rightBarItem.tintColor = UIColor.orange;
         }
-        leftBarButtonItem.tintColor = UIColor.orange;
         self.navigationController?.navigationBar.tintColor = UIColor.orange;
         self.navigationItem.rightBarButtonItems = rightBarItems;
-        self.navigationItem.leftBarButtonItem = leftBarButtonItem;
         
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
@@ -153,6 +77,136 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         
     }
     
+    private func updateCells() -> Void {
+        if (!self.isLoading) {
+            self.isLoading = true;
+        }
+        // get current coins in watchList;
+        if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+            self.coins = loadedCoins;
+        }
+        if let loadedCoin = DataStorageHandler.loadObject(type: Coin.self, forKey: UserDefaultKeys.coinKey) {
+            if (!self.coins.contains(where: { (coin) -> Bool in
+                return coin.ticker.name == loadedCoin.ticker.name;
+            })) {
+                self.coins.append(loadedCoin);
+            }
+        }
+        writeCoinArray();
+        self.tableVIew.reloadData();
+        // update the current coinList;
+        for coin in self.coins {
+            CryptoData.getCoinData(id: coin.ticker.id) { (ticker, error) in
+                if let error = error {
+                    print("no internet")
+                    return;
+                } else {
+                    print("bad 1")
+                    coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                    coin.ticker = ticker!;
+                    self.isLoading = false;
+                    self.tableVIew.reloadData();
+                    self.writeCoinArray();
+                }
+            }
+        }
+    }
+    
+    private func loadData() -> Void {
+        //writeCoinArray();
+        
+        // load in available funds
+        let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        if (availableFunds != nil) {
+            var tempAvailString = String(format: "%.2f", availableFunds!);
+            if (tempAvailString.first == "-") {
+                tempAvailString.removeFirst();
+                self.availableFunds_lbl.text = "$\(tempAvailString)"
+            } else {
+                self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))"
+            }
+        } else {
+            self.availableFunds_lbl.text = "$0.00";
+        }
+        
+        // load in main portfolio amount (update with the all the users holdings)
+        let mainPortfolio = UserDefaults.standard.value(forKey: UserDefaultKeys.mainPortfolioKey) as? Double;
+        if (mainPortfolio != nil) {
+            self.mainPortPercentChange_lbl.isHidden = false;
+            self.mainPortTimeStamp_lbl.isHidden = false;
+            self.mainPort_img.isHidden = false;
+            self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", mainPortfolio!))"
+            
+            // load in holdings array
+            if let loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                var portPercentChange:Double = 0.0;
+                var updatedMainPortfolio:Double = 0.0;
+                for index in 0...loadedHolding.count - 1 {
+                    CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { (ticker, error) in
+                        if let error = error {
+                            print("no internet");
+                        } else {
+                            print("bad 2");
+                            // update estCost
+                            loadedHolding[index].estCost = loadedHolding[index].amountOfCoin * ticker!.price;
+                            updatedMainPortfolio += loadedHolding[index].estCost;
+                            
+                            let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
+                            portPercentChange += (priceDifference / loadedHolding[index].ticker.price) / Double(loadedHolding.count);
+                            let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
+                            self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
+                            
+                            print("Price Difference: \(priceDifference)");
+                            print("Portfolio Percent Change: \(portPercentChange)")
+                            print("Bought at price: \(loadedHolding[index].ticker.price)");
+                            print("Bought at percent change at: \(loadedHolding[index].ticker.changePrecent24H)")
+                            var tempUpChange = String(format: "%.2f", updatedMainPortfolio);
+                            if (tempUpChange.first == "-") {
+                                tempUpChange.removeFirst();
+                                self.mainPortfolio_lbl.text = "$\(tempUpChange)";
+                            } else {
+                                self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
+                            }
+                            if (updatedMainPortfolio.isZero || self.mainPortfolio_lbl.text! == "$0.00") {
+                                self.mainPortPercentChange_lbl.isHidden = true;
+                                self.mainPortTimeStamp_lbl.isHidden = true;
+                                self.mainPort_img.isHidden = true;
+                            } else {
+                                self.mainPortPercentChange_lbl.isHidden = false;
+                                self.mainPortTimeStamp_lbl.isHidden = false;
+                                self.mainPort_img.isHidden = false;
+                            }
+                            if (String(portPercentChange).first == "-" && !portPercentChange.isZero) {
+                                self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightRed.png");
+                                self.mainPortPercentChange_lbl.textColor = ChartColors.darkRedColor();
+                                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", portPercentChange * 100))%"
+                                self.portPercentChange = portPercentChange;
+                            } else {
+                                self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightGreen.png");
+                                var mainPortPercentString = String(portPercentChange);
+                                if (mainPortPercentString.first == "-") { mainPortPercentString.removeFirst(); portPercentChange = Double(mainPortPercentString)! }
+                                self.portPercentChange = portPercentChange;
+                                if (self.traitCollection.userInterfaceStyle == .dark) {
+                                    self.mainPortPercentChange_lbl.textColor = ChartColors.darkGreenColor();
+                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
+                                } else {
+                                    self.mainPortPercentChange_lbl.textColor = ChartColors.greenColor();
+                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+        } else {
+            self.mainPortfolio_lbl.text = "$0.00";
+            self.mainPortPercentChange_lbl.isHidden = true;
+            self.mainPortTimeStamp_lbl.isHidden = true;
+            self.mainPort_img.isHidden = true;
+        }
+    }
+    
     @objc private func availFundsTapped() -> Void {
         let addFundsVC = storyboard?.instantiateViewController(withIdentifier: "addFundsVC") as! AddFundsVC;
         addFundsVC.title = "Add Funds";
@@ -168,7 +222,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc private func mainPortPercentTapped() -> Void {
-        // MOST LIKELY GOING TO DELETE
+        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light);
+        impactFeedbackgenerator.prepare()
+        impactFeedbackgenerator.impactOccurred()
         PortfolioVC.counter += 1;
         if (PortfolioVC.counter % 2 != 0) {
             if (String(self.portPercentChange).first != "-") {
@@ -192,35 +248,63 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     private func writeCoinArray() {
-        let encoder = JSONEncoder();
-        if let encoded = try? encoder.encode(self.coins) {
-            let defaults = UserDefaults.standard;
-            defaults.set(encoded, forKey: UserDefaultKeys.coinArrayKey);
+        DataStorageHandler.saveObject(type: self.coins, forKey: UserDefaultKeys.coinArrayKey);
+    }
+    
+    private func displayAlert(title:String, message:String) {
+        let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
+        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
+        alert.addAction(defaultButton);
+        present(alert, animated: true, completion: nil);
+    }
+    
+    // MARK: - Buy/Sell methods
+    
+    private func quickBuy(indexPathRow:Int) -> Void {
+        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        if (currentFunds != nil) {
+            CryptoData.getCoinData(id: self.coins[indexPathRow].ticker.id) { (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    let amountCoin = currentFunds! / ticker!.price;
+                    let amountCost = amountCoin * ticker!.price;
+                    if (OrderHandler.buy(amountCost: amountCost, amountOfCoin: amountCoin, ticker: ticker!)) {
+                        self.loadData();
+                        self.tableVIew.reloadData();
+                    } else {
+                        //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
+                    }
+                }
+            }
+        } else {
+            displayAlert(title: "Sorry", message: "Insufficient funds")
         }
     }
     
-    private func writeCoin() {
-        let defaults = UserDefaults.standard;
-        if let savedCoin = defaults.object(forKey: UserDefaultKeys.coinKey) as? Data {
-            let decoder = JSONDecoder()
-            if let loadedCoin = try? decoder.decode(Coin.self, from: savedCoin) {
-                if (!self.coins.contains(where: { (coin) -> Bool in
-                    return coin.ticker.name == loadedCoin.ticker.name;
-                })) {
-                    self.coins.append(loadedCoin);
+    private func quickSell(indexPathRow:Int) -> Void {
+        var currentHoldings:Holding?
+        let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
+        for holding in loadedHoldings! {
+            if (holding.ticker.name == self.coins[indexPathRow].ticker.name) {
+                currentHoldings = holding;
+                break;
+            }
+        }
+        CryptoData.getCoinData(id: currentHoldings!.ticker.id) { (ticker, error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                let amountCost = currentHoldings!.amountOfCoin * ticker!.price;
+                if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker!)) {
+                    self.loadData();
+                    self.tableVIew.reloadData();
+                } else {
+                    self.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
                 }
             }
         }
     }
-    
-    
-    func displayAlert(title:String, message:String) {
-        let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
-        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
-        alert.addAction(defaultButton)
-        present(alert, animated: true, completion: nil);
-    }
-    
     
     // MARK: - TableView methods
     
@@ -232,9 +316,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let movedCoin = self.coins.remove(at: sourceIndexPath.row);
         self.coins.insert(movedCoin, at: destinationIndexPath.row);
-        let movedIndex = self.indexArray.remove(at: sourceIndexPath.row);
-        self.indexArray.insert(movedIndex, at: destinationIndexPath.row);
-        UserDefaults.standard.set(self.indexArray, forKey: UserDefaultKeys.indexArrayKey);
         writeCoinArray();
         tableView.reloadData();
     }
@@ -248,110 +329,150 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        
-        let defaults = UserDefaults.standard;
-        if let savedCoin = defaults.object(forKey: UserDefaultKeys.coinArrayKey) as? Data {
-            let decoder = JSONDecoder()
-            if let loadedCoin = try? decoder.decode([Coin].self, from: savedCoin) {
-                self.coins = loadedCoin;
+        if (self.coins.count == 0) {
+            if(self.isLoading) {
+                self.isLoading = false;
             }
+            self.hideViews(hidden: false);
+            self.hideFunds(hidden: true);
+            styleButton(button: &self.addCoin_btn);
+            self.mainPortPercentChange_lbl.isHidden = true;
+            self.mainPortTimeStamp_lbl.isHidden = true;
+            self.mainPort_img.isHidden = true;
+            tableView.separatorStyle = .none;
+            return 0;
         }
-        if let savedCoin = defaults.object(forKey: UserDefaultKeys.coinKey) as? Data {
-            let decoder = JSONDecoder()
-            if let loadedCoin = try? decoder.decode(Coin.self, from: savedCoin) {
-                if (!self.coins.contains(where: { (coin) -> Bool in
-                    return coin.ticker.name == loadedCoin.ticker.name;
-                })) {
-                    self.coins.append(loadedCoin);
-                }
+        if (self.isLoading) {
+            if (self.coins.count == 0) {
+                self.isLoading = false;
             }
-        }
-        if (self.coins.count > 0) {
+            for rightBarItems in self.navigationItem.rightBarButtonItems! {
+                rightBarItems.isEnabled = false;
+            }
+            self.hideViews(hidden: true);
+            self.hideFunds(hidden: true);
+            self.mainPortPercentChange_lbl.isHidden = true;
+            self.mainPortTimeStamp_lbl.isHidden = true;
+            self.mainPort_img.isHidden = true;
+            tableView.separatorStyle = .none;
+            return 1;
+        } else if (self.coins.count > 0) {
+            for rightBarItems in self.navigationItem.rightBarButtonItems! {
+                rightBarItems.isEnabled = true;
+            }
             self.hideViews(hidden: true);
             self.hideFunds(hidden: false);
             tableView.separatorStyle = .none;
             return self.coins.count;
         } else {
-            self.styleButton(button: &self.addCoin_btn);
-            self.hideViews(hidden: false);
-            self.hideFunds(hidden: true);
-            tableView.backgroundView = self.multipleViews;
+            for rightBarItems in self.navigationItem.rightBarButtonItems! {
+                rightBarItems.isEnabled = true;
+            }
+            self.hideViews(hidden: true);
+            self.hideFunds(hidden: false);
             tableView.separatorStyle = .none;
             return 0;
         }
     }
     
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        // load holdings and check if the coin swiped on has any holdings, if so, then display quick sell, otherwise just display delete
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (rowAction, indexPath) in
             self.coins.remove(at: indexPath.row);
-            self.indexArray.remove(at: indexPath.row);
             UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinKey);
-            UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
-            UserDefaults.standard.set(self.indexArray, forKey: UserDefaultKeys.indexArrayKey);
-            writeCoinArray();
+            //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
+            self.writeCoinArray();
             tableView.beginUpdates();
             tableView.deleteRows(at: [indexPath], with: .fade);
             tableView.endUpdates();
-            print("Index Array: " + "\(self.indexArray)");
-        } else if editingStyle == .insert {
-            
+            if (self.coins.count == 0) {
+                self.styleButton(button: &self.addCoin_btn);
+                self.hideViews(hidden: false);
+                self.hideFunds(hidden: true);
+                tableView.backgroundView = self.multipleViews;
+                tableView.separatorStyle = .none;
+            }
+            self.writeCoinArray();
+            tableView.reloadData();
         }
+        let quickBuyAction = UITableViewRowAction(style: .normal, title: "Quick Buy") { (rowAction, indexPath) in
+            self.quickBuy(indexPathRow: indexPath.row);
+        }
+        quickBuyAction.backgroundColor = ChartColors.greenColor();
+        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            for holding in loadedHoldings {
+                if (holding.ticker.name == self.coins[indexPath.row].ticker.name) {
+                    if (!holding.amountOfCoin.isLessThanOrEqualTo(0.0)) {
+                        let quickSellAction = UITableViewRowAction(style: .destructive, title: "Quick Sell") { (rowAction, indexPath) in
+                            self.quickSell(indexPathRow: indexPath.row);
+                        }
+                        return [quickSellAction, quickBuyAction];
+                    } else {
+                        return [deleteAction, quickBuyAction];
+                    }
+                }
+            }
+        } else {
+            return [deleteAction, quickBuyAction];
+        }
+        return [deleteAction, quickBuyAction];
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! PortfolioVCCustomCell;
-        cell.crypto_img.image = self.coins[indexPath.row].image.getImage()!;
-        cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
-        cell.price_lbl.text = "$0.00";
-        cell.priceChange_lbl.text = "+$0.00"
-        cell.percentChange_lbl.text = "+0.00%"
-        CryptoData.getCryptoData(index: self.coins[indexPath.row].ticker.rank - 1) { (ticker, error) in
-            if let error = error {
-                print(error.localizedDescription);
+        if (self.isLoading) {
+            SVProgressHUD.show(withStatus: "Loading...");
+            cell.crypto_img.isHidden = true;
+            cell.name_lbl.text = "";
+            cell.price_lbl.text = "";
+            cell.percentChange_lbl.text = ""
+            cell.amountCost_lbl.text = "";
+            cell.amountCoin_lbl.text = "";
+        } else {
+            cell.crypto_img.isHidden = false;
+            SVProgressHUD.dismiss();
+            // basic stuff
+            cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
+            cell.crypto_img.image = self.coins[indexPath.row].image.getImage()!;
+            
+            // format price
+            let theoPriceString = String(format: "%.2f", self.coins[indexPath.row].ticker.price);
+            //self.appendZero(string: &theoPriceString);
+            cell.price_lbl.text = "$\(theoPriceString)";
+            
+            // format percent change
+            if (String(self.coins[indexPath.row].ticker.changePrecent24H).first != "-") {
+                if (self.traitCollection.userInterfaceStyle == .dark) {
+                    cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
+                } else {
+                    cell.percentChange_lbl.textColor = ChartColors.greenColor();
+                }
+                let theoPercentString = String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H);
+                //self.appendZero(string: &theoPercentString);
+                cell.percentChange_lbl.text = "+\(theoPercentString)%"
             } else {
-                // format price
-                let theoPriceString = String(format: "%.2f", ticker!.price);
-                //self.appendZero(string: &theoPriceString);
-                cell.price_lbl.text = "$\(theoPriceString)";
-                
-                // format percent change
-                if (String(ticker!.changePrecent24H).first != "-") {
-                    if (self.traitCollection.userInterfaceStyle == .dark) {
-                        cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
-                    } else {
-                        cell.percentChange_lbl.textColor = ChartColors.greenColor();
-                    }
-                    let theoPercentString = String(format: "%.2f", ticker!.changePrecent24H);
-                    //self.appendZero(string: &theoPercentString);
-                    cell.percentChange_lbl.text = "(+\(theoPercentString)%)"
-                } else {
-                    cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
-                    let theoPercentString = String(format: "%.2f", ticker!.changePrecent24H);
-                    //self.appendZero(string: &theoPercentString);
-                    cell.percentChange_lbl.text = "(\(theoPercentString)%)"
-                }
-                
-                // format price change
-                let theoricalPriceChange = ((ticker!.price - ticker!.history24h[0]) / ticker!.price) * ticker!.price;
-                var thString = String(format: "%.2f", theoricalPriceChange);
-                //self.appendZero(string: &thString);
-                if (thString.first == "-") {
-                    cell.priceChange_lbl.textColor = ChartColors.darkRedColor();
-                    let minus = thString.first!;
-                    thString.removeFirst();
-                    cell.priceChange_lbl.text = "\(minus)\(thString)"
-                } else {
-                    if (self.traitCollection.userInterfaceStyle == .dark) {
-                        cell.priceChange_lbl.textColor = ChartColors.darkGreenColor();
-                    } else {
-                        cell.priceChange_lbl.textColor = ChartColors.greenColor();
-                    }
-                    cell.priceChange_lbl.text = "+\(thString)"
-                }
+                cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
+                let theoPercentString = String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H);
+                //self.appendZero(string: &theoPercentString);
+                cell.percentChange_lbl.text = "\(theoPercentString)%"
             }
+            
+            // format holdings
+            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                for holding in loadedHoldings {
+                    if (holding.ticker.name == self.coins[indexPath.row].ticker.name) {
+                        holding.estCost = holding.amountOfCoin * self.coins[indexPath.row].ticker.price;
+                        cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
+                        cell.amountCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))";
+                    }
+                }
+            } else {
+                cell.amountCost_lbl.text = "$0.00";
+                cell.amountCoin_lbl.text = "0.00";
+            }
+            //cell.layer.cornerRadius = 10.0;
+            //cell.backgroundColor = UIColor.init(red: 2/255, green: 7/255, blue: 93/255, alpha: 0.5)
         }
-        //cell.layer.cornerRadius = 10.0;
-        //cell.backgroundColor = UIColor.init(red: 2/255, green: 7/255, blue: 93/255, alpha: 0.5)
         return cell;
     }
     
@@ -361,7 +482,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         infoVC.coin = self.coins[indexPath.row];
         infoVC.isTradingMode = true;
         self.navigationController?.pushViewController(infoVC, animated: true);
-        
     }
     
     // MARK: - Helper method for appending zeros to numbers

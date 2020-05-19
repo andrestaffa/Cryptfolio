@@ -23,9 +23,11 @@
 		209FB61F24077BD400253759 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 209FB61E24077BD400253759 /* Images */; };
 		20AF258424633AC4000265A5 /* TradeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF258324633AC4000265A5 /* TradeVC.swift */; };
 		20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF2585246375E1000265A5 /* UserDefaultKeys.swift */; };
+		20DF8F4C246F1664002754E2 /* OrderHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DF8F4B246F1664002754E2 /* OrderHandler.swift */; };
 		20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E924FF24494FC8002B59B1 /* CryptoData.swift */; };
 		20E9250624495016002B59B1 /* Data.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 20E9250524495016002B59B1 /* Data.bundle */; };
 		20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */; };
+		20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */; };
 		336CF84D7E0D536B38FAD874 /* libPods-Cryptfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F98E6168701258487BA213EC /* libPods-Cryptfolio.a */; };
 /* End PBXBuildFile section */
 
@@ -52,9 +54,11 @@
 		209FB61E24077BD400253759 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		20AF258324633AC4000265A5 /* TradeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeVC.swift; sourceTree = "<group>"; };
 		20AF2585246375E1000265A5 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
+		20DF8F4B246F1664002754E2 /* OrderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderHandler.swift; sourceTree = "<group>"; };
 		20E924FF24494FC8002B59B1 /* CryptoData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoData.swift; sourceTree = "<group>"; };
 		20E9250524495016002B59B1 /* Data.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Data.bundle; sourceTree = "<group>"; };
 		20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVCCustomCell.swift; sourceTree = "<group>"; };
+		20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageHandler.swift; sourceTree = "<group>"; };
 		39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.debug.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.debug.xcconfig"; sourceTree = "<group>"; };
 		F98E6168701258487BA213EC /* libPods-Cryptfolio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Cryptfolio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -105,6 +109,8 @@
 				2007D42B2464E5D200D422E6 /* Holding.swift */,
 				20E924FF24494FC8002B59B1 /* CryptoData.swift */,
 				20AF2585246375E1000265A5 /* UserDefaultKeys.swift */,
+				20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */,
+				20DF8F4B246F1664002754E2 /* OrderHandler.swift */,
 				2010F1DE23FE113C007B4343 /* Main.storyboard */,
 				20E9250524495016002B59B1 /* Data.bundle */,
 				209FB61E24077BD400253759 /* Images */,
@@ -260,6 +266,8 @@
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
 				20AF258424633AC4000265A5 /* TradeVC.swift in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
+				20DF8F4C246F1664002754E2 /* OrderHandler.swift in Sources */,
+				20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */,
 				2007D42C2464E5D200D422E6 /* Holding.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,

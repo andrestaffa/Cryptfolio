@@ -28,7 +28,7 @@ public struct Image: Codable {
 
 public class Coin : NSObject, Codable {
     public var ticker:Ticker;
-    public let image:Image;
+    public var image:Image;
     
     init(ticker:Ticker, image:Image) {
         self.ticker = ticker;
