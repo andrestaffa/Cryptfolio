@@ -9,14 +9,21 @@
 import UIKit
 import SwiftChart;
 
+protocol CellDelegate: class {
+    func didTap(_ cell: PortfolioVCCustomCell)
+}
+
 class PortfolioVCCustomCell: UITableViewCell {
 
+    weak var delegate: CellDelegate?
+    
     @IBOutlet weak var name_lbl: UILabel!
     @IBOutlet weak var crypto_img: UIImageView!
     @IBOutlet weak var price_lbl: UILabel!
     @IBOutlet weak var percentChange_lbl: UILabel!
     @IBOutlet weak var amountCost_lbl: UILabel!
     @IBOutlet weak var amountCoin_lbl: UILabel!
+    @IBOutlet weak var add_btn: UIButton!
     
     
     override func awakeFromNib() {
@@ -29,5 +36,7 @@ class PortfolioVCCustomCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
+    
+    @IBAction func addHoldingButtonPressed(_ sender: Any) { delegate?.didTap(self); }
+    
 }

@@ -22,9 +22,11 @@ class TradeVC: UIViewController {
     
     // Public member variables
     public var ticker:Ticker?;
+    public var portfolioVC:PortfolioVC?;
     
     // Private member variables
     private var holdings = Array<Holding>();
+    private var availPressed:Bool = false;
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
@@ -84,6 +86,7 @@ class TradeVC: UIViewController {
         if (currentFunds != nil) {
             let result = currentFunds! / self.ticker!.price;
             self.amount_txt.text = "\(result)"
+            self.availPressed = true;
             self.updateInfo();
         }
     }
@@ -160,13 +163,18 @@ class TradeVC: UIViewController {
     }
     
     @IBAction func buyPressed(_ sender: Any) {
+        self.vibrate(style: .light);
         
         // get the amount of coin being bought
-        
         let doubleAmount = Double(self.amount_txt.text!);
         if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0)) {
             incorrectInputLayout()
             return;
+        }
+        
+        var funds:Double = 0.0
+        if let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double {
+            funds = currentFunds;
         }
         
 //        var tempCost = self.cost_lbl.text!;
@@ -179,9 +187,17 @@ class TradeVC: UIViewController {
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
+//                    if (self.availPressed) {
+//                        doubleAmount = funds / ticker!.price;
+//                    }
                     let result = doubleAmount! * ticker!.price;
                     if (OrderHandler.buy(amountCost: result, amountOfCoin: doubleAmount!, ticker: ticker!)) {
-                        self.dismiss(animated: true, completion: nil);
+                        self.dismiss(animated: true) {
+                            if let portVC = self.portfolioVC {
+                                portVC.loadData();
+                                portVC.tableVIew.reloadData();
+                            }
+                        };
                     }
                 }
             }
@@ -190,7 +206,7 @@ class TradeVC: UIViewController {
     }
     
     @IBAction func sellPressed(_ sender: Any) {
-        
+        self.vibrate(style: .light);
         // get the amount of coin being bought
         let doubleAmount = Double(self.amount_txt.text!);
         if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0)) {
@@ -206,7 +222,12 @@ class TradeVC: UIViewController {
                 } else {
                     let amountCost = doubleAmount! * ticker!.price;
                     if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: doubleAmount!, ticker: ticker!)) {
-                        self.dismiss(animated: true, completion: nil);
+                        self.dismiss(animated: true) {
+                            if let portVC = self.portfolioVC {
+                                portVC.loadData();
+                                portVC.tableVIew.reloadData();
+                            }
+                        };
                     }
                 }
             }
@@ -220,6 +241,12 @@ class TradeVC: UIViewController {
         let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
         alert.addAction(defaultButton)
         present(alert, animated: true, completion: nil);
+    }
+    
+    private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
+        impactFeedbackGenerator.prepare();
+        impactFeedbackGenerator.impactOccurred();
     }
     
 }

@@ -10,7 +10,7 @@ import UIKit
 import SwiftChart;
 import SVProgressHUD;
 
-class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
+class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate {
     
     @IBOutlet weak var addCoin_btn: UIButton!
     @IBOutlet weak var welcome_lbl: UILabel!
@@ -24,17 +24,37 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     @IBOutlet weak var mainPortTimeStamp_lbl: UILabel!
     @IBOutlet weak var mainPortPercentChange_lbl: UILabel!
     @IBOutlet weak var mainPort_img: UIImageView!
+    @IBOutlet weak var nameCol_btn: UIButton!
+    @IBOutlet weak var priceCol_btn: UIButton!
+    @IBOutlet weak var holdingCol_btn: UIButton!
+    @IBOutlet weak var nameCol_img: UIImageView!
+    @IBOutlet weak var priceCol_img: UIImageView!
+    @IBOutlet weak var holdingCol_img: UIImageView!
     
     
     private var coins = Array<Coin>();
+    
     private var isLoading:Bool = true;
     private var priceDifference:Double = 0.0;
     private var portPercentChange:Double = 0.0;
     private static var counter = 0;
+    private static var indexOptionName = 0;
+    private static var indexOptionsPrice = 0;
+    private static var indexOptionsHolding = 0;
+    
+
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.tabBarController?.tabBar.isHidden = false;
+        
+        PortfolioVC.indexOptionName = 0;
+        PortfolioVC.indexOptionsPrice = 0;
+        PortfolioVC.indexOptionsHolding = 0;
+        
+        self.nameCol_img.image = #imageLiteral(resourceName: "normal")
+        self.priceCol_img.image = #imageLiteral(resourceName: "normal");
+        self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
         
         self.updateCells();
         self.loadData();
@@ -44,19 +64,29 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.tabBarController?.tabBar.isHidden = false;
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
 
+        PortfolioVC.indexOptionName = 0;
+        PortfolioVC.indexOptionsPrice = 0;
+        PortfolioVC.indexOptionsHolding = 0;
+        
+        self.nameCol_img.image = #imageLiteral(resourceName: "normal");
+        self.priceCol_img.image = #imageLiteral(resourceName: "normal");
+        self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
+        
         // style buttons
         let rightBarItems:[UIBarButtonItem] = [UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addTapped)), self.editButtonItem];
         for rightBarItem in rightBarItems {
             rightBarItem.tintColor = UIColor.orange;
         }
+        let leftBarItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(goToHoldingsVC));
+        leftBarItem.tintColor = .orange;
         self.navigationController?.navigationBar.tintColor = UIColor.orange;
         self.navigationItem.rightBarButtonItems = rightBarItems;
+        self.navigationItem.leftBarButtonItem = leftBarItem;
         
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
@@ -69,7 +99,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         self.mainPortPercentChange_lbl.isUserInteractionEnabled = true;
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
         self.mainPortPercentChange_lbl.addGestureRecognizer(mainPortPercentTap);
-        
     
         self.title = "Dashboard";
         
@@ -77,7 +106,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         
     }
     
-    private func updateCells() -> Void {
+    public func updateCells() -> Void {
         if (!self.isLoading) {
             self.isLoading = true;
         }
@@ -112,7 +141,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         }
     }
     
-    private func loadData() -> Void {
+    public func loadData() -> Void {
         //writeCoinArray();
         
         // load in available funds
@@ -214,7 +243,137 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc private func mainPortTapped() -> Void {
-        print("go to mainPortFolioVC")
+        print("go to mainPortFolioVC");
+    }
+    
+    @IBAction func nameColButtonPressed(_ sender: Any) {
+        self.vibrate(style: .light);
+        if (self.isLoading) { return; }
+        self.toggleNameFilter();
+        self.tableVIew.reloadData();
+    }
+    @IBAction func priceColButtonPressed(_ sender: Any) {
+        self.vibrate(style: .light);
+        if (self.isLoading) { return; }
+        self.togglePriceFilter();
+        self.tableVIew.reloadData();
+    }
+    @IBAction func holdingColPressed(_ sender: Any) {
+        self.vibrate(style: .light);
+        if (self.isLoading) { return; }
+        self.toggleHoldingFilter();
+        self.tableVIew.reloadData();
+    }
+    
+    private func toggleNameFilter() {
+        PortfolioVC.indexOptionName += 1;
+        if (PortfolioVC.indexOptionName % 4 == 0) { PortfolioVC.indexOptionName = 1; }
+        let options = [1, 2, 3, 4];
+        
+        if (options[PortfolioVC.indexOptionName] == 2) {
+            self.nameCol_img.image = #imageLiteral(resourceName: "sortUpArrow");
+            self.coins = self.coins.sorted(by: { (coin, nextCoin) -> Bool in
+                return coin.ticker.name < nextCoin.ticker.name;
+            });
+        } else if (options[PortfolioVC.indexOptionName] == 3) {
+            self.nameCol_img.image = #imageLiteral(resourceName: "sortDownArrow");
+            self.coins = self.coins.sorted(by: { (coin, nextCoin) -> Bool in
+                return coin.ticker.name > nextCoin.ticker.name;
+            });
+        } else if (options[PortfolioVC.indexOptionName] == 4) {
+            self.nameCol_img.image = #imageLiteral(resourceName: "normal");
+            if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+                self.coins = loadedCoins;
+            }
+        }
+    
+    }
+    
+    private func togglePriceFilter() {
+        PortfolioVC.indexOptionsPrice += 1;
+        if (PortfolioVC.indexOptionsPrice % 4 == 0) { PortfolioVC.indexOptionsPrice = 1; }
+        let options = [1, 2, 3, 4];
+        
+        if (options[PortfolioVC.indexOptionsPrice] == 2) {
+            self.priceCol_img.image = #imageLiteral(resourceName: "sortUpArrow");
+            self.coins = self.coins.sorted(by: { (coin, nextCoin) -> Bool in
+                return coin.ticker.price > nextCoin.ticker.price;
+            });
+        } else if (options[PortfolioVC.indexOptionsPrice] == 3) {
+            self.priceCol_img.image = #imageLiteral(resourceName: "sortDownArrow");
+            self.coins = self.coins.sorted(by: { (coin, nextCoin) -> Bool in
+                return coin.ticker.price < nextCoin.ticker.price;
+            });
+        } else if (options[PortfolioVC.indexOptionsPrice] == 4) {
+            self.priceCol_img.image = #imageLiteral(resourceName: "normal");
+            if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+                self.coins = loadedCoins;
+            }
+        }
+    }
+    
+    private func toggleHoldingFilter() {
+        PortfolioVC.indexOptionsHolding += 1;
+        if (PortfolioVC.indexOptionsHolding % 4 == 0) { PortfolioVC.indexOptionsHolding = 1; }
+        let options = [1, 2, 3, 4];
+        
+        if(options[PortfolioVC.indexOptionsHolding] == 2) {
+            self.holdingCol_img.image = #imageLiteral(resourceName: "sortUpArrow")
+            self.sortHoldingUp();
+        } else if (options[PortfolioVC.indexOptionsHolding] == 3) {
+            self.holdingCol_img.image = #imageLiteral(resourceName: "sortDownArrow")
+            self.sortHoldingDown();
+        } else if (options[PortfolioVC.indexOptionsHolding] == 4) {
+            self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
+            if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+                self.coins = loadedCoins;
+            }
+        }
+    }
+    
+    private func sortHoldingUp() {
+        var index = 0;
+        if var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            loadedHoldings = loadedHoldings.sorted(by: { (holding, nextHolding) -> Bool in
+                return holding.amountOfCoin > nextHolding.amountOfCoin
+            })
+            for holding in loadedHoldings {
+                self.coins.removeAll { (coin) -> Bool in
+                    return holding.ticker.name == coin.ticker.name;
+                }
+            }
+            for holding in loadedHoldings {
+                if (!self.coins.contains(where: { (coin) -> Bool in
+                    return holding.ticker.name == coin.ticker.name;
+                })) {
+                    self.coins.insert(Coin(ticker: holding.ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holding.ticker.symbol.lowercased())" + ".png")!)), at: index)
+                    index += 1;
+                }
+            }
+        }
+    }
+    
+    private func sortHoldingDown() {
+        if var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            loadedHolding = loadedHolding.sorted(by: { (holding, nextHolding) -> Bool in
+                return holding.amountOfCoin < nextHolding.amountOfCoin;
+            })
+            for holding in loadedHolding {
+                self.coins.removeAll { (coin) -> Bool in
+                    return holding.ticker.name == coin.ticker.name;
+                }
+            }
+            for holding in loadedHolding {
+                var index = self.coins.count;
+                if (!self.coins.contains(where: { (coin) -> Bool in
+                    return holding.ticker.name == coin.ticker.name
+                })) {
+                    self.coins.insert(Coin(ticker: holding.ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holding.ticker.symbol.lowercased())" + ".png")!)), at: index)
+                    index -= 1;
+                }
+            }
+            
+        }
     }
     
     @objc private func goToHoldingsVC() -> Void {
@@ -222,9 +381,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     }
     
     @objc private func mainPortPercentTapped() -> Void {
-        let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light);
-        impactFeedbackgenerator.prepare()
-        impactFeedbackgenerator.impactOccurred()
+        self.vibrate(style: .light);
         PortfolioVC.counter += 1;
         if (PortfolioVC.counter % 2 != 0) {
             if (String(self.portPercentChange).first != "-") {
@@ -260,10 +417,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     
     // MARK: - Buy/Sell methods
     
-    private func quickBuy(indexPathRow:Int) -> Void {
+    private func quickBuy(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
+        self.vibrate(style: .light);
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (currentFunds != nil) {
-            CryptoData.getCoinData(id: self.coins[indexPathRow].ticker.id) { (ticker, error) in
+            CryptoData.getCoinData(id: coinSet[indexPathRow].ticker.id) { (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
@@ -282,11 +440,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         }
     }
     
-    private func quickSell(indexPathRow:Int) -> Void {
+    private func quickSell(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
+        self.vibrate(style: .light);
         var currentHoldings:Holding?
         let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
         for holding in loadedHoldings! {
-            if (holding.ticker.name == self.coins[indexPathRow].ticker.name) {
+            if (holding.ticker.name == coinSet[indexPathRow].ticker.name) {
                 currentHoldings = holding;
                 break;
             }
@@ -316,7 +475,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
         let movedCoin = self.coins.remove(at: sourceIndexPath.row);
         self.coins.insert(movedCoin, at: destinationIndexPath.row);
-        writeCoinArray();
+        self.writeCoinArray()
         tableView.reloadData();
     }
     
@@ -335,11 +494,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             }
             self.hideViews(hidden: false);
             self.hideFunds(hidden: true);
+            self.hideColTitleLabels(hidden: true);
+            self.hideColTitleImages(hidden: true);
             styleButton(button: &self.addCoin_btn);
             self.mainPortPercentChange_lbl.isHidden = true;
             self.mainPortTimeStamp_lbl.isHidden = true;
             self.mainPort_img.isHidden = true;
             tableView.separatorStyle = .none;
+            tableView.backgroundView = self.multipleViews;
             return 0;
         }
         if (self.isLoading) {
@@ -354,6 +516,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             self.mainPortPercentChange_lbl.isHidden = true;
             self.mainPortTimeStamp_lbl.isHidden = true;
             self.mainPort_img.isHidden = true;
+            self.hideColTitleLabels(hidden: true);
+            self.hideColTitleImages(hidden: true);
             tableView.separatorStyle = .none;
             return 1;
         } else if (self.coins.count > 0) {
@@ -362,6 +526,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             }
             self.hideViews(hidden: true);
             self.hideFunds(hidden: false);
+            self.hideColTitleLabels(hidden: false);
+            self.hideColTitleImages(hidden: false);
             tableView.separatorStyle = .none;
             return self.coins.count;
         } else {
@@ -370,6 +536,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             }
             self.hideViews(hidden: true);
             self.hideFunds(hidden: false);
+            self.hideColTitleLabels(hidden: true);
+            self.hideColTitleImages(hidden: true);
             tableView.separatorStyle = .none;
             return 0;
         }
@@ -378,7 +546,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         // load holdings and check if the coin swiped on has any holdings, if so, then display quick sell, otherwise just display delete
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (rowAction, indexPath) in
-            self.coins.remove(at: indexPath.row);
+            self.vibrate(style: .light);
+            self.coins.remove(at: indexPath.row)
             UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinKey);
             //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
             self.writeCoinArray();
@@ -389,6 +558,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
                 self.styleButton(button: &self.addCoin_btn);
                 self.hideViews(hidden: false);
                 self.hideFunds(hidden: true);
+                self.hideColTitleLabels(hidden: true);
                 tableView.backgroundView = self.multipleViews;
                 tableView.separatorStyle = .none;
             }
@@ -396,7 +566,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             tableView.reloadData();
         }
         let quickBuyAction = UITableViewRowAction(style: .normal, title: "Quick Buy") { (rowAction, indexPath) in
-            self.quickBuy(indexPathRow: indexPath.row);
+            self.quickBuy(coinSet: self.coins, indexPathRow: indexPath.row);
         }
         quickBuyAction.backgroundColor = ChartColors.greenColor();
         if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
@@ -404,7 +574,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
                 if (holding.ticker.name == self.coins[indexPath.row].ticker.name) {
                     if (!holding.amountOfCoin.isLessThanOrEqualTo(0.0)) {
                         let quickSellAction = UITableViewRowAction(style: .destructive, title: "Quick Sell") { (rowAction, indexPath) in
-                            self.quickSell(indexPathRow: indexPath.row);
+                            self.quickSell(coinSet: self.coins, indexPathRow: indexPath.row);
                         }
                         return [quickSellAction, quickBuyAction];
                     } else {
@@ -420,8 +590,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! PortfolioVCCustomCell;
+        cell.delegate = self;
         if (self.isLoading) {
+            if (self.traitCollection.userInterfaceStyle == .dark) { SVProgressHUD.setDefaultStyle(.dark); }
             SVProgressHUD.show(withStatus: "Loading...");
+            cell.add_btn.isHidden = true;
             cell.crypto_img.isHidden = true;
             cell.name_lbl.text = "";
             cell.price_lbl.text = "";
@@ -429,49 +602,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
             cell.amountCost_lbl.text = "";
             cell.amountCoin_lbl.text = "";
         } else {
-            cell.crypto_img.isHidden = false;
-            SVProgressHUD.dismiss();
-            // basic stuff
-            cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
-            cell.crypto_img.image = self.coins[indexPath.row].image.getImage()!;
-            
-            // format price
-            let theoPriceString = String(format: "%.2f", self.coins[indexPath.row].ticker.price);
-            //self.appendZero(string: &theoPriceString);
-            cell.price_lbl.text = "$\(theoPriceString)";
-            
-            // format percent change
-            if (String(self.coins[indexPath.row].ticker.changePrecent24H).first != "-") {
-                if (self.traitCollection.userInterfaceStyle == .dark) {
-                    cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
-                } else {
-                    cell.percentChange_lbl.textColor = ChartColors.greenColor();
-                }
-                let theoPercentString = String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H);
-                //self.appendZero(string: &theoPercentString);
-                cell.percentChange_lbl.text = "+\(theoPercentString)%"
-            } else {
-                cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
-                let theoPercentString = String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H);
-                //self.appendZero(string: &theoPercentString);
-                cell.percentChange_lbl.text = "\(theoPercentString)%"
-            }
-            
-            // format holdings
-            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
-                for holding in loadedHoldings {
-                    if (holding.ticker.name == self.coins[indexPath.row].ticker.name) {
-                        holding.estCost = holding.amountOfCoin * self.coins[indexPath.row].ticker.price;
-                        cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
-                        cell.amountCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))";
-                    }
-                }
-            } else {
-                cell.amountCost_lbl.text = "$0.00";
-                cell.amountCoin_lbl.text = "0.00";
-            }
-            //cell.layer.cornerRadius = 10.0;
-            //cell.backgroundColor = UIColor.init(red: 2/255, green: 7/255, blue: 93/255, alpha: 0.5)
+            self.displayCellData(cell: cell, coinSet: self.coins, indexPath: indexPath);
         }
         return cell;
     }
@@ -484,21 +615,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         self.navigationController?.pushViewController(infoVC, animated: true);
     }
     
-    // MARK: - Helper method for appending zeros to numbers
-    
-    private func appendZero(string:inout String) {
-        if (string.last == "0" || string.last == "1" || string.last == "2" || string.last == "3" || string.last == "4" || string == "5" ||
-            string.last == "6" || string.last == "7" || string.last == "8" || string.last == "9") {
-            string += "0";
-        }
-    }
-    
     // MARK: - Button Methods
     
     @IBAction func pressAddCoinBtn(_ sender: Any) {
         let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
         homeTBVC.isAdding = true;
         self.navigationController?.pushViewController(homeTBVC, animated: true);
+    }
+    
+    func didTap(_ cell: PortfolioVCCustomCell) {
+        self.vibrate(style: .light);
+        let indexPath = self.tableVIew.indexPath(for: cell);
+        let tradeVC = self.storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
+        tradeVC.ticker = self.coins[indexPath!.row].ticker;
+        tradeVC.portfolioVC = self;
+        self.present(tradeVC, animated: true, completion: nil);
     }
     
     
@@ -510,6 +641,84 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         button.layer.shadowOpacity = 1.0
         button.backgroundColor = UIColor.orange;
     }
+    
+    private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {
+        button.layer.cornerRadius = 12.0
+        button.layer.masksToBounds = true
+        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+        button.layer.shadowOpacity = 1.0
+        button.layer.borderWidth = 1;
+        button.layer.borderColor = borderColor;
+    }
+    
+    // MARK: - Display Cell Data
+    
+    private func displayCellData(cell:PortfolioVCCustomCell, coinSet:Array<Coin>, indexPath:IndexPath) -> Void {
+        cell.amountCoin_lbl.text = "";
+        cell.amountCost_lbl.text = "";
+        if (indexPath.row >= 9) {
+            cell.amountCost_lbl.text = ""
+            cell.amountCoin_lbl.text = "";
+        }
+        cell.add_btn.isHidden = false;
+        self.styleButton(button: &cell.add_btn, borderColor: UIColor.orange.cgColor);
+        cell.crypto_img.isHidden = false;
+        SVProgressHUD.dismiss();
+        // basic stuff
+        cell.name_lbl.text = coinSet[indexPath.row].ticker.name;
+        cell.crypto_img.image = coinSet[indexPath.row].image.getImage()!;
+        
+        // format price
+        let theoPriceString = String(format: "%.2f", coinSet[indexPath.row].ticker.price);
+        //self.appendZero(string: &theoPriceString);
+        cell.price_lbl.text = "$\(theoPriceString)";
+        
+        // format percent change
+        if (String(coinSet[indexPath.row].ticker.changePrecent24H).first != "-") {
+            if (self.traitCollection.userInterfaceStyle == .dark) {
+                cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
+            } else {
+                cell.percentChange_lbl.textColor = ChartColors.greenColor();
+            }
+            let theoPercentString = String(format: "%.2f", coinSet[indexPath.row].ticker.changePrecent24H);
+            //self.appendZero(string: &theoPercentString);
+            cell.percentChange_lbl.text = "+\(theoPercentString)%"
+        } else {
+            cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
+            let theoPercentString = String(format: "%.2f", coinSet[indexPath.row].ticker.changePrecent24H);
+            //self.appendZero(string: &theoPercentString);
+            cell.percentChange_lbl.text = "\(theoPercentString)%"
+        }
+        
+        // format holdings
+        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            for holding in loadedHoldings {
+                if (holding.ticker.name == coinSet[indexPath.row].ticker.name) {
+                    if (!holding.amountOfCoin.isLessThanOrEqualTo(0.0)) {
+                        cell.add_btn.isHidden = true;
+                    }
+                    if (holding.amountOfCoin.isLessThanOrEqualTo(0.00)) {
+                        cell.amountCost_lbl.text = "";
+                        cell.amountCoin_lbl.text = "";
+                    } else {
+                        holding.estCost = holding.amountOfCoin * coinSet[indexPath.row].ticker.price;
+                        cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
+                        cell.amountCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))";
+                    }
+                }
+            }
+        } else {
+            cell.amountCost_lbl.text = "";
+            cell.amountCoin_lbl.text = "";
+            cell.add_btn.isHidden = false;
+            self.styleButton(button: &cell.add_btn, borderColor: UIColor.orange.cgColor);
+        }
+        //cell.layer.cornerRadius = 10.0;
+        //cell.backgroundColor = UIColor.init(red: 2/255, green: 7/255, blue: 93/255, alpha: 0.5)
+    }
+    
+    
     
     // MARK: - Hide all views
     
@@ -525,6 +734,24 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource 
         self.availableFunds_lbl.isHidden = hidden;
         self.mainPortfolioStatic_lbl.isHidden = hidden;
         self.mainPortfolio_lbl.isHidden = hidden;
+    }
+    
+    private func hideColTitleLabels(hidden:Bool) -> Void {
+        self.nameCol_btn.isHidden = hidden;
+        self.priceCol_btn.isHidden = hidden;
+        self.holdingCol_btn.isHidden = hidden;
+    }
+    
+    private func hideColTitleImages(hidden:Bool) -> Void {
+        self.nameCol_img.isHidden = hidden;
+        self.priceCol_img.isHidden = hidden;
+        self.holdingCol_img.isHidden = hidden;
+    }
+    
+    private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
+        impactFeedbackGenerator.prepare();
+        impactFeedbackGenerator.impactOccurred();
     }
 
 }
