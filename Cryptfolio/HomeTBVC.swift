@@ -14,7 +14,6 @@ class HomeTBVC: UITableViewController {
     // Private member vairables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
-    private var indexArray = [Int]();
     private var loading = true;
     private var maxCoins = 20;
     private var counter = 0;

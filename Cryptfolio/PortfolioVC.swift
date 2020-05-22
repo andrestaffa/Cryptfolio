@@ -127,6 +127,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         for coin in self.coins {
             CryptoData.getCoinData(id: coin.ticker.id) { (ticker, error) in
                 if let error = error {
+                    print(error.localizedDescription);
                     print("no internet")
                     return;
                 } else {
@@ -173,7 +174,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 for index in 0...loadedHolding.count - 1 {
                     CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { (ticker, error) in
                         if let error = error {
+                            print(error.localizedDescription);
                             print("no internet");
+                            return;
                         } else {
                             print("bad 2");
                             // update estCost

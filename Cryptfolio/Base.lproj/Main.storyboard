@@ -22,6 +22,7 @@
                     <connections>
                         <segue destination="ZaF-at-ypZ" kind="relationship" relationship="viewControllers" id="1ow-9I-1GV"/>
                         <segue destination="pK8-YX-pCF" kind="relationship" relationship="viewControllers" id="u8n-2I-Ln6"/>
+                        <segue destination="TSA-hb-8ts" kind="relationship" relationship="viewControllers" id="H5Q-6v-N4H"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tpN-C2-Lhi" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -113,7 +114,7 @@
             <objects>
                 <viewController storyboardIdentifier="infoVC" id="7zZ-kP-2e7" customClass="InfoVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9mr-4h-rQf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="1000"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ICm-2U-St7">
@@ -1177,6 +1178,69 @@
             </objects>
             <point key="canvasLocation" x="1204" y="94.902548725637189"/>
         </scene>
+        <!--NewsTBVC-->
+        <scene sceneID="jPX-Zi-hdt">
+            <objects>
+                <tableViewController storyboardIdentifier="newsTBVC" id="SHr-3l-JE7" customClass="NewsTBVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="5pn-Ea-PaN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="cell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" rowHeight="89" id="D2f-gQ-wR8" customClass="NewsTBVCCustomCell" customModule="Cryptfolio" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="28" width="375" height="89"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="D2f-gQ-wR8" id="RHI-AN-e8B">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="89"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="MRNA Stock Up 2.69%, Is Coronavirus Vaccine Just Tip of the Iceberg for Moderna?" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RIq-Pz-01Z">
+                                            <rect key="frame" x="10" y="0.0" width="343" height="59"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="59" id="Mtk-hH-epU"/>
+                                            </constraints>
+                                            <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="15"/>
+                                            <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        </textView>
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CoinTelegraph - 59 minutes ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzK-ia-urz">
+                                            <rect key="frame" x="16" y="67" width="343" height="16"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" constant="16" id="8B0-Rh-rJF"/>
+                                                <constraint firstAttribute="width" constant="343" id="sea-wY-nWz"/>
+                                            </constraints>
+                                            <fontDescription key="fontDescription" type="system" pointSize="13"/>
+                                            <color key="textColor" white="0.66666666669999997" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="RIq-Pz-01Z" firstAttribute="leading" secondItem="RHI-AN-e8B" secondAttribute="leadingMargin" constant="-6" id="3GF-JK-o4u"/>
+                                        <constraint firstItem="wzK-ia-urz" firstAttribute="bottom" secondItem="RHI-AN-e8B" secondAttribute="bottomMargin" constant="5" id="IwF-Ml-zhI"/>
+                                        <constraint firstAttribute="trailing" secondItem="RIq-Pz-01Z" secondAttribute="trailing" constant="22" id="MXu-mz-f1p"/>
+                                        <constraint firstItem="wzK-ia-urz" firstAttribute="top" secondItem="RIq-Pz-01Z" secondAttribute="bottom" constant="8" id="cwJ-X6-2Jn"/>
+                                        <constraint firstAttribute="trailingMargin" secondItem="RIq-Pz-01Z" secondAttribute="trailing" constant="6" id="hpl-dv-2uq"/>
+                                        <constraint firstItem="RIq-Pz-01Z" firstAttribute="top" secondItem="RHI-AN-e8B" secondAttribute="topMargin" constant="-11" id="nWH-zm-rBI"/>
+                                        <constraint firstItem="wzK-ia-urz" firstAttribute="leading" secondItem="RHI-AN-e8B" secondAttribute="leadingMargin" id="yYv-kF-edH"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="source_lbl" destination="wzK-ia-urz" id="sg3-Qu-GUP"/>
+                                    <outlet property="title_lbl" destination="RIq-Pz-01Z" id="gHO-au-wQT"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="SHr-3l-JE7" id="8ip-7l-JIJ"/>
+                            <outlet property="delegate" destination="SHr-3l-JE7" id="Md2-Y9-LdE"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" id="Iq4-yE-aB1"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="sSf-JN-w9I" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2821.5999999999999" y="95.802098950524751"/>
+        </scene>
         <!--Add FundsVC-->
         <scene sceneID="2F3-69-8nj">
             <objects>
@@ -1393,11 +1457,31 @@
             </objects>
             <point key="canvasLocation" x="1204" y="762.36881559220399"/>
         </scene>
+        <!--News-->
+        <scene sceneID="4ei-Vn-DDU">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="TSA-hb-8ts" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="News" image="news" id="lf1-Pc-aLV"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="uYX-5I-iXU">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="SHr-3l-JE7" kind="relationship" relationship="rootViewController" id="JaJ-E6-eAc"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="heF-A2-DOq" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2025" y="95"/>
+        </scene>
     </scenes>
     <resources>
         <image name="circle.png" width="400" height="400"/>
         <image name="dashboardIcon" width="25" height="25"/>
         <image name="exploreIcon" width="25" height="25"/>
+        <image name="news" width="25" height="25"/>
         <namedColor name="Color">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>

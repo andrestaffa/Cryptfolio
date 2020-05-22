@@ -439,9 +439,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
         dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
         dateFormatter.timeZone = .current
+        dateFormatter.dateFormat = "MMM d, yyyy";
         let localDate = dateFormatter.string(from: date)
-        let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
-        return String(localDate[r]);
+        //let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
+        return localDate;
     }
     
 

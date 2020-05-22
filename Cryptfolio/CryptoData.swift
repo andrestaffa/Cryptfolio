@@ -25,6 +25,13 @@ public struct Ticker : Codable {
     let history24h:[Double]
 }
 
+public struct News : Codable {
+    let title:String;
+    let source:String;
+    let publishedOn:Double;
+    let url:String;
+}
+
 public class CryptoData {
     
 //    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
@@ -60,6 +67,31 @@ public class CryptoData {
 //             }
 //         }
 //     }
+    
+    public static func getNewsData(completion:@escaping (News?, Error?) -> Void) -> Void {
+        let url = URL(string: "https://min-api.cryptocompare.com/data/v2/news/?lang=EN");
+        if (url == nil) {
+            print("url was nil");
+            return;
+        }
+        AF.request(url!).responseJSON { (response) in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                let data = jsonObject["Data"] as! [Dictionary<String, Any>];
+                for index in 0...data.count - 1 {
+                    let title = data[index]["title"] as! String;
+                    let sourceInfo:Dictionary = data[index]["source_info"] as! Dictionary<String, Any>;
+                    let source = sourceInfo["name"] as! String;
+                    let publishedOn = data[index]["published_on"] as! Double;
+                    let urlString = data[index]["url"] as! String;
+                    let news = News(title: title, source: source, publishedOn: publishedOn, url: urlString);
+                    completion(news, nil);
+                }
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
     
     public static func getCoinData(id: Int, completion:@escaping (Ticker?, Error?) -> Void) -> Void {
         let url = URL(string: "https://api.coinranking.com/v1/public/coin/" + "\(id)");

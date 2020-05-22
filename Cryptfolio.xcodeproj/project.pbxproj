@@ -15,6 +15,8 @@
 		2010F1E823FE113D007B4343 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 2010F1E623FE113D007B4343 /* LaunchScreen.storyboard */; };
 		2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F123FE1202007B4343 /* HomeTBVC.swift */; };
 		2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F323FE1240007B4343 /* CustomCell.swift */; };
+		2035B58524784F6100626463 /* NewsTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B58424784F6100626463 /* NewsTBVC.swift */; };
+		2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */; };
 		2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */; };
 		204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */; };
 		2053C4CF245F851B00A04769 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2053C4CE245F851B00A04769 /* Coin.swift */; };
@@ -45,6 +47,8 @@
 		2010F1F323FE1240007B4343 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		202A15892404EA5E003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		202A15902404EA93003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2035B58424784F6100626463 /* NewsTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVC.swift; sourceTree = "<group>"; };
+		2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVCCustomCell.swift; sourceTree = "<group>"; };
 		2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVCCustomCell.swift; sourceTree = "<group>"; };
 		204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVC.swift; sourceTree = "<group>"; };
 		2053C4CE245F851B00A04769 /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
@@ -102,9 +106,11 @@
 				204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */,
 				20AF258324633AC4000265A5 /* TradeVC.swift */,
 				208A2F5424649382004D2B39 /* AddFundsVC.swift */,
+				2035B58424784F6100626463 /* NewsTBVC.swift */,
 				2010F1F323FE1240007B4343 /* CustomCell.swift */,
 				20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */,
 				2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */,
+				2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */,
 				2053C4CE245F851B00A04769 /* Coin.swift */,
 				2007D42B2464E5D200D422E6 /* Holding.swift */,
 				20E924FF24494FC8002B59B1 /* CryptoData.swift */,
@@ -263,6 +269,7 @@
 				2053C4CF245F851B00A04769 /* Coin.swift in Sources */,
 				20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */,
 				208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */,
+				2035B58524784F6100626463 /* NewsTBVC.swift in Sources */,
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
 				20AF258424633AC4000265A5 /* TradeVC.swift in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
@@ -270,6 +277,7 @@
 				20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */,
 				2007D42C2464E5D200D422E6 /* Holding.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
+				2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
 				20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */,
 				2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */,
