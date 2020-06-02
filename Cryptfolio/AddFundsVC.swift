@@ -54,9 +54,6 @@ class AddFundsVC: UIViewController {
     
     
     @IBAction func otherPressed(_ sender: Any) {
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.availableFundsKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.holdingsKey);
         self.navigationController?.popViewController(animated: true);
     }
     

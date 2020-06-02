@@ -338,7 +338,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         var index = 0;
         if var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             loadedHoldings = loadedHoldings.sorted(by: { (holding, nextHolding) -> Bool in
-                return holding.amountOfCoin > nextHolding.amountOfCoin
+                return holding.estCost > nextHolding.estCost
             })
             for holding in loadedHoldings {
                 self.coins.removeAll { (coin) -> Bool in
@@ -359,7 +359,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private func sortHoldingDown() {
         if var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             loadedHolding = loadedHolding.sorted(by: { (holding, nextHolding) -> Bool in
-                return holding.amountOfCoin < nextHolding.amountOfCoin;
+                return holding.estCost < nextHolding.estCost;
             })
             for holding in loadedHolding {
                 self.coins.removeAll { (coin) -> Bool in

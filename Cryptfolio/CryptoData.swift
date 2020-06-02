@@ -176,7 +176,7 @@ public class CryptoData {
         }
     }
     
-    private static func readTextToArray(path:String) -> Array<String>? {
+    public static func readTextToArray(path:String) -> Array<String>? {
         var arrayOfStrings: Array<String>?
         do {
             // This solution assumes  you've got the file in your bundle
@@ -184,9 +184,9 @@ public class CryptoData {
                 let data = try String(contentsOfFile:path, encoding: String.Encoding.utf8);
                 arrayOfStrings = data.components(separatedBy: "\n");
                 arrayOfStrings!.remove(at: arrayOfStrings!.count - 1);
-                for index in 0...arrayOfStrings!.count - 1 {
-                    arrayOfStrings![index].removeLast();
-                }
+//                for index in 0...arrayOfStrings!.count - 1 {
+//                    arrayOfStrings![index].removeLast();
+//                }
                 return arrayOfStrings;
             }
         } catch let err as NSError {
