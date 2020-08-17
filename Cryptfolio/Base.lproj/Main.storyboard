@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="15705" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="15706"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -115,7 +115,7 @@
             <objects>
                 <viewController storyboardIdentifier="infoVC" id="7zZ-kP-2e7" customClass="InfoVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9mr-4h-rQf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="1000"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ICm-2U-St7">
@@ -499,7 +499,7 @@
                                             <constraint firstItem="yYH-bm-32q" firstAttribute="leading" secondItem="fZr-Uq-RAr" secondAttribute="trailing" constant="2" id="jLk-ac-Qby"/>
                                             <constraint firstItem="m47-TT-wMj" firstAttribute="centerY" secondItem="sIy-J6-1ES" secondAttribute="centerY" id="jgh-KA-gUc"/>
                                             <constraint firstItem="fZr-Uq-RAr" firstAttribute="leading" secondItem="4hZ-4i-Z0l" secondAttribute="trailing" constant="3.5" id="jwT-gq-HZU"/>
-                                            <constraint firstItem="zh0-bt-y64" firstAttribute="top" secondItem="uuz-3J-EaS" secondAttribute="bottom" constant="15.5" id="kDV-dG-B72"/>
+                                            <constraint firstItem="zh0-bt-y64" firstAttribute="top" secondItem="uuz-3J-EaS" secondAttribute="bottom" constant="5" id="kDV-dG-B72"/>
                                             <constraint firstItem="2oK-Yn-3wh" firstAttribute="trailing" secondItem="yYH-bm-32q" secondAttribute="trailing" id="kGf-mI-7Ui"/>
                                             <constraint firstItem="bvs-9s-xm9" firstAttribute="top" secondItem="QDH-iL-wGg" secondAttribute="bottom" constant="120" id="kWK-CS-GpE"/>
                                             <constraint firstItem="5YK-IG-ulE" firstAttribute="leading" secondItem="uuz-3J-EaS" secondAttribute="trailing" constant="3.5" id="lX3-Ci-t1k"/>
@@ -1035,10 +1035,10 @@
                                     <constraint firstAttribute="width" constant="10" id="WPG-e3-fOA"/>
                                 </constraints>
                             </imageView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="24HR" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zd2-FI-yvc">
-                                <rect key="frame" x="328" y="116" width="31" height="15"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Change" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Zd2-FI-yvc">
+                                <rect key="frame" x="315" y="116" width="44" height="15"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="31" id="igH-1y-kvy"/>
+                                    <constraint firstAttribute="width" constant="44" id="igH-1y-kvy"/>
                                     <constraint firstAttribute="height" constant="15" id="lRm-Dv-HhP"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-UltraLight" family="Helvetica Neue" pointSize="13"/>
@@ -1295,7 +1295,7 @@
                                     <constraint firstAttribute="width" constant="343" id="jCr-ZK-Ago"/>
                                     <constraint firstAttribute="height" constant="545" id="sdh-xC-pBM"/>
                                 </constraints>
-                                <mutableString key="text">Cryptfolio is an application where you can view, analyze, and practice trade 50+ different cryptocurrency 
+                                <string key="text">Cryptfolio is an application where you can view, analyze, and practice trade 50+ different cryptocurrency 
 with a press of a button. You initially start with an up-front investment of $10,000 and can buy any cryptocurrency
 of your choice and play the markets, you can see your portfolio grow or decay depending on what cryptocurrencies are in your
 holdings. The Dashboard is where the you can view your "available funds" (how much USD you have) and your "main portfolio" 
@@ -1307,7 +1307,7 @@ of cryptocurrencies, you may use the information provided in the news articles t
 The Settings tab is where you can reset your portfolio back to $10,000 if you are unhappy with your current portfolio
 state. Other activities such as social, and references can be viewed if interested in.
 Lastly I want to give a special thanks to all the users who chose my app, this is my first app and I really
-appreciate all the feedback from all of you as it helps me grow as a developer, Thank you.</mutableString>
+appreciate all the feedback from all of you as it helps me grow as a developer, Thank you.</string>
                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>

@@ -34,6 +34,8 @@ class HomeTBVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //let ids = CryptoData.readTextToArray(path: "Data.bundle/id");
+        
         if (self.isAdding) {
             //self.navigationController?.navigationBar.prefersLargeTitles = false;
             self.navigationItem.rightBarButtonItem = nil;
@@ -119,7 +121,7 @@ class HomeTBVC: UITableViewController {
             if (self.isFiltering) {
                 return filterCoins.count;
             } else {
-            return self.coins.count;
+                return self.coins.count;
             }
         }
     }

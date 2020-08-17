@@ -169,7 +169,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             
             // load in holdings array
             if let loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
-                var portPercentChange:Double = 0.0;
+                //var portPercentChange:Double = 0.0;
                 var updatedMainPortfolio:Double = 0.0;
                 for index in 0...loadedHolding.count - 1 {
                     CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { (ticker, error) in
@@ -183,13 +183,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                             loadedHolding[index].estCost = loadedHolding[index].amountOfCoin * ticker!.price;
                             updatedMainPortfolio += loadedHolding[index].estCost;
                             
-                            let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
-                            portPercentChange += (priceDifference / loadedHolding[index].ticker.price) / Double(loadedHolding.count);
-                            let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
-                            self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
+//                            let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
+//                            portPercentChange += (priceDifference / loadedHolding[index].ticker.price) / Double(loadedHolding.count);
+//                            let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
+//                            self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
                             
-                            print("Price Difference: \(priceDifference)");
-                            print("Portfolio Percent Change: \(portPercentChange)")
+                            self.priceDifference = updatedMainPortfolio - 10000;
+                            self.portPercentChange = (self.priceDifference / 10000);
+                            
+                            print("Price Difference: \(self.priceDifference)");
+                            print("Portfolio Percent Change: \(self.portPercentChange)")
                             print("Bought at price: \(loadedHolding[index].ticker.price)");
                             print("Bought at percent change at: \(loadedHolding[index].ticker.changePrecent24H)")
                             var tempUpChange = String(format: "%.2f", updatedMainPortfolio);
@@ -208,22 +211,22 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 self.mainPortTimeStamp_lbl.isHidden = false;
                                 self.mainPort_img.isHidden = false;
                             }
-                            if (String(portPercentChange).first == "-" && !portPercentChange.isZero) {
+                            if (String(self.portPercentChange).first == "-" && !self.portPercentChange.isZero) {
                                 self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightRed.png");
                                 self.mainPortPercentChange_lbl.textColor = ChartColors.darkRedColor();
-                                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", portPercentChange * 100))%"
-                                self.portPercentChange = portPercentChange;
+                                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", self.portPercentChange * 100))%"
+                               // self.portPercentChange = self.portPercentChange;
                             } else {
                                 self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightGreen.png");
-                                var mainPortPercentString = String(portPercentChange);
-                                if (mainPortPercentString.first == "-") { mainPortPercentString.removeFirst(); portPercentChange = Double(mainPortPercentString)! }
-                                self.portPercentChange = portPercentChange;
+                                var mainPortPercentString = String(self.portPercentChange);
+                                if (mainPortPercentString.first == "-") { mainPortPercentString.removeFirst(); self.portPercentChange = Double(mainPortPercentString)! }
+                                //self.portPercentChange = self.portPercentChange;
                                 if (self.traitCollection.userInterfaceStyle == .dark) {
                                     self.mainPortPercentChange_lbl.textColor = ChartColors.darkGreenColor();
-                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
+                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.portPercentChange * 100))%"
                                 } else {
                                     self.mainPortPercentChange_lbl.textColor = ChartColors.greenColor();
-                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", portPercentChange * 100))%"
+                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.portPercentChange * 100))%"
                                 }
                             }
                         }
@@ -336,46 +339,43 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private func sortHoldingUp() {
         var index = 0;
+        var removedCoins = Array<Coin>();
         if var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             loadedHoldings = loadedHoldings.sorted(by: { (holding, nextHolding) -> Bool in
-                return holding.estCost > nextHolding.estCost
+                return holding.estCost > nextHolding.estCost;
             })
             for holding in loadedHoldings {
                 self.coins.removeAll { (coin) -> Bool in
+                    if (holding.ticker.name == coin.ticker.name) {
+                        removedCoins.append(coin);
+                    }
                     return holding.ticker.name == coin.ticker.name;
                 }
             }
-            for holding in loadedHoldings {
-                if (!self.coins.contains(where: { (coin) -> Bool in
-                    return holding.ticker.name == coin.ticker.name;
-                })) {
-                    self.coins.insert(Coin(ticker: holding.ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holding.ticker.symbol.lowercased())" + ".png")!)), at: index)
-                    index += 1;
-                }
+            for removedCoin in removedCoins {
+                self.coins.insert(removedCoin, at: index);
+                index += 1;
             }
         }
     }
     
     private func sortHoldingDown() {
+        var removedCoins = Array<Coin>();
         if var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             loadedHolding = loadedHolding.sorted(by: { (holding, nextHolding) -> Bool in
                 return holding.estCost < nextHolding.estCost;
             })
             for holding in loadedHolding {
                 self.coins.removeAll { (coin) -> Bool in
+                    if (holding.ticker.name == coin.ticker.name) {
+                        removedCoins.append(coin);
+                    }
                     return holding.ticker.name == coin.ticker.name;
                 }
             }
-            for holding in loadedHolding {
-                var index = self.coins.count;
-                if (!self.coins.contains(where: { (coin) -> Bool in
-                    return holding.ticker.name == coin.ticker.name
-                })) {
-                    self.coins.insert(Coin(ticker: holding.ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holding.ticker.symbol.lowercased())" + ".png")!)), at: index)
-                    index -= 1;
-                }
+            for removedCoin in removedCoins {
+                self.coins.append(removedCoin);
             }
-            
         }
     }
     
@@ -706,6 +706,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         cell.amountCoin_lbl.text = "";
                     } else {
                         holding.estCost = holding.amountOfCoin * coinSet[indexPath.row].ticker.price;
+                        DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
                         cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
                         cell.amountCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))";
                     }

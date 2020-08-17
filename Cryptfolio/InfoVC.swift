@@ -72,9 +72,9 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 print(error.localizedDescription);
             } else {
                 self.coin!.ticker = ticker!;
-                self.setDesciption(ticker: &self.coin!.ticker);
+                //self.setDesciption(ticker: &self.coin!.ticker);
                 self.updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
-                self.dayChart();
+                //self.dayChart();
             }
         }
         
@@ -91,13 +91,21 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.activityIndicator.hidesWhenStopped = true;
         
         if (self.isTradingMode) {
-            let imageLiteral = #imageLiteral(resourceName: "tradeIcon");
-            self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: imageLiteral, style: .plain, target: self, action: #selector(trade))
+            //let imageLiteral = #imageLiteral(resourceName: "tradeIcon");
+            //self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: imageLiteral, style: .plain, target: self, action: #selector(trade))
+            let tradeButton = UIButton();
+            tradeButton.frame = CGRect(x:0, y:0, width:80, height:20);
+            tradeButton.setTitle("Trade", for: .normal);
+            tradeButton.setTitle("Trade", for: .highlighted);
+            tradeButton.backgroundColor = UIColor.orange;
+            tradeButton.layer.cornerRadius = 8.0;
+            tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
+            let rightBarButton = UIBarButtonItem(customView: tradeButton);
+            self.navigationItem.rightBarButtonItem = rightBarButton;
         } else {
             self.navigationItem.setRightBarButton(nil, animated: true);
         }
         self.navigationController?.navigationBar.isTranslucent = true;
-        
         updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
         self.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coin!.ticker.name, imageIcon: self.coin!.image.getImage()!);
         
@@ -179,7 +187,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.allTimeHigh_lbl.text = "$\(String(format: "%.2f", ticker.allTimeHigh))";
         self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
         self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
-        self.description_view.text = ticker.description;
+        self.description_view.text = self.setGoodDescription(ticker: ticker);
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "CryptoCompare", linkName: "cryptocompare.com/coins/" + "\(ticker.symbol.lowercased())" + "/forum"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"));
@@ -201,6 +209,36 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             for view in self.views {
                 view.backgroundColor = UIColor.init(red: 105/255, green: 105/255, blue: 105/255, alpha: 1);
             }
+        }
+    }
+    
+    private func setGoodDescription(ticker:Ticker) -> String {
+        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased()) {
+            let charset = CharacterSet(charactersIn: ".")
+            let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
+            var resultString = Array<String>();
+            for i in 0...1 {
+                if (i < arr.count) {
+                    resultString.append(arr[i]);
+                }
+            }
+            //resultString.append("");
+            return resultString.joined(separator: ".");
+        } else if (ticker.name.lowercased() == "TrueUSD".lowercased()) {
+            return "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
+        } else if (ticker.name.lowercased() == "Paxos Standard".lowercased()) {
+            return "Paxos Standard (PAX) is a stablecoin that allows users to exchange US dollars for Paxos Standard Tokens to 'transact at the speed of the internet'. It aims to meld the stability of the dollar with blockchain technology. Paxos, the company behind PAX, has a charter from the New York State Department of Financial Services, which allows it to offer regulated services in the cryptoasset space.";
+        } else {
+            let charset = CharacterSet(charactersIn: ".")
+            let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
+            var resultString = Array<String>();
+            for i in 0...2 {
+                if (i < arr.count) {
+                    resultString.append(arr[i]);
+                }
+            }
+            //resultString.append("");
+            return resultString.joined(separator: ".");
         }
     }
     
@@ -516,22 +554,36 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                switch ticker.name {
                case "Huobi Token":
                    ticker.description = "Huobi Token (HT) is an exchange based token and native currency of the Huobi crypto exchange. The HT can be used to purchase monthly VIP status plans for transaction fee discounts, vote on exchange decisions, gain early access to special Huobi events, receive crypto rewards from seasonal buybacks and trade with other cryptocurrencies listed on the Huobi exchange.";
+                   self.description_view.text = ticker.description;
                    break;
                case "Paxos Standard":
                    ticker.description = "Paxos Standard (PAX) is a stablecoin that allows users to exchange US dollars for Paxos Standard Tokens to 'transact at the speed of the internet'. It aims to meld the stability of the dollar with blockchain technology. Paxos, the company behind PAX, has a charter from the New York State Department of Financial Services, which allows it to offer regulated services in the cryptoasset space.";
+                    self.description_view.text = ticker.description;
                    break;
                case "Multi-Collateral Dai":
                    ticker.description = "Dai is decentralized and backed by collateral. The Maker Protocol, which allows anyone anywhere in the world to generate Dai, aims to facilitate greater security, transparency, and trust.";
+                    self.description_view.text = ticker.description;
                    break;
                case "Kyber Network":
                    ticker.description = "Kyber Network’s on-chain liquidity protocol allows decentralized token swaps to be integrated into any application, enabling value exchange to be performed seamlessly between all parties in the ecosystem. Tapping on the protocol, developers can build payment flows and financial apps, including instant token swap services, erc20 payments, and innovative financial dapps - helping to build a world where any token is usable anywhere.";
+                    self.description_view.text = ticker.description;
                    break;
                case "Matic Network":
                    ticker.description = "Matic Network describes itself as is a Layer 2 scaling solution that uses sidechains for off-chain computation while ensuring asset security using the Plasma framework and a decentralized network of Proof-of-Stake (PoS) validators. Matic aims to be the de-facto platform on which developers will deploy and run decentralized applications in a secure and decentralized manner.";
+                    self.description_view.text = ticker.description;
                    break;
                case "TrueUSD":
                    ticker.description = "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
+                 self.description_view.text = ticker.description;
                default:
+                       let charset = CharacterSet(charactersIn: ".")
+                       let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
+                       var resultString = Array<String>();
+                       for i in 0...4 {
+                            resultString.append(arr[i]);
+                       }
+                       ticker.description = resultString.joined(separator: " ");
+                       self.description_view.text = ticker.description;
                    break;
                }
            }
