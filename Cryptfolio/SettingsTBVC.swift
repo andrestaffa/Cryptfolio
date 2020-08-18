@@ -6,7 +6,8 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
+import GoogleMobileAds;
+import UIKit;
 
 private class Section {
     public var title:String;
@@ -17,14 +18,17 @@ private class Section {
     }
 }
 
-class SettingsTBVC: UITableViewController {
+class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     
     private var generalItems = Array<Section>();
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
+    private var rewardedAd:GADRewardedAd?;
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.rewardedAd = self.createAndLoadRewardedAd();
         
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.title = "Settings"
@@ -32,6 +36,31 @@ class SettingsTBVC: UITableViewController {
         self.getData();
         
     }
+    
+    // MARK: - Reward Ad Methods
+    
+    private func createAndLoadRewardedAd() -> GADRewardedAd? {
+        self.rewardedAd = GADRewardedAd(adUnitID: "ca-app-pub-3940256099942544/1712485313");
+        self.rewardedAd?.load(GADRequest()) { error in
+            if let error = error {
+                print("Loading failed: \(error)");
+            } else {
+                print("Loading Succeeded");
+            }
+        };
+        return self.rewardedAd;
+    }
+    
+    func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
+        print("Reward the user with an investing tip. What is this: \(reward.type)");
+    }
+
+    func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
+        self.rewardedAd = self.createAndLoadRewardedAd();
+        print("Ad dismissed");
+    }
+
+    // MARK: - Get Data
     
     private func getData() -> Void {
         
@@ -132,13 +161,13 @@ class SettingsTBVC: UITableViewController {
             self.resetPortfolio();
             break;
         case (0, 1):
-            // watch ad for investing tip pressed
+            self.watchAdForInvestingTip();
             break;
         case (0, 2):
-            // view investing tips unlocked pressed
+            self.viewInvestingTips();
             break;
         case (1, 0):
-            // rate app
+            self.rateOnAppStore();
             break;
         case (1, 1):
             self.shareCryptfolio();
@@ -176,15 +205,19 @@ class SettingsTBVC: UITableViewController {
     }
     
     private func watchAdForInvestingTip() -> Void {
-        
+        if (self.rewardedAd!.isReady) {
+            self.rewardedAd!.present(fromRootViewController: self, delegate: self);
+        } else {
+            displayAlertNormal(title: "Error", message: "Ad was not loaded yet! Please try again", style: .default);
+        }
     }
     
     private func viewInvestingTips() -> Void {
-        
+        print("view investing tips");
     }
     
     private func rateOnAppStore() -> Void {
-        //self.openLink(linkToSite: "link to app on App Store (Itunes Link)");
+        print("rate app on app store");
     }
     
     private func shareCryptfolio() -> Void {
@@ -216,6 +249,12 @@ class SettingsTBVC: UITableViewController {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert);
         alert.addAction(UIAlertAction(title: "Reset", style: style, handler: handler));
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        self.present(alert, animated: true, completion: nil);
+    }
+    
+    private func displayAlertNormal(title: String, message: String, style: UIAlertAction.Style) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert);
+        alert.addAction(UIAlertAction(title: "OK", style: style, handler: nil));
         self.present(alert, animated: true, completion: nil);
     }
     
