@@ -6,6 +6,7 @@
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="collection view cell content view" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -344,7 +345,7 @@
                                                 <nil key="highlightedColor"/>
                                             </label>
                                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" textAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="zh0-bt-y64">
-                                                <rect key="frame" x="10" y="487" width="355" height="119.5"/>
+                                                <rect key="frame" x="10" y="476.5" width="355" height="130"/>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                 <string key="text">Bitcoin is a digital currency created in January 2009. It follows the ideas set out in a whitepaper by the mysterious and pseudonymous developer Satoshi Nakamoto, whose true identity has yet to be verified. Bitcoin offers the promise of lower transaction fees than traditional online payment mechanisms and is operated by a decentralized authority, unlike government-issued currencies.</string>
                                                 <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -1268,7 +1269,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="70X-p5-aZE" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3665" y="-563"/>
+            <point key="canvasLocation" x="3303" y="-576"/>
         </scene>
         <!--AboutVC-->
         <scene sceneID="3tO-Nx-WFd">
@@ -1329,7 +1330,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TB5-7a-mwB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4348" y="-564.46776611694156"/>
+            <point key="canvasLocation" x="3986" y="-577"/>
         </scene>
         <!--ReferenceTBVC-->
         <scene sceneID="sgM-1x-nLN">
@@ -1357,7 +1358,76 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="HQO-9d-nHo" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="5046" y="-564"/>
+            <point key="canvasLocation" x="4684" y="-577"/>
+        </scene>
+        <!--Investing TipsVC-->
+        <scene sceneID="hFa-ql-qCw">
+            <objects>
+                <viewController storyboardIdentifier="investingTipVC" id="eNI-pS-xaB" customClass="InvestingTipsVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9b8-hd-mWb">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="pO6-rm-n8N">
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <collectionViewFlowLayout key="collectionViewLayout" automaticEstimatedItemSize="YES" minimumLineSpacing="10" minimumInteritemSpacing="10" id="ca0-5o-pUi">
+                                    <size key="itemSize" width="172" height="196"/>
+                                    <size key="headerReferenceSize" width="0.0" height="10"/>
+                                    <size key="footerReferenceSize" width="0.0" height="0.0"/>
+                                    <inset key="sectionInset" minX="0.0" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                </collectionViewFlowLayout>
+                                <cells>
+                                    <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="cell" id="OcQ-N0-qJ6" customClass="InvestingTipCell" customModule="Cryptfolio" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="10" width="172" height="196"/>
+                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                        <collectionViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="IsS-6y-IM5">
+                                            <rect key="frame" x="0.0" y="0.0" width="172" height="196"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="e0G-mx-xfN">
+                                                    <rect key="frame" x="8" y="8" width="156" height="180"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="e0G-mx-xfN" firstAttribute="leading" secondItem="IsS-6y-IM5" secondAttribute="leading" constant="8" id="7kk-BT-8p0"/>
+                                                <constraint firstItem="e0G-mx-xfN" firstAttribute="top" secondItem="IsS-6y-IM5" secondAttribute="top" constant="8" id="QI3-Wr-EEc"/>
+                                                <constraint firstAttribute="bottom" secondItem="e0G-mx-xfN" secondAttribute="bottom" constant="8" id="abe-ES-No1"/>
+                                                <constraint firstAttribute="trailing" secondItem="e0G-mx-xfN" secondAttribute="trailing" constant="8" id="w3D-mA-Uf5"/>
+                                            </constraints>
+                                        </collectionViewCellContentView>
+                                        <color key="backgroundColor" white="0.10209760273972603" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <size key="customSize" width="172" height="196"/>
+                                        <connections>
+                                            <outlet property="tipTitle" destination="e0G-mx-xfN" id="TbH-AN-8QB"/>
+                                        </connections>
+                                    </collectionViewCell>
+                                </cells>
+                                <collectionReusableView key="sectionHeaderView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="qdd-y4-2yi">
+                                    <rect key="frame" x="0.0" y="0.0" width="375" height="10"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </collectionReusableView>
+                            </collectionView>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="pO6-rm-n8N" firstAttribute="bottom" secondItem="bXs-KL-Qf0" secondAttribute="bottom" id="7M7-zH-27U"/>
+                            <constraint firstItem="pO6-rm-n8N" firstAttribute="leading" secondItem="bXs-KL-Qf0" secondAttribute="leading" id="7mf-Xm-odb"/>
+                            <constraint firstItem="pO6-rm-n8N" firstAttribute="top" secondItem="bXs-KL-Qf0" secondAttribute="top" id="iuq-Kq-lY9"/>
+                            <constraint firstItem="pO6-rm-n8N" firstAttribute="trailing" secondItem="bXs-KL-Qf0" secondAttribute="trailing" id="rh9-dQ-1pz"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="bXs-KL-Qf0"/>
+                    </view>
+                    <connections>
+                        <outlet property="collectionView" destination="pO6-rm-n8N" id="bjO-Jm-dgm"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="id6-Yj-AOg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="5343.1999999999998" y="-577.06146926536735"/>
         </scene>
         <!--SettingsTBVC-->
         <scene sceneID="dW9-2W-Ai5">

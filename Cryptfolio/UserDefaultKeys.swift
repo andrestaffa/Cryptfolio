@@ -16,5 +16,8 @@ public class UserDefaultKeys {
     public static let availableFundsKey = "availableFundsKey";
     public static let mainPortfolioKey = "mainPortfolioKey";
     public static let holdingsKey = "holdingsKey";
+    // Investing Tips
+    public static let investingTipsKey = "investingTipsKey";
+    public static let randomIndex = "randomIndex";
     
 }

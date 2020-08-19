@@ -8,6 +8,7 @@
 
 import GoogleMobileAds;
 import UIKit;
+import SVProgressHUD;
 
 private class Section {
     public var title:String;
@@ -24,7 +25,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
     private var rewardedAd:GADRewardedAd?;
-
+    private var isLoading:Bool = true;
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -45,6 +47,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             if let error = error {
                 print("Loading failed: \(error)");
             } else {
+                self.isLoading = false;
+                self.tableView.reloadData();
                 print("Loading Succeeded");
             }
         };
@@ -52,12 +56,24 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
     
     func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
-        print("Reward the user with an investing tip. What is this: \(reward.type)");
+        TipManager.addRandomTip();
+        print("You just got a new tip, go check your investing tips");
     }
 
     func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
+        self.isLoading = true;
+        self.tableView.reloadData();
         self.rewardedAd = self.createAndLoadRewardedAd();
         print("Ad dismissed");
+    }
+    
+    private func gainMoneyReward() -> Void {
+        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        if (currentFunds == nil || currentFunds!.isLessThanOrEqualTo(0.0)) {
+            UserDefaults.standard.set(100.0, forKey: UserDefaultKeys.availableFundsKey);
+        } else {
+            UserDefaults.standard.set(currentFunds! + 100.0, forKey: UserDefaultKeys.availableFundsKey);
+        }
     }
 
     // MARK: - Get Data
@@ -137,8 +153,16 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         switch indexPath.section {
         case 0:
-            cell.textLabel!.text = self.generalItems[indexPath.row].title;
-            //cell.imageView!.image = self.generalItems[indexPath.row].image;
+            if (self.isLoading && indexPath.row == 1) {
+                cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
+                cell.textLabel!.text = self.generalItems[1].title;
+                cell.isUserInteractionEnabled = false;
+            }
+            else {
+                cell.isUserInteractionEnabled = true;
+                cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
+                cell.textLabel!.text = self.generalItems[indexPath.row].title;
+            }
             break;
         case 1:
             cell.textLabel!.text = self.feedbackItems[indexPath.row].title;
@@ -213,7 +237,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
     
     private func viewInvestingTips() -> Void {
-        print("view investing tips");
+        let investingTipVC = self.storyboard?.instantiateViewController(withIdentifier: "investingTipVC") as! InvestingTipsVC;
+        self.navigationController?.pushViewController(investingTipVC, animated: true);
     }
     
     private func rateOnAppStore() -> Void {
