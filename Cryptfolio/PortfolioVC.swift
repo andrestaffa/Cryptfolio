@@ -384,6 +384,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // REMOVE THIS LATER
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
     }
     
     @objc private func mainPortPercentTapped() -> Void {

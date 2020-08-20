@@ -11,8 +11,6 @@ import UIKit
 class InvestingTipCell: UICollectionViewCell {
     
     @IBOutlet weak var tipTitle: UILabel!
-    
-    
-    
+    @IBOutlet weak var orangeDotImg: UIImageView!
     
 }

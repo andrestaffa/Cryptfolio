@@ -56,15 +56,30 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         cell.layer.masksToBounds = true;
         cell.tipTitle.font = cell.tipTitle.font.withSize(20.0);
         
+        if (cell.tipTitle.text == "?") {
+            cell.orangeDotImg.isHidden = true;
+        } else {
+            if (!self.investingTips[indexPath.item].isDiscovered) {
+                cell.orangeDotImg.isHidden = false;
+            } else {
+                cell.orangeDotImg.isHidden = true;
+            }
+        }
+        
         return cell;
     }
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true);
         if (self.investingTips[indexPath.item].title == "?") {
-            alert(title: "Locked!", message: "Go Watch an ad to unlock investing tips");
+            alert(title: "Locked!", message: "Watch a reward Ad video to unlock investing tips");
         } else {
-            alert(title: self.investingTips[indexPath.item].title, message: self.investingTips[indexPath.item].paragraph);
+            self.investingTips[indexPath.item].isDiscovered = true;
+            TipManager.saveTipList();
+            self.collectionView.reloadData();
+            let tipVC = self.storyboard?.instantiateViewController(withIdentifier: "tipVC") as! TipVC;
+            tipVC.tip = self.investingTips[indexPath.item];
+            self.present(tipVC, animated: true, completion: nil);
         }
     }
     

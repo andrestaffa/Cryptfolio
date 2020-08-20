@@ -116,7 +116,7 @@
             <objects>
                 <viewController storyboardIdentifier="infoVC" id="7zZ-kP-2e7" customClass="InfoVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9mr-4h-rQf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="1000"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ICm-2U-St7">
@@ -1280,22 +1280,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Cryptfolio" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="twJ-cB-69L">
-                                <rect key="frame" x="121" y="20" width="132" height="36"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="132" id="4zT-kW-NVb"/>
-                                    <constraint firstAttribute="height" constant="36" id="kgz-al-IDq"/>
-                                </constraints>
+                                <rect key="frame" x="16" y="20" width="343" height="74"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Thin" family="Helvetica Neue" pointSize="30"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" textAlignment="center" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hz5-5l-Ry5">
-                                <rect key="frame" x="16" y="102" width="343" height="545"/>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="hz5-5l-Ry5">
+                                <rect key="frame" x="16" y="102" width="343" height="565"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="343" id="jCr-ZK-Ago"/>
-                                    <constraint firstAttribute="height" constant="545" id="sdh-xC-pBM"/>
-                                </constraints>
                                 <string key="text">Cryptfolio is an application where you can view, analyze, and practice trade 50+ different cryptocurrency 
 with a press of a button. You initially start with an up-front investment of $10,000 and can buy any cryptocurrency
 of your choice and play the markets, you can see your portfolio grow or decay depending on what cryptocurrencies are in your
@@ -1316,21 +1308,26 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="twJ-cB-69L" firstAttribute="top" secondItem="qgp-xO-ceH" secondAttribute="top" constant="20" id="HVM-uV-CnU"/>
-                            <constraint firstItem="twJ-cB-69L" firstAttribute="leading" secondItem="qgp-xO-ceH" secondAttribute="leading" constant="121" id="ao6-Ky-dni"/>
-                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="leading" secondItem="qgp-xO-ceH" secondAttribute="leading" constant="16" id="lpQ-EH-nc2"/>
-                            <constraint firstItem="qgp-xO-ceH" firstAttribute="trailing" secondItem="hz5-5l-Ry5" secondAttribute="trailing" constant="16" id="mGQ-xT-3cf"/>
-                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="top" secondItem="twJ-cB-69L" secondAttribute="bottom" constant="46" id="p8t-wX-E8X"/>
-                            <constraint firstItem="qgp-xO-ceH" firstAttribute="trailing" secondItem="twJ-cB-69L" secondAttribute="trailing" constant="122" id="vvq-aF-4Ds"/>
-                            <constraint firstItem="qgp-xO-ceH" firstAttribute="bottom" secondItem="hz5-5l-Ry5" secondAttribute="bottom" constant="20" id="yj7-4P-ziV"/>
+                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="bottom" secondItem="qgp-xO-ceH" secondAttribute="bottom" id="2lE-fe-B1K"/>
+                            <constraint firstItem="twJ-cB-69L" firstAttribute="top" secondItem="qgp-xO-ceH" secondAttribute="top" constant="20" id="JLe-Yn-JTn"/>
+                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="leading" secondItem="qgp-xO-ceH" secondAttribute="leading" constant="16" id="N6Q-9s-bMg"/>
+                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="top" secondItem="qgp-xO-ceH" secondAttribute="top" constant="102" id="Txc-XO-EaU"/>
+                            <constraint firstItem="twJ-cB-69L" firstAttribute="trailing" secondItem="hz5-5l-Ry5" secondAttribute="trailing" id="kYH-BH-33H"/>
+                            <constraint firstItem="qgp-xO-ceH" firstAttribute="trailing" secondItem="hz5-5l-Ry5" secondAttribute="trailing" constant="16" id="rYc-CQ-scP"/>
+                            <constraint firstItem="hz5-5l-Ry5" firstAttribute="top" secondItem="twJ-cB-69L" secondAttribute="bottom" constant="8" id="waG-vE-rdK"/>
+                            <constraint firstItem="twJ-cB-69L" firstAttribute="leading" secondItem="hz5-5l-Ry5" secondAttribute="leading" id="whg-KW-QzN"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="qgp-xO-ceH"/>
                     </view>
                     <navigationItem key="navigationItem" id="6ra-16-Ijg"/>
+                    <connections>
+                        <outlet property="aboutView" destination="hz5-5l-Ry5" id="26o-NS-nZz"/>
+                        <outlet property="titleLbl" destination="twJ-cB-69L" id="wUn-G1-sUc"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="TB5-7a-mwB" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="3986" y="-577"/>
+            <point key="canvasLocation" x="3984.8000000000002" y="-577.06146926536735"/>
         </scene>
         <!--ReferenceTBVC-->
         <scene sceneID="sgM-1x-nLN">
@@ -1391,10 +1388,19 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                                     <nil key="textColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
+                                                <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="orangeCircle" translatesAutoresizingMaskIntoConstraints="NO" id="zGh-Hl-fza">
+                                                    <rect key="frame" x="8" y="8" width="10" height="10"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="10" id="P5H-Jw-DH2"/>
+                                                        <constraint firstAttribute="width" constant="10" id="yZS-r5-pAA"/>
+                                                    </constraints>
+                                                </imageView>
                                             </subviews>
                                             <constraints>
                                                 <constraint firstItem="e0G-mx-xfN" firstAttribute="leading" secondItem="IsS-6y-IM5" secondAttribute="leading" constant="8" id="7kk-BT-8p0"/>
+                                                <constraint firstItem="zGh-Hl-fza" firstAttribute="top" secondItem="IsS-6y-IM5" secondAttribute="top" constant="8" id="Klo-CN-6ZF"/>
                                                 <constraint firstItem="e0G-mx-xfN" firstAttribute="top" secondItem="IsS-6y-IM5" secondAttribute="top" constant="8" id="QI3-Wr-EEc"/>
+                                                <constraint firstItem="zGh-Hl-fza" firstAttribute="leading" secondItem="IsS-6y-IM5" secondAttribute="leading" constant="8" id="Yun-IE-N6y"/>
                                                 <constraint firstAttribute="bottom" secondItem="e0G-mx-xfN" secondAttribute="bottom" constant="8" id="abe-ES-No1"/>
                                                 <constraint firstAttribute="trailing" secondItem="e0G-mx-xfN" secondAttribute="trailing" constant="8" id="w3D-mA-Uf5"/>
                                             </constraints>
@@ -1402,6 +1408,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                         <color key="backgroundColor" white="0.10209760273972603" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <size key="customSize" width="172" height="196"/>
                                         <connections>
+                                            <outlet property="orangeDotImg" destination="zGh-Hl-fza" id="eyH-2Y-CjG"/>
                                             <outlet property="tipTitle" destination="e0G-mx-xfN" id="TbH-AN-8QB"/>
                                         </connections>
                                     </collectionViewCell>
@@ -1428,6 +1435,51 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                 <placeholder placeholderIdentifier="IBFirstResponder" id="id6-Yj-AOg" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="5343.1999999999998" y="-577.06146926536735"/>
+        </scene>
+        <!--TipVC-->
+        <scene sceneID="GGX-Tc-HgM">
+            <objects>
+                <viewController storyboardIdentifier="tipVC" id="laj-MW-wKM" customClass="TipVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Jlu-Gg-blR">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AwN-Du-hm3">
+                                <rect key="frame" x="16" y="81" width="343" height="586"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                                <string key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</string>
+                                <color key="textColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
+                                <fontDescription key="fontDescription" type="system" weight="thin" pointSize="20"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="This What You Need to Do In Order To Get Rich" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Pjk-W5-0pN">
+                                <rect key="frame" x="16" y="20" width="343" height="53"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                        <constraints>
+                            <constraint firstItem="Pjk-W5-0pN" firstAttribute="trailing" secondItem="AwN-Du-hm3" secondAttribute="trailing" id="7x7-Tg-xdD"/>
+                            <constraint firstItem="AwN-Du-hm3" firstAttribute="leading" secondItem="Sgm-5Q-Zhu" secondAttribute="leading" constant="16" id="PXq-UD-cYg"/>
+                            <constraint firstItem="AwN-Du-hm3" firstAttribute="top" secondItem="Pjk-W5-0pN" secondAttribute="bottom" constant="8" id="Qww-Bh-vp7"/>
+                            <constraint firstItem="AwN-Du-hm3" firstAttribute="bottom" secondItem="Sgm-5Q-Zhu" secondAttribute="bottom" id="W8d-Y7-3zH"/>
+                            <constraint firstItem="Pjk-W5-0pN" firstAttribute="top" secondItem="Sgm-5Q-Zhu" secondAttribute="top" constant="20" id="Xej-D3-dWU"/>
+                            <constraint firstItem="AwN-Du-hm3" firstAttribute="top" secondItem="Sgm-5Q-Zhu" secondAttribute="top" constant="81" id="dBF-DN-I9l"/>
+                            <constraint firstItem="AwN-Du-hm3" firstAttribute="trailing" secondItem="Sgm-5Q-Zhu" secondAttribute="trailing" constant="-16" id="dBM-Bu-LjM"/>
+                            <constraint firstItem="Pjk-W5-0pN" firstAttribute="leading" secondItem="AwN-Du-hm3" secondAttribute="leading" id="xzG-CG-ltS"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Sgm-5Q-Zhu"/>
+                    </view>
+                    <connections>
+                        <outlet property="paragraphView" destination="AwN-Du-hm3" id="Pxj-5q-DDv"/>
+                        <outlet property="titleLabel" destination="Pjk-W5-0pN" id="UdJ-Vi-hYK"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ZP8-Lq-bfc" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6013.6000000000004" y="-576.1619190404798"/>
         </scene>
         <!--SettingsTBVC-->
         <scene sceneID="dW9-2W-Ai5">
@@ -1718,6 +1770,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
         <image name="dashboardIcon" width="25" height="25"/>
         <image name="exploreIcon" width="25" height="25"/>
         <image name="news" width="25" height="25"/>
+        <image name="orangeCircle" width="300" height="300"/>
         <image name="settings" width="25" height="25"/>
         <namedColor name="Color">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

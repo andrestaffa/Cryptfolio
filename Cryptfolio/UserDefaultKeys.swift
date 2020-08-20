@@ -19,5 +19,6 @@ public class UserDefaultKeys {
     // Investing Tips
     public static let investingTipsKey = "investingTipsKey";
     public static let randomIndex = "randomIndex";
+    public static let foundAllTips = "foundAllTips";
     
 }

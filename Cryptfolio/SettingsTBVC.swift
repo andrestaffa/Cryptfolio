@@ -26,11 +26,14 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var feedbackItems = Array<Section>();
     private var rewardedAd:GADRewardedAd?;
     private var isLoading:Bool = true;
+    private var watchedAd:Bool = false;
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.rewardedAd = self.createAndLoadRewardedAd();
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+            self.rewardedAd = self.createAndLoadRewardedAd();
+        }
         
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.title = "Settings"
@@ -56,15 +59,22 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
     
     func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
+        self.watchedAd = true;
         TipManager.addRandomTip();
-        print("You just got a new tip, go check your investing tips");
     }
 
     func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
         self.isLoading = true;
         self.tableView.reloadData();
-        self.rewardedAd = self.createAndLoadRewardedAd();
-        print("Ad dismissed");
+        if (self.watchedAd) {
+            self.watchedAd = false;
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+                displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
+            } else {
+                self.rewardedAd = self.createAndLoadRewardedAd();
+                displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
+            }
+        }
     }
     
     private func gainMoneyReward() -> Void {
@@ -153,15 +163,20 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         switch indexPath.section {
         case 0:
-            if (self.isLoading && indexPath.row == 1) {
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips) && indexPath.row == 1) {
                 cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
                 cell.textLabel!.text = self.generalItems[1].title;
                 cell.isUserInteractionEnabled = false;
-            }
-            else {
-                cell.isUserInteractionEnabled = true;
-                cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
-                cell.textLabel!.text = self.generalItems[indexPath.row].title;
+            } else {
+                if (self.isLoading && indexPath.row == 1) {
+                    cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
+                    cell.textLabel!.text = self.generalItems[1].title;
+                    cell.isUserInteractionEnabled = false;
+                } else {
+                    cell.isUserInteractionEnabled = true;
+                    cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
+                    cell.textLabel!.text = self.generalItems[indexPath.row].title;
+                }
             }
             break;
         case 1:
@@ -257,7 +272,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     
     private func aboutCryptfolio() -> Void {
         let aboutVC = self.storyboard?.instantiateViewController(withIdentifier: "aboutVC") as! AboutVC;
-        self.navigationController?.pushViewController(aboutVC, animated: true);
+        //self.navigationController?.pushViewController(aboutVC, animated: true);
+        self.present(aboutVC, animated: true, completion: nil);
     }
     
     private func newsReferences() -> Void {

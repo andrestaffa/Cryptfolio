@@ -25,6 +25,7 @@
 		206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206ABFBE23FE346F00198C12 /* InfoVC.swift */; };
 		2078010C24EC8554001BDC81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2078010B24EC8554001BDC81 /* GoogleService-Info.plist */; };
 		208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208A2F5424649382004D2B39 /* AddFundsVC.swift */; };
+		209965C124EEE8020091F0F1 /* TipVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209965C024EEE8020091F0F1 /* TipVC.swift */; };
 		209FB61F24077BD400253759 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 209FB61E24077BD400253759 /* Images */; };
 		20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE1D132486D1C300A68054 /* AboutVC.swift */; };
 		20AF258424633AC4000265A5 /* TradeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF258324633AC4000265A5 /* TradeVC.swift */; };
@@ -66,6 +67,7 @@
 		20726D5C2404E9810042C9E9 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2078010B24EC8554001BDC81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		208A2F5424649382004D2B39 /* AddFundsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFundsVC.swift; sourceTree = "<group>"; };
+		209965C024EEE8020091F0F1 /* TipVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipVC.swift; sourceTree = "<group>"; };
 		209FB61E24077BD400253759 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		20AE1D132486D1C300A68054 /* AboutVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutVC.swift; sourceTree = "<group>"; };
 		20AF258324633AC4000265A5 /* TradeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeVC.swift; sourceTree = "<group>"; };
@@ -127,6 +129,7 @@
 				20DAB4D0247EF3DB00DD57CC /* SettingsTBVC.swift */,
 				20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */,
 				20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */,
+				209965C024EEE8020091F0F1 /* TipVC.swift */,
 				2062A22024ED920800185BF8 /* TipManager.swift */,
 				20FEBAC324818DC200EE1263 /* NewsRefTBVC.swift */,
 				2010C62F2482CD2A00CECAC5 /* ReferenceTBVC.swift */,
@@ -314,6 +317,7 @@
 				2010C6302482CD2A00CECAC5 /* ReferenceTBVC.swift in Sources */,
 				20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */,
 				20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */,
+				209965C124EEE8020091F0F1 /* TipVC.swift in Sources */,
 				206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
