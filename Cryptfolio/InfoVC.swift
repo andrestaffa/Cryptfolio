@@ -72,9 +72,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 print(error.localizedDescription);
             } else {
                 self.coin!.ticker = ticker!;
-                //self.setDesciption(ticker: &self.coin!.ticker);
                 self.updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
-                //self.dayChart();
             }
         }
         
@@ -90,9 +88,9 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
         self.activityIndicator.hidesWhenStopped = true;
         
+        DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)?.forEach({ if ($0.ticker.name.lowercased() == self.coin!.ticker.name.lowercased()) { self.isTradingMode = true; } });
+            
         if (self.isTradingMode) {
-            //let imageLiteral = #imageLiteral(resourceName: "tradeIcon");
-            //self.navigationItem.rightBarButtonItem = UIBarButtonItem(image: imageLiteral, style: .plain, target: self, action: #selector(trade))
             let tradeButton = UIButton();
             tradeButton.frame = CGRect(x:0, y:0, width:80, height:20);
             tradeButton.setTitle("Trade", for: .normal);
@@ -356,53 +354,39 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     // TODO: - Add loading symbol (chart data and current price dont quite add up)
     
     private func dayChart() {
-        self.updateGraph(timePeriod: "minute", limit: "1440", divisor: 8, isDay: true); // 180 units
+        self.updateGraph(timeFrame: "24h")
     }
     
     private func weekChart() {
-        self.updateGraph(timePeriod: "hour", limit: "168", divisor: 1, isDay: false); // 168 units
+        self.updateGraph(timeFrame: "7d");
     }
     
     private func oneMonthChart() {
-        self.updateGraph(timePeriod: "hour", limit: "744", divisor: 4, isDay: false); // 186 units
-    }
-    
-    private func threeMonthChart() {
-        self.updateGraph(timePeriod: "day", limit: "93", divisor: 1, isDay: false); // 93 units
-    }
-    
-    private func sixMonthChart() {
-        self.updateGraph(timePeriod: "day", limit: "182", divisor: 1, isDay: false); // 182 units
+        self.updateGraph(timeFrame: "30d");
     }
     
     private func yearChart() {
-        self.updateGraph(timePeriod: "day", limit: "365", divisor: 1, isDay: false) // 365 units
+        self.updateGraph(timeFrame: "1y");
     }
     
-    private func updateGraph(timePeriod:String, limit:String, divisor:Int, isDay:Bool) {
+    private func fiveYearChart() {
+        self.updateGraph(timeFrame: "5y");
+    }
+    
+    private func updateGraph(timeFrame: String) {
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
         self.activityIndicator.startAnimating();
-        execute(URL(string: "https://min-api.cryptocompare.com/data/v2/histo" + "\(timePeriod)" + "?fsym=" + "\(self.symbol_lbl.text!.uppercased())" + "&tsym=USD&limit=" + "\(limit)")!) { (data, error) in
+        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { (history, error) in
             if let error = error {
-                print(error.localizedDescription)
+                print(error.localizedDescription);
             } else {
                 self.chart_view.isHidden = false;
                 self.activityIndicator.stopAnimating();
-                for i in 0...data!.count - 1 {
-                    if (i < divisor) {
-                        self.dataPoints.append(data![i]["open"] as! Double);
-                        self.timestamps.append(data![i]["time"] as! Double);
-                    } else if (i % divisor == 0) {
-                        self.dataPoints.append(data![i]["open"] as! Double);
-                        self.timestamps.append(data![i]["time"] as! Double);
-                    }
-                }
-                if (isDay) {
-                    self.chartSetup(data: self.coin!.ticker.history24h, isDay: isDay)
-                } else {
-                    self.chartSetup(data: self.dataPoints, isDay: isDay);
-                }
+                self.dataPoints = history!.prices;
+                self.timestamps = history!.timestamps;
+                self.chartSetup(data: self.dataPoints, isDay: false)
+                
             }
         }
     }
@@ -411,18 +395,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chart_view.removeAllSeries();
         let series = ChartSeries(data);
         series.area = true;
-        if (isDay) {
-            if (change_lbl.text?.first != "-") {
-                series.color = ChartColors.greenColor();
-            } else {
-                series.color = ChartColors.darkRedColor();
-            }
+        if (!((data.first?.isLess(than: data.last!))!)) {
+            series.color = ChartColors.darkRedColor();
         } else {
-            if (!((data.first?.isLess(than: data.last!))!)) {
-                series.color = ChartColors.darkRedColor();
-            } else {
-                series.color = ChartColors.greenColor();
-            }
+            series.color = ChartColors.greenColor();
         }
         self.chart_view.showXLabelsAndGrid = false;
         if traitCollection.userInterfaceStyle == .light {
@@ -447,23 +423,26 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         case 0:
             self.dayChart();
             self.vibrate(style: .light);
+            break;
         case 1:
             self.weekChart();
             self.vibrate(style: .light);
+            break;
         case 2:
             self.oneMonthChart();
             self.vibrate(style: .light);
+            break;
         case 3:
-            self.threeMonthChart();
-            self.vibrate(style: .light);
-        case 4:
-            self.sixMonthChart();
-            self.vibrate(style: .light);
-        case 5:
             self.yearChart();
             self.vibrate(style: .light);
+            break;
+        case 4:
+            self.fiveYearChart();
+            self.vibrate(style: .light);
+            break;
         default:
             print("Not a date");
+            break;
         }
     }
     
@@ -472,7 +451,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     func getFormattedDate(data:Array<Double>?, index: Int) -> String {
         let timeResult = data![index];
-        let date = Date(timeIntervalSince1970: timeResult)
+        let date = Date(timeIntervalSince1970: timeResult / 1000);
         let dateFormatter = DateFormatter()
         dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
         dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
@@ -482,23 +461,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         //let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
         return localDate;
     }
-    
-
-    // MARK: - Networking (getting data for charts)
-    
-    func execute(_ url: URL, completion:@escaping ([[String: Any]]?, Error?) -> Void) {
-        AF.request(url).responseJSON { response in
-            if let json = response.value {
-                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
-                let dataObject:Dictionary = jsonObject["Data"] as! Dictionary<String, Any>;
-                let dataTWO = dataObject["Data"] as! [[String: Any]]
-                completion(dataTWO, nil);
-            } else if let error = response.error {
-                completion(nil, error);
-            }
-        }
-    }
-    
     
     // MARK: - Scroll view methods
     
@@ -548,46 +510,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         impactFeedbackgenerator.prepare()
         impactFeedbackgenerator.impactOccurred()
     }
-    
-    private func setDesciption(ticker:inout Ticker) -> Void {
-           if (ticker.description == "No Description Available") {
-               switch ticker.name {
-               case "Huobi Token":
-                   ticker.description = "Huobi Token (HT) is an exchange based token and native currency of the Huobi crypto exchange. The HT can be used to purchase monthly VIP status plans for transaction fee discounts, vote on exchange decisions, gain early access to special Huobi events, receive crypto rewards from seasonal buybacks and trade with other cryptocurrencies listed on the Huobi exchange.";
-                   self.description_view.text = ticker.description;
-                   break;
-               case "Paxos Standard":
-                   ticker.description = "Paxos Standard (PAX) is a stablecoin that allows users to exchange US dollars for Paxos Standard Tokens to 'transact at the speed of the internet'. It aims to meld the stability of the dollar with blockchain technology. Paxos, the company behind PAX, has a charter from the New York State Department of Financial Services, which allows it to offer regulated services in the cryptoasset space.";
-                    self.description_view.text = ticker.description;
-                   break;
-               case "Multi-Collateral Dai":
-                   ticker.description = "Dai is decentralized and backed by collateral. The Maker Protocol, which allows anyone anywhere in the world to generate Dai, aims to facilitate greater security, transparency, and trust.";
-                    self.description_view.text = ticker.description;
-                   break;
-               case "Kyber Network":
-                   ticker.description = "Kyber Network’s on-chain liquidity protocol allows decentralized token swaps to be integrated into any application, enabling value exchange to be performed seamlessly between all parties in the ecosystem. Tapping on the protocol, developers can build payment flows and financial apps, including instant token swap services, erc20 payments, and innovative financial dapps - helping to build a world where any token is usable anywhere.";
-                    self.description_view.text = ticker.description;
-                   break;
-               case "Matic Network":
-                   ticker.description = "Matic Network describes itself as is a Layer 2 scaling solution that uses sidechains for off-chain computation while ensuring asset security using the Plasma framework and a decentralized network of Proof-of-Stake (PoS) validators. Matic aims to be the de-facto platform on which developers will deploy and run decentralized applications in a secure and decentralized manner.";
-                    self.description_view.text = ticker.description;
-                   break;
-               case "TrueUSD":
-                   ticker.description = "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
-                 self.description_view.text = ticker.description;
-               default:
-                       let charset = CharacterSet(charactersIn: ".")
-                       let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
-                       var resultString = Array<String>();
-                       for i in 0...4 {
-                            resultString.append(arr[i]);
-                       }
-                       ticker.description = resultString.joined(separator: " ");
-                       self.description_view.text = ticker.description;
-                   break;
-               }
-           }
-       }
     
     // MARK: - Navigation controller custom image
     

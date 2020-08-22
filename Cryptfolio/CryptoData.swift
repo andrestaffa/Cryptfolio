@@ -32,6 +32,11 @@ public struct News : Codable {
     let url:String;
 }
 
+public struct History : Codable {
+    let prices:[Double]
+    let timestamps:[Double];
+}
+
 public class CryptoData {
     
 //    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
@@ -67,6 +72,34 @@ public class CryptoData {
 //             }
 //         }
 //     }
+    
+    public static func getCoinHistory(id: Int, timeFrame:String, completion:@escaping (History?, Error?) -> Void) -> Void {
+        let url = URL(string: "https://api.coinranking.com/v1/public/coin/" + "\(id)" + "/history/" + "\(timeFrame)");
+        if (url == nil) {
+            print("error loading history, url was nil");
+            return;
+        }
+        AF.request(url!).responseJSON { (response) in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
+                let historys = data["history"] as! [[String: Any]];
+                var prices = [Double]();
+                var timestamps = [Double]();
+                for i in 0...historys.count - 1 {
+                    let price = historys[i]["price"] as? String;
+                    let timestamp = historys[i]["timestamp"] as? Double;
+                    let priceDouble = Double(price ?? "0.0");
+                    let timestampDouble = Double(timestamp ?? 0);
+                    prices.append(priceDouble!);
+                    timestamps.append(timestampDouble);
+                }
+                completion(History(prices: prices, timestamps: timestamps), nil);
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
     
     public static func getNewsData(completion:@escaping (News?, Error?) -> Void) -> Void {
         let url = URL(string: "https://min-api.cryptocompare.com/data/v2/news/?lang=EN");

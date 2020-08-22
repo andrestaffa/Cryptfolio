@@ -147,7 +147,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         // load in available funds
         let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+        var currentAvailFunds:Double = 0.0;
         if (availableFunds != nil) {
+            currentAvailFunds = availableFunds!;
             var tempAvailString = String(format: "%.2f", availableFunds!);
             if (tempAvailString.first == "-") {
                 tempAvailString.removeFirst();
@@ -188,7 +190,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 //                            let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
 //                            self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
                             
-                            self.priceDifference = updatedMainPortfolio - 10000;
+                            self.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
                             self.portPercentChange = (self.priceDifference / 10000);
                             
                             print("Price Difference: \(self.priceDifference)");
@@ -385,6 +387,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+        
     }
     
     @objc private func mainPortPercentTapped() -> Void {

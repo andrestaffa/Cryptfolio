@@ -116,7 +116,7 @@
             <objects>
                 <viewController storyboardIdentifier="infoVC" id="7zZ-kP-2e7" customClass="InfoVC" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9mr-4h-rQf">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="1000"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="ICm-2U-St7">
@@ -291,9 +291,8 @@
                                                     <segment title="1D"/>
                                                     <segment title="1W"/>
                                                     <segment title="1M"/>
-                                                    <segment title="3M"/>
-                                                    <segment title="6M"/>
                                                     <segment title="1Y"/>
+                                                    <segment title="5Y"/>
                                                 </segments>
                                                 <connections>
                                                     <action selector="timestapLogHandler:" destination="7zZ-kP-2e7" eventType="valueChanged" id="dBt-we-XXY"/>
