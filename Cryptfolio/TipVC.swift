@@ -27,6 +27,10 @@ class TipVC: UIViewController {
         
     }
     
+    @IBAction func tappedXButton(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil);
+    }
+    
     private func updateWithSpacing(lineSpacing: Float) {
         let attributedString = NSMutableAttributedString(string: self.paragraphView.text!)
         let mutableParagraphStyle = NSMutableParagraphStyle()

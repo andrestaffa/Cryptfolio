@@ -12,6 +12,10 @@ import SVProgressHUD;
 
 class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate {
     
+    @IBOutlet weak var collectionView: UICollectionView!
+    @IBOutlet weak var subtitleLbl: UILabel!;
+    @IBOutlet weak var mainTitleLbl: UILabel!;
+    
     @IBOutlet weak var addCoin_btn: UIButton!
     @IBOutlet weak var welcome_lbl: UILabel!
     @IBOutlet weak var appName_lbl: UILabel!
@@ -46,6 +50,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        self.navigationController?.navigationBar.prefersLargeTitles = false;
+        self.navigationController?.navigationBar.barTintColor = .clear;
+        self.navigationController?.navigationBar.shadowImage = UIImage();
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default);
+        
         self.tabBarController?.tabBar.isHidden = false;
         
         PortfolioVC.indexOptionName = 0;
@@ -64,7 +73,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.navigationController?.navigationBar.prefersLargeTitles = true;
+        self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.tabBarController?.tabBar.isHidden = false;
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
@@ -99,12 +108,23 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.mainPortPercentChange_lbl.isUserInteractionEnabled = true;
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
         self.mainPortPercentChange_lbl.addGestureRecognizer(mainPortPercentTap);
-    
-        self.title = "Dashboard";
+        
+        self.subtitleLbl.text = self.getNewCurrentDate();
         
         // TODO: - Add selection when editing
         
     }
+    
+    public func getNewCurrentDate() -> String {
+        let date = Date(timeIntervalSince1970: Double(Date().timeIntervalSince1970))
+        let dateFormatter = DateFormatter();
+        dateFormatter.timeStyle = DateFormatter.Style.medium;
+        dateFormatter.dateStyle = DateFormatter.Style.medium;
+        dateFormatter.timeZone = .current;
+        dateFormatter.dateFormat = "EEEE, MMMM d";
+        return dateFormatter.string(from: date);
+   }
+       
     
     public func updateCells() -> Void {
         if (!self.isLoading) {
@@ -382,11 +402,20 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     @objc private func goToHoldingsVC() -> Void {
-        print("go to holdingsVC");
         // REMOVE THIS LATER
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+        
+        guard DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) != nil else {
+            let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
+            holdingVC.messageText = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
+            self.navigationController?.pushViewController(holdingVC, animated: true);
+            return;
+        }
+        let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
+        holdingVC.messageText = "";
+        self.navigationController?.pushViewController(holdingVC, animated: true);
         
     }
     
@@ -745,6 +774,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.availableFunds_lbl.isHidden = hidden;
         self.mainPortfolioStatic_lbl.isHidden = hidden;
         self.mainPortfolio_lbl.isHidden = hidden;
+        self.subtitleLbl.isHidden = hidden;
+        self.mainTitleLbl.isHidden = hidden;
     }
     
     private func hideColTitleLabels(hidden:Bool) -> Void {
@@ -765,4 +796,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         impactFeedbackGenerator.impactOccurred();
     }
 
+}
+
+public class TickerScreenCell: UICollectionViewCell {
+    @IBOutlet weak var symbolLbl: UILabel!
+    @IBOutlet weak var percentChangeLbl: UILabel!
 }

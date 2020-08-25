@@ -26,6 +26,11 @@ class AboutVC: UIViewController {
         
     }
     
+    
+    @IBAction func tappedXButton(_ sender: Any) {
+        self.dismiss(animated: true, completion: nil);
+    }
+    
     private func updateWithSpacing(lineSpacing: Float) {
         let attributedString = NSMutableAttributedString(string: self.aboutView.text!)
         let mutableParagraphStyle = NSMutableParagraphStyle()

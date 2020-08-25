@@ -18,7 +18,7 @@ public class OrderHandler {
                 betterAlert(title: "Sorry", message: "Insufficient funds");
                 return false;
             }
-            if (round(currentFunds!).isLess(than: round(amountCost))) {
+            if (currentFunds!.isLess(than: amountCost)) {
                 betterAlert(title: "Sorry", message: "Insufficient funds");
                 print("Current Funds: \(currentFunds!)");
                 print("Amount Cost: \(amountCost)");
@@ -60,6 +60,10 @@ public class OrderHandler {
                             prevHolding.amountOfCoin += hold.amountOfCoin;
                             prevHolding.estCost += hold.estCost; // might be an issue
                             prevHolding.ticker = hold.ticker;
+                            prevHolding.amountOfCoins.insert(amountOfCoin, at: 0);
+                            prevHolding.prices.insert(ticker.price, at: 0);
+                            prevHolding.dateAddedList.insert(prevHolding.getNewCurrentDate(), at: 0);
+                            prevHolding.isBuyList.insert(true, at: 0);
                         }
                     }
                 }
@@ -96,7 +100,7 @@ public class OrderHandler {
         // load in avialbale funds
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (currentFunds != nil) {
-            if (!round(amountOfCoin).isLessThanOrEqualTo(round(currentAmountOfCoin))) { // MIGHT NEED TO REMOVE "round()"
+            if (!amountOfCoin.isLessThanOrEqualTo(currentAmountOfCoin)) { // MIGHT NEED TO REMOVE "round()"
                 betterAlert(title: "Sorry", message: "You do not own \(String(format: "%.2f", amountOfCoin)) \(ticker.symbol.uppercased()) to sell.");
                 return false;
             } else {
@@ -109,6 +113,11 @@ public class OrderHandler {
                         prevHolding.estCost -= amountCost;
                         if (prevHolding.ticker.name == ticker.name && prevHolding.amountOfCoin.isZero) { prevHolding.estCost = 0.00; }
                         prevHolding.ticker = ticker;
+                        prevHolding.amountOfCoins.insert(amountOfCoin, at: 0);
+                        prevHolding.prices.insert(ticker.price, at: 0);
+                        prevHolding.dateAddedList.insert(prevHolding.getNewCurrentDate(), at: 0);
+                        prevHolding.isBuyList.insert(false, at: 0);
+                        
                     }
                 }
                 DataStorageHandler.saveObject(type: holdings, forKey: UserDefaultKeys.holdingsKey);
