@@ -6,7 +6,7 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import Foundation
+import Foundation;
 import UIKit;
 
 public class DataStorageHandler {
