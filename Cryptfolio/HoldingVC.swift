@@ -14,11 +14,18 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageLbl: UILabel!;
     
-    public var messageText:String? = nil;
+    public var messageText:String = "";
+    public var titleText:String = "";
     
     private var loadedHoldings:Array<Holding> = Array<Holding>();
     
     override func viewWillAppear(_ animated: Bool) {
+        
+        self.navigationController?.navigationBar.barTintColor = nil;
+        self.navigationController?.navigationBar.prefersLargeTitles = true;
+        self.navigationController?.navigationBar.shadowImage = nil;
+        self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
+        
         if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             self.loadedHoldings = loadedHoldings;
             self.loadedHoldings = self.loadedHoldings.sorted(by: { (holding, nextHolding) -> Bool in
@@ -34,9 +41,9 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         super.viewDidLoad()
 
         self.navigationController?.navigationBar.prefersLargeTitles = true;
-        self.title = "Select Coin";
+        self.title = self.titleText;
         self.messageLbl.numberOfLines = 5;
-        self.messageLbl.text = messageText!;
+        self.messageLbl.text = self.messageText;
         
         self.tableView.delegate = self;
         self.tableView.dataSource = self;

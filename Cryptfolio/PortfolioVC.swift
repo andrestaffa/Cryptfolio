@@ -10,7 +10,7 @@ import UIKit
 import SwiftChart;
 import SVProgressHUD;
 
-class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, CellDelegate {
+class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, CellDelegate {
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var subtitleLbl: UILabel!;
@@ -38,6 +38,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private var coins = Array<Coin>();
     
+    private var tickers = Array<Coin>();
+    private var viewDisappeared:Bool = false;
+    
     private var isLoading:Bool = true;
     private var priceDifference:Double = 0.0;
     private var portPercentChange:Double = 0.0;
@@ -57,6 +60,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.tabBarController?.tabBar.isHidden = false;
         
+        self.viewDisappeared = false;
+        if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
+        
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
@@ -75,6 +81,19 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         super.viewDidLoad()
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.tabBarController?.tabBar.isHidden = false;
+                
+        // setup collectionView
+        self.getTickerData();
+        self.collectionView.delegate = self;
+        self.collectionView.dataSource = self;
+        self.collectionView.showsHorizontalScrollIndicator = false;
+        let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout();
+        layout.minimumLineSpacing = 8;
+        layout.scrollDirection = .horizontal
+        self.collectionView.collectionViewLayout = layout;
+        self.autoScroll();
+        
+        // setup tableView
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
 
@@ -109,13 +128,82 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
         self.mainPortPercentChange_lbl.addGestureRecognizer(mainPortPercentTap);
         
+        // Animations
+        self.collectionView.alpha = 0.0;
+        //self.mainTitleLbl.alpha = 0.0;
+        self.subtitleLbl.alpha = 0.0;
+        UIView.animate(withDuration: 6, delay: 0, options: .allowUserInteraction, animations: { self.collectionView.alpha = 1;  }, completion: nil)
+        UIView.animate(withDuration: 3, delay: 0, options: .allowUserInteraction, animations: { self.subtitleLbl.alpha = 1; /*self.mainTitleLbl.alpha = 1;*/ }, completion: nil)
+        
         self.subtitleLbl.text = self.getNewCurrentDate();
         
         // TODO: - Add selection when editing
         
     }
     
-    public func getNewCurrentDate() -> String {
+    override func viewDidDisappear(_ animated: Bool) { self.viewDisappeared = true; }
+    
+    // MARK: - CollecitonView Methods
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return self.tickers.count;
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TickerScreenCell;
+        
+        cell.symbolLbl.text = self.tickers[indexPath.item].ticker.symbol.uppercased();
+        
+        if (String(self.tickers[indexPath.item].ticker.changePrecent24H).first! == "-") {
+            cell.percentChangeLbl.attributedText = self.attachImageToString(text: "\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortDownArrow"));
+            cell.percentChangeLbl.textColor = ChartColors.darkRedColor();
+        } else {
+            cell.percentChangeLbl.attributedText = self.attachImageToString(text: "+\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortUpArrow"));
+            cell.percentChangeLbl.textColor = ChartColors.darkGreenColor();
+        }
+        
+        return cell;
+    }
+            
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
+        infoVC.coin = self.tickers[indexPath.item];
+        infoVC.isTradingMode = true;
+        self.navigationController?.pushViewController(infoVC, animated: true);
+    }
+    
+    
+    func autoScroll () {
+        if (self.viewDisappeared) {
+            return;
+        }
+        var co = self.collectionView.contentOffset.x;
+        var no = co + 0.5;
+        if (no >= 3700) {
+            self.collectionView.contentOffset.x = -350.0;
+            co = self.collectionView.contentOffset.x;
+            no = co + 0.5;
+        }
+        UIView.animate(withDuration: 0.001, delay: 0, options: .allowUserInteraction, animations: { [weak self]() -> Void in
+            self?.collectionView.contentOffset = CGPoint(x: no, y: 0);
+            }) { [weak self](finished) -> Void in
+                self?.autoScroll();
+        }
+    }
+    
+    private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = CGRect(x: 0.5, y: -0.3, width: 8, height: 8)
+        let masterStirng = NSMutableAttributedString(string: "")
+        let percentString = NSMutableAttributedString(string: text);
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(percentString)
+        masterStirng.append(imageAttachment)
+        return masterStirng;
+    }
+    
+    private func getNewCurrentDate() -> String {
         let date = Date(timeIntervalSince1970: Double(Date().timeIntervalSince1970))
         let dateFormatter = DateFormatter();
         dateFormatter.timeStyle = DateFormatter.Style.medium;
@@ -125,6 +213,20 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         return dateFormatter.string(from: date);
    }
        
+    private func getTickerData() -> Void {
+        CryptoData.getCryptoData { (ticker, error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                if (ticker!.name != "Matic Network") {
+                    if let imageUI = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png") {
+                        self.tickers.append(Coin(ticker: ticker!, image: Image(withImage: imageUI)));
+                        self.collectionView.reloadData();
+                    }
+                }
+            }
+        }
+    }
     
     public func updateCells() -> Void {
         if (!self.isLoading) {
@@ -410,13 +512,23 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         guard DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) != nil else {
             let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
             holdingVC.messageText = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
+            holdingVC.titleText = "";
             self.navigationController?.pushViewController(holdingVC, animated: true);
             return;
         }
         let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
+        holdingVC.titleText = "Select A Coin";
         holdingVC.messageText = "";
         self.navigationController?.pushViewController(holdingVC, animated: true);
         
+    }
+    
+    private func changeAllCellsProperties(configure:(TickerScreenCell, Int) -> Void) -> Void {
+        for i in 0...self.tickers.count - 1 {
+            if let cell = self.collectionView.cellForItem(at: IndexPath(item: i, section: 0)) as? TickerScreenCell {
+                configure(cell, i);
+            }
+        }
     }
     
     @objc private func mainPortPercentTapped() -> Void {
@@ -776,6 +888,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.mainPortfolio_lbl.isHidden = hidden;
         self.subtitleLbl.isHidden = hidden;
         self.mainTitleLbl.isHidden = hidden;
+        self.collectionView.isHidden = hidden;
     }
     
     private func hideColTitleLabels(hidden:Bool) -> Void {

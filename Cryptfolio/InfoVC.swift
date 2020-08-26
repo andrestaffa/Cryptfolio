@@ -67,6 +67,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
         
+        self.navigationController?.navigationBar.barTintColor = nil;
+        self.navigationController?.navigationBar.prefersLargeTitles = true;
+        self.navigationController?.navigationBar.shadowImage = nil;
+        self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
+        
         CryptoData.getCoinData(id: coin!.ticker.id) { (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);

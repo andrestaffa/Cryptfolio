@@ -13,7 +13,6 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
     @IBOutlet weak var collectionView: UICollectionView!
     
     private var investingTips = Array<Tip>();
-    private var isGoingBack:Bool = false;
     
     override func viewWillAppear(_ animated: Bool) {
         if let loadedTips = TipManager.loadTipList() {
@@ -38,54 +37,12 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         layout.minimumInteritemSpacing = 5;
         layout.itemSize = CGSize(width: (self.collectionView.bounds.width - 30) / 2, height: self.collectionView.bounds.height / 3);
         self.collectionView!.collectionViewLayout = layout;
-        //print(self.collectionView.contentOffset.y);
-       self.autoScroll();
-    }
-     
-    
-    
-    func autoScroll () {
-        if (self.isGoingBack) {
-            return;
-        }
-        var co = collectionView.contentOffset.y;
-        var no = co + 3
-        if (no >= 1700) {
-//            self.isGoingBack = true;
-//            autoScrollInner(endPoint: 10.0, speed: 0.001)
-            collectionView.contentOffset.y = 0.0;
-            co = collectionView.contentOffset.y;
-            no = co + 5;
-        }
 
-        UIView.animate(withDuration: 0.001, delay: 0, options: .curveEaseInOut, animations: { [weak self]() -> Void in
-            self?.collectionView.contentOffset = CGPoint(x: 0, y: no)
-            }) { [weak self](finished) -> Void in
-                self?.autoScroll();
-        }
-        
-    }
-    
-    func autoScrollInner (endPoint: CGFloat, speed: TimeInterval) {
-        let co = self.collectionView.contentOffset.y;
-        let no = co - 5
-        
-        if (no <= endPoint) {
-            self.isGoingBack = false;
-            return;
-        }
-        
-        UIView.animate(withDuration: speed, delay: 0, options: .curveEaseInOut, animations: { [weak self]() -> Void in
-            self?.collectionView.contentOffset = CGPoint(x: 0, y: no)
-            }) { [weak self](finished) -> Void in
-                self?.autoScrollInner(endPoint: endPoint, speed: speed);
-        }
     }
 
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.investingTips.count;
     }
-    
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! InvestingTipCell;
