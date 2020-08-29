@@ -74,6 +74,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
                 self.rewardedAd = self.createAndLoadRewardedAd();
                 displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
             }
+        } else {
+            self.rewardedAd = self.createAndLoadRewardedAd();
         }
     }
     

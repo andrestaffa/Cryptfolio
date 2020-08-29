@@ -34,6 +34,11 @@ class HomeTBVC: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.navigationBar.barTintColor = nil;
+        self.navigationController?.navigationBar.prefersLargeTitles = true;
+        self.navigationController?.navigationBar.shadowImage = nil;
+        self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
+        
         //let ids = CryptoData.readTextToArray(path: "Data.bundle/id");
         
         if (self.isAdding) {

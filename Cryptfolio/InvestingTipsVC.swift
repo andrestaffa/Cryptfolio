@@ -8,7 +8,7 @@
 
 import UIKit
 
-class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource {
+class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout {
 
     @IBOutlet weak var collectionView: UICollectionView!
     
@@ -32,10 +32,15 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         self.collectionView.dataSource = self;
         
         // FIX THESE USING ASPECT RATIOS
+//        let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout();
+//        layout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 15);
+//        layout.minimumInteritemSpacing = 5;
+//        layout.itemSize = CGSize(width: (self.collectionView.bounds.width - 30) / 2, height: self.collectionView.bounds.height / 3);
+//        self.collectionView!.collectionViewLayout = layout;
+        
         let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout();
-        layout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 15);
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0);
         layout.minimumInteritemSpacing = 5;
-        layout.itemSize = CGSize(width: (self.collectionView.bounds.width - 30) / 2, height: self.collectionView.bounds.height / 3);
         self.collectionView!.collectionViewLayout = layout;
 
     }
@@ -80,6 +85,10 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
             tipVC.tip = self.investingTips[indexPath.item];
             self.present(tipVC, animated: true, completion: nil);
         }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        return CGSize(width: (self.collectionView.bounds.width / 2) - 5.0, height: self.collectionView.bounds.height / 2.5);
     }
     
 

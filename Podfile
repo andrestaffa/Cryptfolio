@@ -10,6 +10,6 @@ target 'Cryptfolio' do
   pod 'Google-Mobile-Ads-SDK'
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'
-  pod 'Firebase/Database'
+  pod 'Firebase/Database'ßœ
 
 end

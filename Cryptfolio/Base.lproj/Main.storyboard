@@ -2039,7 +2039,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7aL-cI-j19">
-                                <rect key="frame" x="7" y="115" width="101" height="30"/>
+                                <rect key="frame" x="7" y="120" width="101" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="SxL-X5-84b"/>
                                     <constraint firstAttribute="width" constant="101" id="aOA-vc-fmL"/>
@@ -2050,7 +2050,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </state>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="K5J-mt-xkb">
-                                <rect key="frame" x="149" y="115" width="87" height="30"/>
+                                <rect key="frame" x="149" y="120" width="87" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="ILU-AJ-JgN"/>
                                     <constraint firstAttribute="width" constant="87" id="L4K-em-zhq"/>
@@ -2061,7 +2061,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </state>
                             </button>
                             <collectionView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="ryi-Er-8DD">
-                                <rect key="frame" x="0.0" y="153" width="375" height="514"/>
+                                <rect key="frame" x="0.0" y="158" width="375" height="509"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                                 <collectionViewFlowLayout key="collectionViewLayout" minimumLineSpacing="10" minimumInteritemSpacing="10" id="gpU-H6-KeW">
                                     <size key="itemSize" width="375" height="58"/>
@@ -2127,7 +2127,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </cells>
                             </collectionView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yvH-Nl-QSl">
-                                <rect key="frame" x="281" y="115" width="87" height="27"/>
+                                <rect key="frame" x="281" y="120" width="87" height="27"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue-Thin" family="Helvetica Neue" pointSize="12"/>
                                 <state key="normal" title="AMOUNT">
                                     <color key="titleColor" systemColor="labelColor" cocoaTouchSystemColor="darkTextColor"/>
@@ -2172,14 +2172,14 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                             <constraint firstItem="qCM-AI-Tzv" firstAttribute="leading" secondItem="jYl-EW-0MV" secondAttribute="leading" constant="10" id="Hof-7W-lBo"/>
                             <constraint firstItem="yvH-Nl-QSl" firstAttribute="trailing" secondItem="jYl-EW-0MV" secondAttribute="trailing" constant="-7" id="LoA-4J-XgA"/>
                             <constraint firstItem="ryi-Er-8DD" firstAttribute="top" secondItem="7aL-cI-j19" secondAttribute="bottom" constant="8" id="Luw-fm-7K4"/>
-                            <constraint firstItem="yvH-Nl-QSl" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="5" id="Oyq-NE-gXc"/>
-                            <constraint firstItem="7aL-cI-j19" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="5" id="QFc-QZ-6Qz"/>
+                            <constraint firstItem="yvH-Nl-QSl" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="10" id="Oyq-NE-gXc"/>
+                            <constraint firstItem="7aL-cI-j19" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="10" id="QFc-QZ-6Qz"/>
                             <constraint firstItem="gYK-za-bVe" firstAttribute="top" secondItem="jYl-EW-0MV" secondAttribute="top" constant="25" id="aCZ-hf-Mpe"/>
                             <constraint firstItem="ryi-Er-8DD" firstAttribute="bottom" secondItem="jYl-EW-0MV" secondAttribute="bottom" id="aQd-ZU-f0y"/>
                             <constraint firstItem="jYl-EW-0MV" firstAttribute="trailing" secondItem="gYK-za-bVe" secondAttribute="trailing" constant="10" id="ama-st-tk2"/>
                             <constraint firstItem="jYl-EW-0MV" firstAttribute="trailing" secondItem="w3Z-zX-pv5" secondAttribute="trailing" constant="16" id="dMN-8F-1PM"/>
                             <constraint firstItem="K5J-mt-xkb" firstAttribute="leading" secondItem="7aL-cI-j19" secondAttribute="trailing" constant="41" id="o6n-I3-kED"/>
-                            <constraint firstItem="K5J-mt-xkb" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="5" id="oQD-FW-9xT"/>
+                            <constraint firstItem="K5J-mt-xkb" firstAttribute="top" secondItem="w3Z-zX-pv5" secondAttribute="bottom" constant="10" id="oQD-FW-9xT"/>
                             <constraint firstItem="7aL-cI-j19" firstAttribute="leading" secondItem="jYl-EW-0MV" secondAttribute="leading" constant="7" id="vld-tK-iUP"/>
                             <constraint firstItem="ryi-Er-8DD" firstAttribute="trailing" secondItem="w3Z-zX-pv5" secondAttribute="trailing" constant="16" id="zA3-3m-hPs"/>
                         </constraints>

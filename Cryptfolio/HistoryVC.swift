@@ -70,9 +70,8 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! HistoryCell;
-        
         cell.amountOfCoinLbl.text = String(format: "%.2f", self.holdingCoin!.amountOfCoins[indexPath.item]);
-        cell.pricesLbl.text = String(format: "%.2f", self.holdingCoin!.prices[indexPath.item]);
+        cell.pricesLbl.text = self.formatPrice(price: self.holdingCoin!.prices[indexPath.item]);
         cell.dateAddedLbl.text = self.holdingCoin!.dateAddedList[indexPath.row];
         
         if (self.holdingCoin!.isBuyList[indexPath.item]) {
@@ -109,6 +108,23 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
         impactFeedbackGenerator.prepare();
         impactFeedbackGenerator.impactOccurred();
+    }
+    
+    private func formatPrice(price:Double) -> String {
+        var priceString = String(price);
+        priceString.removeFirst();
+        
+        var otherPrice = String(price)
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        
+        if (String(price).first == "0" || priceString.first == ".") {
+            return "\(String(format: "%.5f", price))"
+        } else if (otherPrice.first == ".") {
+            return "\(String(format: "%.2f", price))"
+        } else {
+            return "\(String(format: "%.2f", price))"
+        }
     }
     
 }
