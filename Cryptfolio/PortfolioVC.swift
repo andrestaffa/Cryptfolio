@@ -168,7 +168,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         infoVC.coin = self.tickers[indexPath.item];
-        infoVC.isTradingMode = true;
         self.navigationController?.pushViewController(infoVC, animated: true);
     }
     
@@ -509,16 +508,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
         
-        guard DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) != nil else {
-            let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
-            holdingVC.messageText = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
-            holdingVC.titleText = "";
-            self.navigationController?.pushViewController(holdingVC, animated: true);
-            return;
-        }
         let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
-        holdingVC.titleText = "Select A Coin";
-        holdingVC.messageText = "";
         self.navigationController?.pushViewController(holdingVC, animated: true);
         
     }
@@ -577,8 +567,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     print(error.localizedDescription);
                 } else {
                     let amountCoin = currentFunds! / ticker!.price;
-                    let amountCost = amountCoin * ticker!.price;
-                    if (OrderHandler.buy(amountCost: amountCost, amountOfCoin: amountCoin, ticker: ticker!)) {
+                    if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker!)) {
                         self.loadData();
                         self.tableVIew.reloadData();
                     } else {
@@ -762,7 +751,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         tableView.deselectRow(at: indexPath, animated: true);
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         infoVC.coin = self.coins[indexPath.row];
-        infoVC.isTradingMode = true;
         self.navigationController?.pushViewController(infoVC, animated: true);
     }
     

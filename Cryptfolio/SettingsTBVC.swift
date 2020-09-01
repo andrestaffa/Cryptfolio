@@ -26,6 +26,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var feedbackItems = Array<Section>();
     private var rewardedAd:GADRewardedAd?;
     private var isLoading:Bool = true;
+    private var isMoneyAd:Bool = false;
     private var watchedAd:Bool = false;
     
     override func viewDidLoad() {
@@ -60,7 +61,11 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     
     func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         self.watchedAd = true;
-        TipManager.addRandomTip();
+        if (self.isMoneyAd) {
+            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 25.00, forKey: UserDefaultKeys.availableFundsKey);
+        } else {
+            TipManager.addRandomTip();
+        }
     }
 
     func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
@@ -70,9 +75,13 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             self.watchedAd = false;
             if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
                 displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
-            } else {
+            } else if (!self.isMoneyAd) {
                 self.rewardedAd = self.createAndLoadRewardedAd();
                 displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
+            } else {
+                self.isMoneyAd = false;
+                self.rewardedAd = self.createAndLoadRewardedAd();
+                displayAlertNormal(title: "Whoo!", message: "You just earned $25.00!", style: .default);
             }
         } else {
             self.rewardedAd = self.createAndLoadRewardedAd();
@@ -94,6 +103,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         // section 1 - General
         self.generalItems.append(Section(title: "Reset portfolio", image: UIImage(named: "Images/btc.png")!));
+        self.generalItems.append(Section(title: "Watch ad for for bonus $", image: UIImage(named: "Images/neo.png")!));
         self.generalItems.append(Section(title: "Watch ad for investing tip", image: UIImage(named: "Images/bch.png")!));
         self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
         
@@ -165,14 +175,18 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         switch indexPath.section {
         case 0:
-            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips) && indexPath.row == 1) {
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips) && indexPath.row == 2) {
                 cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
-                cell.textLabel!.text = self.generalItems[1].title;
+                cell.textLabel!.text = self.generalItems[2].title;
                 cell.isUserInteractionEnabled = false;
             } else {
                 if (self.isLoading && indexPath.row == 1) {
                     cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
                     cell.textLabel!.text = self.generalItems[1].title;
+                    cell.isUserInteractionEnabled = false;
+                } else if (self.isLoading && indexPath.row == 2) {
+                    cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
+                    cell.textLabel!.text = self.generalItems[2].title;
                     cell.isUserInteractionEnabled = false;
                 } else {
                     cell.isUserInteractionEnabled = true;
@@ -202,9 +216,12 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             self.resetPortfolio();
             break;
         case (0, 1):
-            self.watchAdForInvestingTip();
+            self.watchAdForMoney();
             break;
         case (0, 2):
+            self.watchAdForInvestingTip();
+            break;
+        case (0, 3):
             self.viewInvestingTips();
             break;
         case (1, 0):
@@ -247,6 +264,15 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     
     private func watchAdForInvestingTip() -> Void {
         if (self.rewardedAd!.isReady) {
+            self.rewardedAd!.present(fromRootViewController: self, delegate: self);
+        } else {
+            displayAlertNormal(title: "Error", message: "Ad was not loaded yet! Please try again", style: .default);
+        }
+    }
+    
+    private func watchAdForMoney() -> Void {
+        if (self.rewardedAd!.isReady) {
+            self.isMoneyAd = true;
             self.rewardedAd!.present(fromRootViewController: self, delegate: self);
         } else {
             displayAlertNormal(title: "Error", message: "Ad was not loaded yet! Please try again", style: .default);

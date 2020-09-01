@@ -54,7 +54,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     // Public member variables
     public var coin:Coin?;
-    public var isTradingMode:Bool = false;
+    private var isTradingMode:Bool = false;
     
     // Private member variables
     private var coinData = Array<CoinData>();
@@ -81,6 +81,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             }
         }
         
+    
     }
     
     override func viewDidLoad() {
@@ -93,21 +94,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
         self.activityIndicator.hidesWhenStopped = true;
         
-        DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)?.forEach({ if ($0.ticker.name.lowercased() == self.coin!.ticker.name.lowercased()) { self.isTradingMode = true; } });
-            
-        if (self.isTradingMode) {
-            let tradeButton = UIButton();
-            tradeButton.frame = CGRect(x:0, y:0, width:80, height:20);
-            tradeButton.setTitle("Trade", for: .normal);
-            tradeButton.setTitle("Trade", for: .highlighted);
-            tradeButton.backgroundColor = UIColor.orange;
-            tradeButton.layer.cornerRadius = 8.0;
-            tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
-            let rightBarButton = UIBarButtonItem(customView: tradeButton);
-            self.navigationItem.rightBarButtonItem = rightBarButton;
-        } else {
-            self.navigationItem.setRightBarButton(nil, animated: true);
-        }
+        self.updateRightBarItem();
+        
         self.navigationController?.navigationBar.isTranslucent = true;
         updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
         self.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coin!.ticker.name, imageIcon: self.coin!.image.getImage()!);
@@ -121,6 +109,47 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         let tradeVC = storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
         tradeVC.ticker = self.coin!.ticker;
         self.present(tradeVC, animated: true, completion: nil);
+    }
+    
+    @objc func addCoin() {
+        DataStorageHandler.saveObject(type: self.coin!, forKey: UserDefaultKeys.coinKey);
+        var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
+        loadedCoins.append(self.coin!);
+        DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
+        self.displayAlertWithCompletion(title: "Coin Added!", message: "\(self.coin!.ticker.name) added to dashboard", style: .default) { (action) in
+            self.updateRightBarItem();
+        }
+    }
+    
+    private func updateRightBarItem() -> Void {
+        let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
+         for coin in loadedCoins {
+             if (coin.ticker.name.lowercased() == self.coin!.ticker.name.lowercased()) {
+                 self.isTradingMode = true;
+                 break;
+             }
+         }
+         if (self.isTradingMode) {
+            let tradeButton = UIButton();
+            tradeButton.frame = CGRect(x:0, y:0, width:80, height:20);
+            tradeButton.setTitle("Trade", for: .normal);
+            tradeButton.setTitle("Trade", for: .highlighted);
+            tradeButton.backgroundColor = UIColor.orange;
+            tradeButton.layer.cornerRadius = 8.0;
+            tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
+            let rightBarButton = UIBarButtonItem(customView: tradeButton);
+            self.navigationItem.rightBarButtonItem = rightBarButton;
+        } else {
+            let addButton = UIButton();
+            addButton.frame = CGRect(x:0, y:0, width:80, height:20);
+            addButton.setTitle("Add", for: .normal);
+            addButton.setTitle("Add", for: .highlighted);
+            addButton.backgroundColor = UIColor.orange;
+            addButton.layer.cornerRadius = 8.0;
+            addButton.addTarget(self, action: #selector(addCoin), for: .touchUpInside);
+            let rightBarButton = UIBarButtonItem(customView: addButton);
+            self.navigationItem.rightBarButtonItem = rightBarButton;
+        }
     }
     
     // MARK: - Table view data source methodd
@@ -167,12 +196,19 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
-    func displayAlert(title:String, message:String) {
+    private func displayAlert(title:String, message:String) -> Void {
         let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
         let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
         alert.addAction(defaultButton)
         present(alert, animated: true, completion: nil);
     }
+    
+     private func displayAlertWithCompletion(title: String, message: String, style: UIAlertAction.Style, handler:@escaping (UIAlertAction) -> Void) -> Void {
+       let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert);
+       alert.addAction(UIAlertAction(title: "OK", style: style, handler: handler));
+       self.present(alert, animated: true, completion: nil);
+    }
+       
     
     // MARK: - Methods for setting up all fields on the screen
     

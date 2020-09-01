@@ -98,21 +98,45 @@ class TradeVC: UIViewController {
     
     @IBAction func fiveTapped(_ sender: Any) {
         self.vibrate(style: .medium);
-        let newAmountOfCoin = 500.00 / self.ticker!.price;
-        self.amount_txt.text = String(newAmountOfCoin);
-        self.updateInfo();
+        if (self.cost_lbl.text == "$ - ") {
+            let newAmountOfCoin = 500.00 / self.ticker!.price;
+            self.amount_txt.text = String(newAmountOfCoin);
+            self.updateInfo();
+        } else {
+            var temp:String = self.cost_lbl.text!;
+            temp.removeFirst();
+            let combinedDouble = (Double(temp)! + 500.0) / ticker!.price;
+            self.amount_txt.text = String(combinedDouble)
+            self.updateInfo();
+        }
     }
     @IBAction func thousTapped(_ sender: Any) {
         self.vibrate(style: .medium);
-        let newAmountOfCoin = 1000.00 / self.ticker!.price;
-        self.amount_txt.text = String(newAmountOfCoin);
-        self.updateInfo();
+        if (self.cost_lbl.text == "$ - ") {
+            let newAmountOfCoin = 1000.00 / self.ticker!.price;
+            self.amount_txt.text = String(newAmountOfCoin);
+            self.updateInfo();
+        } else {
+            var temp:String = self.cost_lbl.text!;
+            temp.removeFirst();
+            let combinedDouble = (Double(temp)! + 1000.00) / ticker!.price;
+            self.amount_txt.text = String(combinedDouble)
+            self.updateInfo();
+        }
     }
     @IBAction func fiveThousTapped(_ sender: Any) {
         self.vibrate(style: .medium);
-        let newAmountOfCoin = 5000.00 / self.ticker!.price;
-        self.amount_txt.text = String(newAmountOfCoin);
-        self.updateInfo();
+        if (self.cost_lbl.text == "$ - ") {
+            let newAmountOfCoin = 5000.00 / self.ticker!.price;
+            self.amount_txt.text = String(newAmountOfCoin);
+            self.updateInfo();
+        } else {
+            var temp:String = self.cost_lbl.text!;
+            temp.removeFirst();
+            let combinedDouble = (Double(temp)! + 5000.00) / ticker!.price;
+            self.amount_txt.text = String(combinedDouble)
+            self.updateInfo();
+        }
     }
     @IBAction func allTapped(_ sender: Any) {
         self.vibrate(style: .medium);
@@ -125,9 +149,17 @@ class TradeVC: UIViewController {
 //        } else {
 //            displayAlert(title: "Sorry", message: "Insuffient funds");
 //        }
-        let newAmountOfCoin = 10000.00 / self.ticker!.price;
-        self.amount_txt.text = String(newAmountOfCoin);
-        self.updateInfo();
+        if (self.cost_lbl.text == "$ - ") {
+            let newAmountOfCoin = 10000.00 / self.ticker!.price;
+            self.amount_txt.text = String(newAmountOfCoin);
+            self.updateInfo();
+        } else {
+           var temp:String = self.cost_lbl.text!;
+            temp.removeFirst();
+            let combinedDouble = (Double(temp)! + 10000.00) / ticker!.price;
+            self.amount_txt.text = String(combinedDouble)
+            self.updateInfo();
+        }
     }
     
     @objc private func amountTapped() -> Void {
@@ -162,7 +194,7 @@ class TradeVC: UIViewController {
         let amountDouble = Double(self.amount_txt.text!);
         if (self.amount_txt.text!.isEmpty) {
             self.view.endEditing(true);
-            self.cost_lbl.text = "$ - "
+            self.cost_lbl.text = "$ - ";
             self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
             return;
         }
@@ -288,9 +320,6 @@ class TradeVC: UIViewController {
             funds = currentFunds;
         }
         
-//        var tempCost = self.cost_lbl.text!;
-//        tempCost.removeFirst();
-//        let tempCostDouble = Double(tempCost);
         
         // buy the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
@@ -301,12 +330,14 @@ class TradeVC: UIViewController {
 //                    if (self.availPressed) {
 //                        doubleAmount = funds / ticker!.price;
 //                    }
-                    let result = doubleAmount! * ticker!.price;
-                    if (OrderHandler.buy(amountCost: result, amountOfCoin: doubleAmount!, ticker: ticker!)) {
+                    let affectedCost:Double = doubleAmount! * ticker!.price;
+                    let affectedAmountOfCoin = affectedCost / ticker!.price;
+                    if (OrderHandler.buy(amountCost: affectedCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker!)) {
                         self.dismiss(animated: true) {
                             if let portVC = self.portfolioVC {
                                 portVC.loadData();
                                 portVC.tableVIew.reloadData();
+                                portVC.updateCells();
                             }
                         };
                     }

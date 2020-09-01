@@ -10,7 +10,7 @@ import UIKit
 
 class ReferenceTBVC: UITableViewController {
 
-    var items = [["Data provided by Coinranking"], ["Images provided by Atomiclabs"], ["Data provided by Cryptocompare"], ["Images provided Icons8"]];
+    var items = [["Data provided by Coinranking"], ["Images provided by Atomiclabs"], ["Data provided by Cryptocompare"], ["Images provided Icons8"], ["Forbes", "Investopedia", "Fidelity", "PrimexXBT", "ICO Holder", "Binance Academy"]];
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +40,15 @@ class ReferenceTBVC: UITableViewController {
            case 2:
                self.setTextOfHeader(label: sectionLabel, text: "CHART DATA, NEWS AND DISCUSSION BOARDS");
                headerView.addSubview(sectionLabel)
+               break;
            case 3:
                self.setTextOfHeader(label: sectionLabel, text: "TAB BAR IMAGES");
                headerView.addSubview(sectionLabel);
+               break;
+           case 4:
+               self.setTextOfHeader(label: sectionLabel, text: "INVESTING TIPS");
+               headerView.addSubview(sectionLabel);
+               break;
            default:
                break;
            }

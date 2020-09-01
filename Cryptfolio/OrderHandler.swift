@@ -18,10 +18,10 @@ public class OrderHandler {
                 betterAlert(title: "Sorry", message: "Insufficient funds");
                 return false;
             }
+            print("Current Funds: \(currentFunds!)");
+            print("Amount Cost: \(amountCost)");
             if (currentFunds!.isLess(than: amountCost)) {
                 betterAlert(title: "Sorry", message: "Insufficient funds");
-                print("Current Funds: \(currentFunds!)");
-                print("Amount Cost: \(amountCost)");
                 return false;
             } else {
                 let updatedFunds:Double = currentFunds! - amountCost;
