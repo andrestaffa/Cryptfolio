@@ -14,7 +14,6 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageLbl: UILabel!;
     
-    private var hasLoadedCoins:Bool = false;
     private var loadedHoldings:Array<Holding> = Array<Holding>();
     private var filterHoldings:Array<Holding> = Array<Holding>();
     
@@ -38,10 +37,28 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             self.loadedHoldings = loadedHoldings;
             self.loadedHoldings = self.loadedHoldings.sorted(by: { (holding, nextHolding) -> Bool in
                 return holding.ticker.marketCap > nextHolding.ticker.marketCap;
-            })
+            });
+            if (loadedHoldings.isEmpty) {
+                self.searchController.searchBar.isHidden = true;
+                self.title = "";
+                self.messageLbl.numberOfLines = 0;
+                self.messageLbl.lineBreakMode = .byWordWrapping;
+                self.messageLbl.isHidden = false;
+                self.messageLbl.text = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
+                return;
+            }
+            self.searchController.searchBar.isHidden = false;
+            self.title = "Select A Coin";
+            self.messageLbl.isHidden = true;
         } else {
             self.tableView.isHidden = true;
             self.loadedHoldings = Array<Holding>();
+            self.searchController.searchBar.isHidden = true;
+            self.title = "";
+            self.messageLbl.numberOfLines = 0;
+            self.messageLbl.lineBreakMode = .byWordWrapping;
+            self.messageLbl.isHidden = false;
+            self.messageLbl.text = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
         }
     }
     
@@ -49,21 +66,6 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
         super.viewDidLoad()
 
         self.navigationController?.navigationBar.prefersLargeTitles = true;
-        self.messageLbl.numberOfLines = 0;
-        
-        let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
-        self.hasLoadedCoins = loadedHoldings == nil || loadedHoldings!.isEmpty ? false : true;
-        
-        if (!self.hasLoadedCoins) {
-            self.searchController.searchBar.isHidden = true;
-            self.title = "";
-            self.messageLbl.isHidden = false;
-            self.messageLbl.text = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
-        } else {
-            self.searchController.searchBar.isHidden = false;
-            self.title = "Select A Coin";
-            self.messageLbl.isHidden = true;
-        }
         
         self.tableView.delegate = self;
         self.tableView.dataSource = self;

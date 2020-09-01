@@ -314,25 +314,15 @@ class TradeVC: UIViewController {
             incorrectInputLayout()
             return;
         }
-        
-        var funds:Double = 0.0
-        if let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double {
-            funds = currentFunds;
-        }
-        
-        
         // buy the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
+            let resultingCost = doubleAmount! * self.ticker!.price;
             CryptoData.getCoinData(id: self.ticker!.id) { (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
-//                    if (self.availPressed) {
-//                        doubleAmount = funds / ticker!.price;
-//                    }
-                    let affectedCost:Double = doubleAmount! * ticker!.price;
-                    let affectedAmountOfCoin = affectedCost / ticker!.price;
-                    if (OrderHandler.buy(amountCost: affectedCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker!)) {
+                    let affectedAmountOfCoin:Double = resultingCost / ticker!.price;
+                    if (OrderHandler.buy(amountCost: resultingCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker!)) {
                         self.dismiss(animated: true) {
                             if let portVC = self.portfolioVC {
                                 portVC.loadData();

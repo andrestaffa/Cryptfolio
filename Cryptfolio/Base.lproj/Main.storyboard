@@ -1992,7 +1992,11 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </prototypes>
                             </tableView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="You have not made any trades yet! As soon as you buy/sell coins your trade history will show up" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="5" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="f4H-3f-UYr">
-                                <rect key="frame" x="16" y="187" width="343" height="216"/>
+                                <rect key="frame" x="16" y="225.5" width="343" height="216"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="343" id="T8y-PD-sdF"/>
+                                    <constraint firstAttribute="height" constant="216" id="fWJ-LQ-u10"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" weight="thin" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -2000,13 +2004,11 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                         </subviews>
                         <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
                         <constraints>
-                            <constraint firstItem="f4H-3f-UYr" firstAttribute="top" secondItem="oXK-C1-k4f" secondAttribute="top" constant="187" id="GM8-az-jPf"/>
-                            <constraint firstItem="oXK-C1-k4f" firstAttribute="bottom" secondItem="f4H-3f-UYr" secondAttribute="bottom" constant="264" id="Meg-HW-eAb"/>
                             <constraint firstItem="Zet-bP-7Ku" firstAttribute="leading" secondItem="oXK-C1-k4f" secondAttribute="leading" id="Upc-an-XxR"/>
                             <constraint firstItem="Zet-bP-7Ku" firstAttribute="top" secondItem="oXK-C1-k4f" secondAttribute="top" id="WFS-C5-A8E"/>
-                            <constraint firstItem="oXK-C1-k4f" firstAttribute="trailing" secondItem="f4H-3f-UYr" secondAttribute="trailing" constant="16" id="ZDR-sO-ssi"/>
+                            <constraint firstItem="f4H-3f-UYr" firstAttribute="centerY" secondItem="mbh-uo-BEu" secondAttribute="centerY" id="YVA-k4-5Gt"/>
                             <constraint firstItem="Zet-bP-7Ku" firstAttribute="trailing" secondItem="oXK-C1-k4f" secondAttribute="trailing" id="eCd-MS-FN2"/>
-                            <constraint firstItem="f4H-3f-UYr" firstAttribute="leading" secondItem="oXK-C1-k4f" secondAttribute="leading" constant="16" id="ghe-0z-DFl"/>
+                            <constraint firstItem="f4H-3f-UYr" firstAttribute="centerX" secondItem="mbh-uo-BEu" secondAttribute="centerX" id="gqs-t7-mBp"/>
                             <constraint firstItem="Zet-bP-7Ku" firstAttribute="bottom" secondItem="oXK-C1-k4f" secondAttribute="bottom" id="lbF-fg-qN1"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="oXK-C1-k4f"/>
