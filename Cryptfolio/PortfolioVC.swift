@@ -15,6 +15,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var subtitleLbl: UILabel!;
     @IBOutlet weak var mainTitleLbl: UILabel!;
+    @IBOutlet weak var leaderboard_btn: UIButton!
+    
+    private var textField = UITextField(frame: CGRect.zero)
     
     @IBOutlet weak var addCoin_btn: UIButton!
     @IBOutlet weak var welcome_lbl: UILabel!
@@ -502,11 +505,108 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
     }
     
+    @IBAction func leaderboardBtnTapped(_ sender: Any) {
+        
+        var temp = self.mainPortfolio_lbl.text!;
+        temp.removeFirst();
+        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
+        let change = self.mainPortPercentChange_lbl.text!;
+        
+        if let username = UserDefaults.standard.string(forKey: UserDefaultKeys.username) {
+            print("User already exited so just move on to the leaderboard View Controller");
+            DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false) { (error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    let leaderboardVC = self.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
+                    leaderboardVC.currentUsername = username;
+                    leaderboardVC.currentHighscore = "Highscore: \(highscore)";
+                    self.navigationController?.pushViewController(leaderboardVC, animated: true);
+                }
+            }
+        } else {
+            print("Username is brand new (drake)");
+            let alertController = UIAlertController(title: "Username", message: "\n\n", preferredStyle: .alert)
+            let cancelAction = UIAlertAction.init(title: "Cancel", style: .default) { (action) in
+                alertController.view.removeObserver(self, forKeyPath: "bounds")
+            }
+            alertController.addAction(cancelAction)
+            let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) in
+                let enteredUsername = self.textField.text
+ //
+                if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername == nil)) {
+                    DatabaseManager.readAllUsers { (snapshot, error) in
+                        if let error = error {
+                            print(error.localizedDescription);
+                        } else {
+                            if let snapshot = snapshot {
+                                var foundUser:Bool = false;
+                                for document in snapshot.documents {
+                                    let docData = document.data();
+                                    let foundUsername = docData["username"] as! String;
+                                    if (foundUsername.lowercased() == enteredUsername!.lowercased()) {
+                                        foundUser = true;
+                                        break;
+                                    }
+                                }
+                                if (!foundUser) {
+                                    UserDefaults.standard.set(enteredUsername!, forKey: UserDefaultKeys.username);
+                                    DatabaseManager.writeUserData(username: enteredUsername!, highscore: highscore, change: change, merge: false) { (error) in
+                                        if let error = error {
+                                            print(error.localizedDescription);
+                                        } else {
+                                            let leaderboardInfoVC = self.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
+                                            leaderboardInfoVC.currentUsername = enteredUsername!;
+                                            leaderboardInfoVC.currentHighscore = "Highscore: \(highscore)";
+                                            self.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
+                                        }
+                                    }
+                                } else {
+                                    self.displayAlert(title: "Error", message: "username already exists");
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    self.displayAlert(title: "Error", message: "Please enter a valid username");
+                }
+  //
+                alertController.view.removeObserver(self, forKeyPath: "bounds")
+            }
+            alertController.addAction(saveAction)
+            alertController.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
+            self.textField.backgroundColor = UIColor.clear;
+            self.textField.placeholder = "Enter username"
+            self.textField.textColor = UIColor.lightGray;
+            self.textField.layer.borderColor = UIColor.lightGray.cgColor;
+            self.textField.layer.borderWidth = 0.5
+            alertController.view.addSubview(self.textField)
+            self.present(alertController, animated: true, completion: nil);
+        }
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "bounds"{
+            if let rect = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgRectValue {
+                let margin: CGFloat = 8
+                let xPos = rect.origin.x + margin
+                let yPos = rect.origin.y + 54
+                let width = rect.width - 2 * margin
+                let height: CGFloat = 20
+
+                print("yo")
+                
+                self.textField.frame = CGRect.init(x: xPos, y: yPos, width: width, height: height)
+            }
+        }
+    }
+
     @objc private func goToHoldingsVC() -> Void {
         // REMOVE THIS LATER
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+        //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.username);
         
         let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
         self.navigationController?.pushViewController(holdingVC, animated: true);
@@ -877,6 +977,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.subtitleLbl.isHidden = hidden;
         self.mainTitleLbl.isHidden = hidden;
         self.collectionView.isHidden = hidden;
+        self.leaderboard_btn.isHidden = hidden;
     }
     
     private func hideColTitleLabels(hidden:Bool) -> Void {

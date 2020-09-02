@@ -1,2 +1,3 @@
 ${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources.sh
 ${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle
+${PODS_CONFIGURATION_BUILD_DIR}/gRPC-C++/gRPCCertificates-Cpp.bundle

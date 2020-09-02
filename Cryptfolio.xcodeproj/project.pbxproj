@@ -34,6 +34,8 @@
 		20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF2585246375E1000265A5 /* UserDefaultKeys.swift */; };
 		20C4C05B24ECDB1C0096B31E /* InvestingTipsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */; };
 		20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */; };
+		20D0F0BD25002D7500C458E4 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */; };
+		20D0F0BF2500363500C458E4 /* LeaderboardVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D0F0BE2500363500C458E4 /* LeaderboardVC.swift */; };
 		20DAB4D1247EF3DB00DD57CC /* SettingsTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DAB4D0247EF3DB00DD57CC /* SettingsTBVC.swift */; };
 		20DF8F4C246F1664002754E2 /* OrderHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DF8F4B246F1664002754E2 /* OrderHandler.swift */; };
 		20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E924FF24494FC8002B59B1 /* CryptoData.swift */; };
@@ -41,7 +43,7 @@
 		20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */; };
 		20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */; };
 		20FEBAC424818DC200EE1263 /* NewsRefTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FEBAC324818DC200EE1263 /* NewsRefTBVC.swift */; };
-		336CF84D7E0D536B38FAD874 /* libPods-Cryptfolio.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F98E6168701258487BA213EC /* libPods-Cryptfolio.a */; };
+		484E81B95CE56F92844988CD /* Pods_Cryptfolio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FBC762C4C7AFBE7E8DBA5AC /* Pods_Cryptfolio.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -78,6 +80,8 @@
 		20AF2585246375E1000265A5 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
 		20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipsVC.swift; sourceTree = "<group>"; };
 		20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipCell.swift; sourceTree = "<group>"; };
+		20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
+		20D0F0BE2500363500C458E4 /* LeaderboardVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LeaderboardVC.swift; sourceTree = "<group>"; };
 		20DAB4D0247EF3DB00DD57CC /* SettingsTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsTBVC.swift; sourceTree = "<group>"; };
 		20DF8F4B246F1664002754E2 /* OrderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderHandler.swift; sourceTree = "<group>"; };
 		20E924FF24494FC8002B59B1 /* CryptoData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoData.swift; sourceTree = "<group>"; };
@@ -86,7 +90,7 @@
 		20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageHandler.swift; sourceTree = "<group>"; };
 		20FEBAC324818DC200EE1263 /* NewsRefTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRefTBVC.swift; sourceTree = "<group>"; };
 		39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.debug.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.debug.xcconfig"; sourceTree = "<group>"; };
-		F98E6168701258487BA213EC /* libPods-Cryptfolio.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Cryptfolio.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6FBC762C4C7AFBE7E8DBA5AC /* Pods_Cryptfolio.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Cryptfolio.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,7 +98,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				336CF84D7E0D536B38FAD874 /* libPods-Cryptfolio.a in Frameworks */,
+				484E81B95CE56F92844988CD /* Pods_Cryptfolio.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -157,6 +161,8 @@
 				2010F1E123FE113C007B4343 /* Cryptfolio.xcdatamodeld */,
 				2016FEB424F2E6E200E38535 /* HoldingVC.swift */,
 				2016FEB624F2EF7300E38535 /* HistoryVC.swift */,
+				20D0F0BE2500363500C458E4 /* LeaderboardVC.swift */,
+				20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */,
 			);
 			path = Cryptfolio;
 			sourceTree = "<group>";
@@ -176,7 +182,7 @@
 				202A15902404EA93003C1EB3 /* Alamofire.framework */,
 				202A15892404EA5E003C1EB3 /* Alamofire.framework */,
 				20726D5C2404E9810042C9E9 /* Alamofire.framework */,
-				F98E6168701258487BA213EC /* libPods-Cryptfolio.a */,
+				6FBC762C4C7AFBE7E8DBA5AC /* Pods_Cryptfolio.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -192,7 +198,7 @@
 				2010F1D323FE113C007B4343 /* Sources */,
 				2010F1D423FE113C007B4343 /* Frameworks */,
 				2010F1D523FE113C007B4343 /* Resources */,
-				214BF952157D88133FF3BB44 /* [CP] Copy Pods Resources */,
+				2B8DDAC6EB9953A522674A48 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -253,21 +259,21 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		214BF952157D88133FF3BB44 /* [CP] Copy Pods Resources */ = {
+		2B8DDAC6EB9953A522674A48 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		2C8D7EEE8A74D4F6AD12EA68 /* [CP] Check Pods Manifest.lock */ = {
@@ -307,6 +313,7 @@
 				2062A22124ED920800185BF8 /* TipManager.swift in Sources */,
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
 				20AF258424633AC4000265A5 /* TradeVC.swift in Sources */,
+				20D0F0BD25002D7500C458E4 /* DatabaseManager.swift in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
 				20DF8F4C246F1664002754E2 /* OrderHandler.swift in Sources */,
 				20FEBAC424818DC200EE1263 /* NewsRefTBVC.swift in Sources */,
@@ -322,6 +329,7 @@
 				2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */,
 				2016FEB724F2EF7300E38535 /* HistoryVC.swift in Sources */,
 				2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */,
+				20D0F0BF2500363500C458E4 /* LeaderboardVC.swift in Sources */,
 				2010C6302482CD2A00CECAC5 /* ReferenceTBVC.swift in Sources */,
 				20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */,
 				20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */,
