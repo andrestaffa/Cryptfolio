@@ -63,6 +63,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.tabBarController?.tabBar.isHidden = false;
         
+        self.leaderboard_btn.isUserInteractionEnabled = true;
+        
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
         
@@ -507,70 +509,34 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @IBAction func leaderboardBtnTapped(_ sender: Any) {
         
+        self.leaderboard_btn.isUserInteractionEnabled = false;
         var temp = self.mainPortfolio_lbl.text!;
         temp.removeFirst();
         let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
-        let change = self.mainPortPercentChange_lbl.text!;
+        var change:String = "";
+        if (String(self.portPercentChange).first != "-") {
+            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
+        } else {
+            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
+        }
         
         if let username = UserDefaults.standard.string(forKey: UserDefaultKeys.username) {
-            print("User already exited so just move on to the leaderboard View Controller");
-            DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false) { (error) in
-                if let error = error {
-                    print(error.localizedDescription);
-                } else {
-                    let leaderboardVC = self.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
-                    leaderboardVC.currentUsername = username;
-                    leaderboardVC.currentHighscore = "Highscore: \(highscore)";
-                    self.navigationController?.pushViewController(leaderboardVC, animated: true);
-                }
-            }
+            DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false, viewController: self);
         } else {
-            print("Username is brand new (drake)");
             let alertController = UIAlertController(title: "Username", message: "\n\n", preferredStyle: .alert)
             let cancelAction = UIAlertAction.init(title: "Cancel", style: .default) { (action) in
+                self.leaderboard_btn.isUserInteractionEnabled = true;
                 alertController.view.removeObserver(self, forKeyPath: "bounds")
             }
             alertController.addAction(cancelAction)
             let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) in
-                let enteredUsername = self.textField.text
- //
-                if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername == nil)) {
-                    DatabaseManager.readAllUsers { (snapshot, error) in
-                        if let error = error {
-                            print(error.localizedDescription);
-                        } else {
-                            if let snapshot = snapshot {
-                                var foundUser:Bool = false;
-                                for document in snapshot.documents {
-                                    let docData = document.data();
-                                    let foundUsername = docData["username"] as! String;
-                                    if (foundUsername.lowercased() == enteredUsername!.lowercased()) {
-                                        foundUser = true;
-                                        break;
-                                    }
-                                }
-                                if (!foundUser) {
-                                    UserDefaults.standard.set(enteredUsername!, forKey: UserDefaultKeys.username);
-                                    DatabaseManager.writeUserData(username: enteredUsername!, highscore: highscore, change: change, merge: false) { (error) in
-                                        if let error = error {
-                                            print(error.localizedDescription);
-                                        } else {
-                                            let leaderboardInfoVC = self.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
-                                            leaderboardInfoVC.currentUsername = enteredUsername!;
-                                            leaderboardInfoVC.currentHighscore = "Highscore: \(highscore)";
-                                            self.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
-                                        }
-                                    }
-                                } else {
-                                    self.displayAlert(title: "Error", message: "username already exists");
-                                }
-                            }
-                        }
-                    }
+                self.leaderboard_btn.isUserInteractionEnabled = true;
+                let enteredUsername = self.textField.text;
+                if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername!.trimmingCharacters(in: .whitespaces).isEmpty) || enteredUsername!.count <= 8 || enteredUsername == nil) {
+                    DatabaseManager.findUser(username: enteredUsername!, highscore: highscore, change: change, viewController: self);
                 } else {
                     self.displayAlert(title: "Error", message: "Please enter a valid username");
                 }
-  //
                 alertController.view.removeObserver(self, forKeyPath: "bounds")
             }
             alertController.addAction(saveAction)

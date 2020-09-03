@@ -8,6 +8,7 @@
 
 import Foundation;
 import UIKit;
+import SVProgressHUD;
 import FirebaseFirestore;
 
 
@@ -26,9 +27,73 @@ public class DatabaseManager {
     public static func writeUserData(username:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
         db.collection("users").document(username).setData(["username":username, "highscore":highscore, "change":change], merge: merge, completion: completion);
     }
+
+    public static func writeUserData(username:String, highscore:Double, change:String, merge:Bool, viewController:UIViewController) -> Void {
+        SVProgressHUD.show(withStatus: "Loading...");
+        db.collection("users").document(username).setData(["username":username, "highscore":highscore, "change":change], merge: merge) { (error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                SVProgressHUD.dismiss();
+                let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
+                leaderboardInfoVC.currentUsername = username;
+                leaderboardInfoVC.currentHighscore = "Highscore: \(highscore)";
+                viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
+            }
+        }
+    }
     
-    public static func readAllUsers(completion:@escaping(QuerySnapshot?, Error?) -> Void) -> Void {
-        db.collection("users").getDocuments(completion: completion)
+    public static func findUser(username:String, highscore:Double, change:String, viewController:UIViewController) -> Void {
+        SVProgressHUD.show(withStatus: "Loading...");
+        db.collection("users").getDocuments { (snapshot, error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                if let snapshot = snapshot {
+                    var foundUser:Bool = false;
+                    for document in snapshot.documents {
+                        let docData = document.data();
+                        let foundUsername = docData["username"] as! String;
+                        if (foundUsername.lowercased() == username.lowercased()) {
+                            foundUser = true;
+                            break;
+                        }
+                    }
+                    if (!foundUser) {
+                        UserDefaults.standard.set(username, forKey: UserDefaultKeys.username);
+                        DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false, viewController: viewController);
+                    } else {
+                        SVProgressHUD.dismiss();
+                        let alert = UIAlertController(title: "Sorry", message: "Username already exists!", preferredStyle: .alert);
+                        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
+                        alert.addAction(defaultButton);
+                        viewController.present(alert, animated: true, completion: nil);
+                    }
+                    return;
+                }
+            }
+        }
+    }
+        
+    public static func findUser(username:String, completion:@escaping(Bool) -> Void) -> Void {
+        db.collection("users").getDocuments { (snapshot, error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                if let snapshot = snapshot {
+                    for document in snapshot.documents {
+                        let docData = document.data();
+                        let foundUser = docData["username"] as! String;
+                        if (foundUser.lowercased() == username.lowercased()) {
+                            completion(true);
+                            return;
+                        }
+                    }
+                    completion(false);
+                    return;
+                }
+            }
+        }
     }
     
     public static func deleteUser(username:String, completion:@escaping(Error?) -> Void) -> Void {
@@ -59,68 +124,3 @@ public class DatabaseManager {
     
 
 }
-
-// FirebaseStore test data
-        
-        // get reference to database
-        //let db = Firestore.firestore();
-        
-        // CREATE/WRITE/UPDATE: adding/updating documents with completion.
-//        var temp = self.mainPortfolio_lbl.text!;
-//        temp.removeFirst();
-//        db.collection("users").document("andre_is_life").setData(["highscore":Double(temp)!], merge: false) { (error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//
-//            }
-//        }
-        
-        // READ: read specific document / read read all documents from a specific collection
-//        db.collection("users").document("andre_is_life").getDocument { (document, error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//                if (document != nil && document!.exists) {
-//                    let data = document!.data();
-//                }
-//            }
-//        }
-//        db.collection("users").getDocuments { (snapshot, error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//                if (snapshot != nil) {
-//                    for document in snapshot!.documents {
-//                        let docData = document.data();
-//                    }
-//                }
-//            }
-//        }
-//        db.collection("users").whereField("highscore", isGreaterThan: 15000.0).getDocuments { (snapshot, error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//                if (snapshot != nil) {
-//                    for document in snapshot!.documents {
-//                        let docData = document.data();
-//                    }
-//                }
-//            }
-//        }
-        
-        // DELETE: delete a document with completion / delete field if nessessary
-//        db.collection("users").document("andre_is_life").delete { (error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//                // delete has completed
-//            }
-//        }
-//        db.collection("users").document("andre_is_life").updateData(["highscore":FieldValue.delete()]) { (error) in
-//            if let error = error {
-//                print(error.localizedDescription);
-//            } else {
-//                // deletion of field successful
-//            }
-//        }

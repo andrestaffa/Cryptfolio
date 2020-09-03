@@ -6,7 +6,9 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
+import UIKit;
+import SVProgressHUD;
+import SwiftChart;
 
 class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
@@ -17,20 +19,21 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     private var users:Array<User> = Array<User>();
     private var isLoading:Bool = true;
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
 
+    override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.barTintColor = nil;
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.navigationController?.navigationBar.shadowImage = nil;
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
-        
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+
         self.tableView.delegate = self;
         self.tableView.dataSource = self;
 
         self.title = "Leaderboard";
-        
         self.getUserData();
         
     }
@@ -62,25 +65,31 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! LeaderboardCell;
         
         if (self.isLoading) {
-            cell.rank_lbl.isHidden = true;
-            cell.username_lbl.isHidden = true;
-            cell.highscore_lbl.isHidden = true;
-            cell.change_lbl.isHidden = true;
+            SVProgressHUD.show(withStatus: "Loading...");
+            self.hideCells(cell: cell, hidden: true);
         } else {
-            cell.rank_lbl.isHidden = false;
-            cell.username_lbl.isHidden = false;
-            cell.highscore_lbl.isHidden = false;
-            cell.change_lbl.isHidden = false;
+            SVProgressHUD.dismiss();
+            self.hideCells(cell: cell, hidden: false);
+            if (String(self.users[indexPath.row].change).first != "-") {
+                if (self.traitCollection.userInterfaceStyle == .dark) {
+                    cell.change_lbl.textColor = ChartColors.darkGreenColor();
+                } else {
+                    cell.change_lbl.textColor = ChartColors.greenColor();
+                }
+                cell.change_lbl.attributedText = self.attachImageToString(text: self.users[indexPath.row].change, image: #imageLiteral(resourceName: "sortUpArrow"));
+            } else {
+                cell.change_lbl.textColor = ChartColors.darkRedColor();
+                cell.change_lbl.attributedText = self.attachImageToString(text: self.users[indexPath.row].change, image: #imageLiteral(resourceName: "sortDownArrow"));
+            }
             
             cell.rank_lbl.text = "# \(self.users[indexPath.row].rank)";
             cell.username_lbl.text = self.users[indexPath.row].username;
             cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[indexPath.row].highscore))";
-            cell.change_lbl.text = self.users[indexPath.row].change;
             
             if (self.users[indexPath.row].username.lowercased() == currentUsername.lowercased()) {
-                cell.username_lbl.textColor = .yellow;
+                cell.username_lbl.textColor = .orange;
             }
-            
+                
         }
         return cell;
     }
@@ -91,6 +100,25 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 50.0;
+    }
+    
+    private func hideCells(cell:LeaderboardCell, hidden:Bool) {
+        cell.rank_lbl.isHidden = hidden;
+        cell.username_lbl.isHidden = hidden;
+        cell.highscore_lbl.isHidden = hidden;
+        cell.change_lbl.isHidden = hidden;
+    }
+    
+    private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = CGRect(x: 0.5, y: -0.3, width: 8, height: 8)
+        let masterStirng = NSMutableAttributedString(string: "")
+        let percentString = NSMutableAttributedString(string: text);
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(percentString)
+        masterStirng.append(imageAttachment)
+        return masterStirng;
     }
 
 }
