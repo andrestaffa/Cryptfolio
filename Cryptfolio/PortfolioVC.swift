@@ -6,7 +6,7 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
+import UIKit;
 import SwiftChart;
 import SVProgressHUD;
 
@@ -17,7 +17,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var mainTitleLbl: UILabel!;
     @IBOutlet weak var leaderboard_btn: UIButton!
     
-    private var textField = UITextField(frame: CGRect.zero)
+    private var isSubmitLogin:Bool = true;
+    private var alert:UIAlertController = UIAlertController();
+    private var alertButton:UIButton = UIButton();
     
     @IBOutlet weak var addCoin_btn: UIButton!
     @IBOutlet weak var welcome_lbl: UILabel!
@@ -377,7 +379,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     @objc private func mainPortTapped() -> Void {
-        print("go to mainPortFolioVC");
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.username);
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
@@ -510,6 +515,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBAction func leaderboardBtnTapped(_ sender: Any) {
         
         self.leaderboard_btn.isUserInteractionEnabled = false;
+        self.isSubmitLogin = true;
         var temp = self.mainPortfolio_lbl.text!;
         temp.removeFirst();
         let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
@@ -521,62 +527,70 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
         
         if let username = UserDefaults.standard.string(forKey: UserDefaultKeys.username) {
-            DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false, viewController: self);
+            DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: true, viewController: self);
         } else {
-            let alertController = UIAlertController(title: "Username", message: "\n\n", preferredStyle: .alert)
-            let cancelAction = UIAlertAction.init(title: "Cancel", style: .default) { (action) in
+            self.alert = UIAlertController(title: "\nLogin", message: "Enter username and password", preferredStyle: .alert);
+            self.alert.view.addSubview(createButton());
+            self.alert.addTextField();
+            self.alert.addTextField();
+            self.alert.textFields![0].placeholder = "Enter username";
+            self.alert.textFields![1].placeholder = "Enter password";
+            self.alert.textFields![1].isSecureTextEntry = true;
+            
+            self.alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in self.leaderboard_btn.isUserInteractionEnabled = true; }));
+            self.alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { (action) in
                 self.leaderboard_btn.isUserInteractionEnabled = true;
-                alertController.view.removeObserver(self, forKeyPath: "bounds")
-            }
-            alertController.addAction(cancelAction)
-            let saveAction = UIAlertAction(title: "Submit", style: .default) { (action) in
-                self.leaderboard_btn.isUserInteractionEnabled = true;
-                let enteredUsername = self.textField.text;
-                if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername!.trimmingCharacters(in: .whitespaces).isEmpty) || enteredUsername!.count <= 8 || enteredUsername == nil) {
-                    DatabaseManager.findUser(username: enteredUsername!, highscore: highscore, change: change, viewController: self);
+                let enteredUsername = self.alert.textFields![0].text;
+                let enteredPassword = self.alert.textFields![1].text;
+                if (self.isSubmitLogin) {
+                    if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername!.trimmingCharacters(in: .whitespaces).isEmpty || enteredUsername!.count >= 7 || enteredUsername == nil ||
+                        enteredPassword! == "" || enteredPassword!.isEmpty || enteredPassword!.trimmingCharacters(in: .whitespaces).isEmpty || enteredPassword!.count < 5 || enteredPassword == nil)) {
+                        DatabaseManager.findUser(username: enteredUsername!, password: enteredPassword!, highscore: highscore, change: change, viewController: self, isLogin: true);
+                    } else {
+                        self.displayAlert(title: "Error", message: "Incorrect formating of username or password");
+                    }
                 } else {
-                    self.displayAlert(title: "Error", message: "Please enter a valid username");
+                    if (!(enteredUsername! == "" || enteredUsername!.isEmpty || enteredUsername!.trimmingCharacters(in: .whitespaces).isEmpty || enteredUsername!.count >= 7 || enteredUsername == nil ||
+                        enteredPassword! == "" || enteredPassword!.isEmpty || enteredPassword!.trimmingCharacters(in: .whitespaces).isEmpty || enteredPassword!.count < 5 || enteredPassword == nil)) {
+                        DatabaseManager.findUser(username: enteredUsername!, password: enteredPassword!, highscore: highscore, change: change, viewController: self, isLogin: false);
+                    } else {
+                        self.displayAlert(title: "Error", message: "Incorrect formating of username or password");
+                    }
                 }
-                alertController.view.removeObserver(self, forKeyPath: "bounds")
-            }
-            alertController.addAction(saveAction)
-            alertController.view.addObserver(self, forKeyPath: "bounds", options: NSKeyValueObservingOptions.new, context: nil)
-            self.textField.backgroundColor = UIColor.clear;
-            self.textField.placeholder = "Enter username"
-            self.textField.textColor = UIColor.lightGray;
-            self.textField.layer.borderColor = UIColor.lightGray.cgColor;
-            self.textField.layer.borderWidth = 0.5
-            alertController.view.addSubview(self.textField)
-            self.present(alertController, animated: true, completion: nil);
+            }));
+            self.present(self.alert, animated: true, completion: nil);
         }
     }
-    
-    override func observeValue(forKeyPath keyPath: String?, of object: Any?, change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "bounds"{
-            if let rect = (change?[NSKeyValueChangeKey.newKey] as? NSValue)?.cgRectValue {
-                let margin: CGFloat = 8
-                let xPos = rect.origin.x + margin
-                let yPos = rect.origin.y + 54
-                let width = rect.width - 2 * margin
-                let height: CGFloat = 20
+        
+    func createButton() -> UIButton {
+        self.alertButton = UIButton(frame: CGRect(x: 10, y: 10, width: 70, height: 35));
+        self.alertButton.setTitle("Register", for: .normal);
+        self.alertButton.setTitle("Register", for: .selected);
+        self.alertButton.titleLabel!.font = UIFont(name: "Arial", size: 13.0);
+        self.alertButton.isUserInteractionEnabled = true;
+        self.alertButton.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside);
+        self.styleButton(button: &self.alertButton, borderColor: UIColor.orange.cgColor);
+        self.alertButton.backgroundColor = UIColor(red: 150/255, green: 90/255, blue: 0, alpha: 1);
+        return self.alertButton;
+    }
 
-                print("yo")
-                
-                self.textField.frame = CGRect.init(x: xPos, y: yPos, width: width, height: height)
-            }
+    @objc func signUpTapped() {
+        self.vibrate(style: .medium);
+        self.isSubmitLogin = !self.isSubmitLogin;
+        self.alert.title = self.isSubmitLogin ? "\nLogin" : "\nRegister";
+        self.alert.message = self.isSubmitLogin ? "Enter username and password"  : "Create a username and password";
+        if (self.isSubmitLogin) {
+            self.alertButton.setTitle("Register", for: .normal);
+            self.alertButton.setTitle("Register", for: .selected);
+        } else {
+            self.alertButton.setTitle("Login", for: .normal)
+            self.alertButton.setTitle("Login", for: .selected);
         }
     }
 
     @objc private func goToHoldingsVC() -> Void {
-        // REMOVE THIS LATER
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
-        //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.username);
-        
         let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
         self.navigationController?.pushViewController(holdingVC, animated: true);
-        
     }
     
     private func changeAllCellsProperties(configure:(TickerScreenCell, Int) -> Void) -> Void {

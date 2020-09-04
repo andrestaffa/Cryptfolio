@@ -7,6 +7,7 @@ target 'Cryptfolio' do
   pod 'SVProgressHUD'
   pod 'SwiftChart'
   pod 'Alamofire', '~> 5.0'
+  pod 'CryptoSwift'
   pod 'Google-Mobile-Ads-SDK'
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'

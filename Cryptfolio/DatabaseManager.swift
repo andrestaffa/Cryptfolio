@@ -10,6 +10,7 @@ import Foundation;
 import UIKit;
 import SVProgressHUD;
 import FirebaseFirestore;
+import CryptoSwift;
 
 
 public struct User : Codable {
@@ -24,8 +25,8 @@ public class DatabaseManager {
     
     private static let db = Firestore.firestore();
     
-    public static func writeUserData(username:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
-        db.collection("users").document(username).setData(["username":username, "highscore":highscore, "change":change], merge: merge, completion: completion);
+    public static func writeUserData(username:String, password:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
+        db.collection("users").document(username).setData(["username":username, "hashedPassword":password, "highscore":highscore, "change":change], merge: merge, completion: completion);
     }
 
     public static func writeUserData(username:String, highscore:Double, change:String, merge:Bool, viewController:UIViewController) -> Void {
@@ -43,7 +44,23 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(username:String, highscore:Double, change:String, viewController:UIViewController) -> Void {
+    public static func writeUserData(username:String, password:String, highscore:Double, change:String, merge:Bool, viewController:UIViewController) -> Void {
+        let hashedPassword:String = DatabaseManager.passwordHash(username: username, password: password);
+        SVProgressHUD.show(withStatus: "Loading...");
+        db.collection("users").document(username).setData(["username":username, "hashedPassword":hashedPassword, "highscore":highscore, "change":change], merge: merge) { (error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                SVProgressHUD.dismiss();
+                let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
+                leaderboardInfoVC.currentUsername = username;
+                leaderboardInfoVC.currentHighscore = "Highscore: \(highscore)";
+                viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
+            }
+        }
+    }
+    
+    public static func findUser(username:String, password:String, highscore:Double, change:String, viewController:UIViewController, isLogin:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection("users").getDocuments { (snapshot, error) in
             if let error = error {
@@ -51,25 +68,42 @@ public class DatabaseManager {
             } else {
                 if let snapshot = snapshot {
                     var foundUser:Bool = false;
+                    var foundBoth:Bool = false;
                     for document in snapshot.documents {
                         let docData = document.data();
                         let foundUsername = docData["username"] as! String;
-                        if (foundUsername.lowercased() == username.lowercased()) {
+                        let foundHashedPasswrod = docData["hashedPassword"] as! String;
+                        if (foundUsername.lowercased() == username.lowercased()) {  
                             foundUser = true;
+                        }
+                        if (foundHashedPasswrod == DatabaseManager.passwordHash(username: username, password: password)) {
+                            foundBoth = true;
+                        }
+                        if (foundBoth || foundUser) {
                             break;
                         }
                     }
-                    if (!foundUser) {
-                        UserDefaults.standard.set(username, forKey: UserDefaultKeys.username);
-                        DatabaseManager.writeUserData(username: username, highscore: highscore, change: change, merge: false, viewController: viewController);
+                    if (isLogin) {
+                        if (foundBoth) {
+                            UserDefaults.standard.set(username, forKey: UserDefaultKeys.username);
+                            DatabaseManager.writeUserData(username: username, password: password, highscore: highscore, change: change, merge: false, viewController: viewController);
+                        } else {
+                            SVProgressHUD.dismiss();
+                            let alert = UIAlertController(title: "Sorry", message: "Incorrect username or password!", preferredStyle: UIAlertController.Style.alert);
+                            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil));
+                            viewController.present(alert, animated: true, completion: nil);
+                        }
                     } else {
-                        SVProgressHUD.dismiss();
-                        let alert = UIAlertController(title: "Sorry", message: "Username already exists!", preferredStyle: .alert);
-                        let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
-                        alert.addAction(defaultButton);
-                        viewController.present(alert, animated: true, completion: nil);
+                        if (!foundUser) {
+                            UserDefaults.standard.set(username, forKey: UserDefaultKeys.username);
+                            DatabaseManager.writeUserData(username: username, password: password, highscore: highscore, change: change, merge: false, viewController: viewController);
+                        } else {
+                            SVProgressHUD.dismiss();
+                            let alert = UIAlertController(title: "Sorry", message: "Username already exists!", preferredStyle: UIAlertController.Style.alert);
+                            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil));
+                            viewController.present(alert, animated: true, completion: nil);
+                        }
                     }
-                    return;
                 }
             }
         }
@@ -120,6 +154,11 @@ public class DatabaseManager {
                 }
             }
         }
+    }
+    
+    public static func passwordHash(username: String, password: String) -> String {
+        let salt = "x4vV8bGgqqmQwgCoyXFQj+(o.nUNQhVP7ND"
+        return "\(password).\(username).\(salt)".sha256()
     }
     
 
