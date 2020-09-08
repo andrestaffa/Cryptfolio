@@ -40,20 +40,20 @@ class NewsTBVC: UITableViewController {
         if (!self.isLoading) {
             self.isLoading = true;
         }
-        CryptoData.getNewsData { (news, error) in
+        CryptoData.getNewsData { [weak self] (news, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.newsList.append(news!);
-                if (self.counter < 2) {
-                    self.prevLength = (self.newsList.count);
+                self?.newsList.append(news!);
+                if (self!.counter < 2) {
+                    self!.prevLength = (self!.newsList.count);
                 }
-                if ((self.newsList.count) > self.prevLength) {
-                    self.newsList.removeSubrange((0...self.prevLength - 1));
+                if ((self!.newsList.count) > self!.prevLength) {
+                    self?.newsList.removeSubrange((0...self!.prevLength - 1));
                 }
             }
-            self.isLoading = false;
-            self.tableView.reloadData();
+            self?.isLoading = false;
+            self?.tableView.reloadData();
         }
         
     }

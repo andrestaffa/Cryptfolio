@@ -72,12 +72,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.navigationController?.navigationBar.shadowImage = nil;
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
         
-        CryptoData.getCoinData(id: coin!.ticker.id) { (ticker, error) in
+        CryptoData.getCoinData(id: coin!.ticker.id) { [weak self] (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.coin!.ticker = ticker!;
-                self.updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
+                self?.coin!.ticker = ticker!;
+                self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
             }
         }
         
@@ -418,15 +418,15 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
         self.activityIndicator.startAnimating();
-        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { (history, error) in
+        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { [weak self] (history, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.chart_view.isHidden = false;
-                self.activityIndicator.stopAnimating();
-                self.dataPoints = history!.prices;
-                self.timestamps = history!.timestamps;
-                self.chartSetup(data: self.dataPoints, isDay: false)
+                self?.chart_view.isHidden = false;
+                self?.activityIndicator.stopAnimating();
+                self?.dataPoints = history!.prices;
+                self?.timestamps = history!.timestamps;
+                self?.chartSetup(data: self!.dataPoints, isDay: false)
                 
             }
         }

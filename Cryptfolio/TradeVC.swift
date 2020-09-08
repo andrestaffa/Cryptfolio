@@ -317,14 +317,14 @@ class TradeVC: UIViewController {
         // buy the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
             let resultingCost = doubleAmount! * self.ticker!.price;
-            CryptoData.getCoinData(id: self.ticker!.id) { (ticker, error) in
+            CryptoData.getCoinData(id: self.ticker!.id) { [weak self] (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
                     let affectedAmountOfCoin:Double = resultingCost / ticker!.price;
                     if (OrderHandler.buy(amountCost: resultingCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker!)) {
-                        self.dismiss(animated: true) {
-                            if let portVC = self.portfolioVC {
+                        self?.dismiss(animated: true) {
+                            if let portVC = self?.portfolioVC {
                                 portVC.loadData();
                                 portVC.tableVIew.reloadData();
                                 portVC.updateCells();
@@ -348,14 +348,14 @@ class TradeVC: UIViewController {
         
         // sell the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
-            CryptoData.getCoinData(id: self.ticker!.id) { (ticker, error) in
+            CryptoData.getCoinData(id: self.ticker!.id) { [weak self] (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
                     let amountCost = doubleAmount! * ticker!.price;
                     if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: doubleAmount!, ticker: ticker!)) {
-                        self.dismiss(animated: true) {
-                            if let portVC = self.portfolioVC {
+                        self?.dismiss(animated: true) {
+                            if let portVC = self?.portfolioVC {
                                 portVC.loadData();
                                 portVC.tableVIew.reloadData();
                             }

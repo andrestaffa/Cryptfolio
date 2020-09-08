@@ -15,7 +15,6 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var tableView: UITableView!
     
     public var currentUsername:String = "";
-    public var currentHighscore:String = "";
     
     private var users:Array<User> = Array<User>();
     private var isLoading:Bool = true;
@@ -25,6 +24,21 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.navigationController?.navigationBar.shadowImage = nil;
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
+        
+        // custom nav back button
+        self.navigationItem.backBarButtonItem = nil;
+        let backButton = UIButton();
+        backButton.frame = CGRect(x:0, y:0, width:100, height:20);
+        backButton.setTitle("Dashboard", for: .normal);
+        backButton.setTitle("Dashboard", for: .highlighted);
+        backButton.backgroundColor = UIColor.orange;
+        backButton.layer.cornerRadius = 8.0;
+        backButton.addTarget(self, action: #selector(backBtnTapped), for: .touchUpInside);
+        let leftBarButton = UIBarButtonItem(customView: backButton);
+        self.navigationItem.leftBarButtonItem = leftBarButton;
+        
+        self.tabBarController?.tabBar.isHidden = false;
+        
     }
     
     override func viewDidLoad() {
@@ -39,13 +53,13 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     private func getUserData() -> Void {
-        DatabaseManager.getAllUserData { (user, error) in
+        DatabaseManager.getAllUserData { [weak self] (user, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.isLoading = false;
-                self.users.append(user!);
-                self.tableView.reloadData();
+                self?.isLoading = false;
+                self?.users.append(user!);
+                self?.tableView.reloadData();
             }
         }
         self.tableView.reloadData();
@@ -109,6 +123,10 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.change_lbl.isHidden = hidden;
     }
     
+    @objc func backBtnTapped() {
+        self.navigationController?.popToRootViewController(animated: true);
+    }
+    
     private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = image
@@ -120,6 +138,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         masterStirng.append(imageAttachment)
         return masterStirng;
     }
+    
 
 }
 
