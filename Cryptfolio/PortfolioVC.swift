@@ -163,10 +163,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         if (String(self.tickers[indexPath.item].ticker.changePrecent24H).first! == "-") {
             cell.percentChangeLbl.attributedText = self.attachImageToString(text: "\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortDownArrow"));
-            cell.percentChangeLbl.textColor = ChartColors.darkRedColor();
+            cell.percentChangeLbl.textColor = ChartColors.redColor();
         } else {
             cell.percentChangeLbl.attributedText = self.attachImageToString(text: "+\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortUpArrow"));
-            cell.percentChangeLbl.textColor = ChartColors.darkGreenColor();
+            cell.percentChangeLbl.textColor = ChartColors.greenColor();
         }
         
         return cell;
@@ -185,7 +185,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
         var co = self.collectionView.contentOffset.x;
         var no = co + 0.5;
-        if (no >= 3700) {
+        if (no >= 3500) {
             self.collectionView.contentOffset.x = -350.0;
             co = self.collectionView.contentOffset.x;
             no = co + 0.5;
@@ -319,7 +319,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self?.mainPortPercentChange_lbl.isHidden = false;
                     self?.mainPortTimeStamp_lbl.isHidden = false;
                     
-                    self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.darkRedColor() : ChartColors.darkGreenColor();
+                    self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
                     self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
                 }
             }
@@ -476,6 +476,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     @IBAction func leaderboardBtnTapped(_ sender: Any) {
+        self.vibrate(style: .light);
         self.leaderboard_btn.isUserInteractionEnabled = false;
         self.isSubmitLogin = true;
         var temp = self.mainPortfolio_lbl.text!;
@@ -798,7 +799,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // format percent change
         if (String(coinSet[indexPath.row].ticker.changePrecent24H).first != "-") {
             if (self.traitCollection.userInterfaceStyle == .dark) {
-                cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
+                cell.percentChange_lbl.textColor = ChartColors.greenColor();
             } else {
                 cell.percentChange_lbl.textColor = ChartColors.greenColor();
             }
@@ -806,7 +807,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             //self.appendZero(string: &theoPercentString);
             cell.percentChange_lbl.text = "+\(theoPercentString)%"
         } else {
-            cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
+            cell.percentChange_lbl.textColor = ChartColors.redColor();
             let theoPercentString = String(format: "%.2f", coinSet[indexPath.row].ticker.changePrecent24H);
             //self.appendZero(string: &theoPercentString);
             cell.percentChange_lbl.text = "\(theoPercentString)%"

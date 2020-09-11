@@ -34,8 +34,8 @@ class LoginVC: UIViewController {
         self.signUp_btn.setTitleColor(.orange, for: .highlighted);
         self.email_txt.keyboardType = .emailAddress;
         self.password_txt.isSecureTextEntry = true;
-        self.styleTextField(textField: &self.email_txt, image: UIImage(named: "Images/btc.png")!);
-        self.styleTextField(textField: &self.password_txt, image: UIImage(named: "Images/eth.png")!);
+        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0);
+        self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
                 
         // add methods for signUp_btn, forgot_btn and login_btn
         self.login_btn.addTarget(self, action: #selector(loginBtnTapped), for: .touchUpInside);
@@ -98,19 +98,26 @@ class LoginVC: UIViewController {
         button.layer.borderColor = borderColor;
     }
     
-    private func styleTextField(textField:inout UITextField, image:UIImage) {
+    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat) {
+        var tempImage:UIImage = image;
         textField.leftViewMode = .always;
         textField.backgroundColor = .clear;
-        let distanceFromImage:CGFloat = 30.0;
+        let distanceFromImage:CGFloat = 25.0;
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
-        bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: textField.frame.width - distanceFromImage, height: 1.0);
+        if (UIDevice.current.userInterfaceIdiom == .pad) {
+            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: (self.view.frame.width) - 130.0, height: 1.0);
+        } else {
+            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: textField.frame.width - distanceFromImage, height: 1.0);
+        }
         bottomLine.backgroundColor = UIColor.white.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);
         let imageView = UIImageView();
-        imageView.frame = CGRect(x: 0.0, y: 0.0, width: 20, height: 20);
-        imageView.image = image;
+        imageView.frame = CGRect(x: 0.0, y: 5.0, width: width, height: height);
+        tempImage = image.withRenderingMode(.alwaysTemplate);
+        imageView.tintColor = .lightGray;
+        imageView.image = tempImage;
         textField.addSubview(imageView)
     }
     

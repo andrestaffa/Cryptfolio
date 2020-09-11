@@ -9,6 +9,7 @@
 import UIKit
 import SwiftChart;
 import Alamofire;
+import SafariServices;
 
 public class CoinData {
     
@@ -171,28 +172,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableView.deselectRow(at: indexPath, animated: true);
         switch indexPath.row {
         case 0:
-            openLink(linkToSite: self.coin!.ticker.website);
+            let safariVC = SFSafariViewController(url: URL(string: self.coin!.ticker.website)!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 1:
-            openLink(linkToSite: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum");
+            let safariVC = SFSafariViewController(url: URL(string: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 2:
-            openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
+            let safariVC = SFSafariViewController(url: URL(string: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 3:
-            openLink(linkToSite: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())");
+            let safariVC = SFSafariViewController(url: URL(string: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         default:
             break;
-        }
-    }
-    
-    private func openLink(linkToSite:String) {
-        let link = linkToSite;
-        if let url = URL(string: link) {
-            UIApplication.shared.open(url);
-        } else {
-            displayAlert(title: "Oops...", message: "Link does not exist")
         }
     }
     
@@ -437,7 +433,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         let series = ChartSeries(data);
         series.area = true;
         if (!((data.first?.isLess(than: data.last!))!)) {
-            series.color = ChartColors.darkRedColor();
+            series.color = ChartColors.redColor();
         } else {
             series.color = ChartColors.greenColor();
         }

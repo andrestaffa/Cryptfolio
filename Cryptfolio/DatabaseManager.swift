@@ -42,6 +42,8 @@ public class DatabaseManager {
                 SVProgressHUD.dismiss();
                 let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
                 leaderboardInfoVC.currentUsername = username;
+                leaderboardInfoVC.currentHighscore = highscore;
+                leaderboardInfoVC.currentChange = change;
                 viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
             }
         }
@@ -91,6 +93,8 @@ public class DatabaseManager {
                                     SVProgressHUD.dismiss();
                                     let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
                                     leaderboardInfoVC.currentUsername = foundUser!;
+                                    leaderboardInfoVC.currentHighscore = highscore;
+                                    leaderboardInfoVC.currentChange = change;
                                     viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
                                 }
                             }
