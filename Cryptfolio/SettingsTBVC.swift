@@ -62,7 +62,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         self.watchedAd = true;
         if (self.isMoneyAd) {
-            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 25.00, forKey: UserDefaultKeys.availableFundsKey);
+            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 10.00, forKey: UserDefaultKeys.availableFundsKey);
         } else {
             TipManager.addRandomTip();
         }
@@ -81,7 +81,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             } else {
                 self.isMoneyAd = false;
                 self.rewardedAd = self.createAndLoadRewardedAd();
-                displayAlertNormal(title: "Whoo!", message: "You just earned $25.00!", style: .default);
+                displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
             }
         } else {
             self.rewardedAd = self.createAndLoadRewardedAd();

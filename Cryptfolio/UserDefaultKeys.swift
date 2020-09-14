@@ -26,4 +26,7 @@ public class UserDefaultKeys {
     // Leaderboard
     public static let username = "username";
     
+    // Traking Data
+    public static let mainPortfolioGraph = "mainPortfolioGraph";
+    
 }

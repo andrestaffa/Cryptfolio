@@ -37,6 +37,11 @@ public struct History : Codable {
     let timestamps:[Double];
 }
 
+public struct PortfolioData : Codable {
+    let currentPrice:Double;
+    let currentDate:String;
+}
+
 public class CryptoData {
     
 //    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {

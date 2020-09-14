@@ -33,11 +33,19 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var profileView: UIView!
     @IBOutlet weak var profileInfoBtn: UIButton!
     @IBOutlet weak var profileExit: UIButton!
+    @IBOutlet weak var profileRank_lbl: UILabel!
+    @IBOutlet weak var profileUsername_lbl: UILabel!
+    @IBOutlet weak var profilePortfolio_lbl: UILabel!
+    @IBOutlet weak var profileChange_lbl: UILabel!
+    @IBOutlet weak var profileTransactions_lbl: UILabel!
+    @IBOutlet weak var profileOwnedCoin_lbl: UILabel!
     private var profileCurrentUserIndex:Int = 0;
     
     public var currentUsername:String = "";
     public var currentHighscore:Double = 0.0;
     public var currentChange:String = "";
+    public var currentOwnedCoin:Int = 0;
+    public var currentTransactions:Int = 0;
 
     
     private var theRank:String = "0";
@@ -95,6 +103,8 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
     }
     
+    // MARK: Data Gathering
+    
     private func getUserData() -> Void {
         DatabaseManager.getAllUserData { [weak self] (user, error) in
             if let error = error {
@@ -111,20 +121,6 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
         }
         self.tableView.reloadData();
-    }
-    
-    private func setChange(change:inout UILabel, changeString:String) {
-        if (changeString.first! != "-") {
-            if (self.traitCollection.userInterfaceStyle == .dark) {
-                change.textColor = ChartColors.greenColor();
-            } else {
-                change.textColor = ChartColors.greenColor();
-            }
-            change.attributedText = self.attachImageToString(text: changeString, image: #imageLiteral(resourceName: "sortUpArrow"));
-        } else {
-            change.textColor = ChartColors.redColor();
-            change.attributedText = self.attachImageToString(text: changeString, image: #imageLiteral(resourceName: "sortDownArrow"));
-        }
     }
     
     // MARK: - TableView Methods
@@ -181,6 +177,23 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileCurrentUserIndex = indexPath.row;
         self.adjustViewsForAnimation(alpha: 0.5);
         self.tableView.isUserInteractionEnabled = false;
+        
+        // configure profileView
+        self.profileRank_lbl.text = self.users[indexPath.row].rank;
+        self.profileUsername_lbl.text = self.users[indexPath.row].username;
+        self.profilePortfolio_lbl.text = "$\(String(format: "%.2f", self.users[indexPath.row].highscore))";
+        
+        self.setChange(change: &self.profileChange_lbl, changeString: self.users[indexPath.row].change);
+        if (self.users[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) {
+            self.profileUsername_lbl.textColor = .orange;
+        } else { if #available(iOS 13.0, *) {
+            self.profileUsername_lbl.textColor = .label
+        } else {
+            self.profileUsername_lbl.textColor = .black;
+            }; }
+        self.profileOwnedCoin_lbl.text = "\(self.users[indexPath.row].numberOfOwnedCoin)";
+        self.profileTransactions_lbl.text = "\(self.users[indexPath.row].numberOfTransactions)";
+        
         self.profileView.isHidden = false;
         self.profileViewCenterY.constant = 0;
         UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 1, options: .curveEaseIn, animations: {
@@ -200,11 +213,11 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         alert.textFields![0].placeholder = "Reason";
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
         alert.addAction(UIAlertAction(title: "Submit", style: .default, handler: { [weak self] (action) in
-            if (alert.textFields![0].text!.isEmpty || alert.textFields![0].text!.trimmingCharacters(in: .whitespaces).isEmpty) {
+            if (alert.textFields![0].text!.isEmpty) {
                 self?.displayAlert(title: "Error", message: "Reason cannot be blank");
                 return;
             }
-            DatabaseManager.writeUserData(username: self!.users[self!.profileCurrentUserIndex].username, merge: true, data: ["reported":true, "reportedMessage":alert.textFields![0].text!]) { [weak self] (error) in
+            DatabaseManager.writeUserData(username: self!.users[self!.profileCurrentUserIndex].username, merge: true, data: ["reported":true, "reportedMessage":alert.textFields![0].text! + "\n" + "Reported By: \(self!.currentUsername)"]) { [weak self] (error) in
                 if (error != nil) {
                     print("Error reporting user");
                     return;
@@ -311,12 +324,25 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         return masterStirng;
     }
     
+    private func setChange(change:inout UILabel, changeString:String) {
+        if (changeString.first! != "-") {
+            if (self.traitCollection.userInterfaceStyle == .dark) {
+                change.textColor = ChartColors.greenColor();
+            } else {
+                change.textColor = ChartColors.greenColor();
+            }
+            change.attributedText = self.attachImageToString(text: changeString, image: #imageLiteral(resourceName: "sortUpArrow"));
+        } else {
+            change.textColor = ChartColors.redColor();
+            change.attributedText = self.attachImageToString(text: changeString, image: #imageLiteral(resourceName: "sortDownArrow"));
+        }
+    }
+    
     private func displayAlert(title:String, message:String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert);
         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil));
         self.present(alert, animated: true, completion: nil);
     }
-    
 
 }
 

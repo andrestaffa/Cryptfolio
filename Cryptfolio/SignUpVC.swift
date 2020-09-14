@@ -20,6 +20,8 @@ class SignUpVC: UIViewController {
     
     public var highscore:Double = 0.0;
     public var change:String = "";
+    public var numberOfOwnedCoins:Int = 0;
+    public var numberOfTransactions:Int = 0;
     
     
     override func viewDidLoad() {
@@ -63,7 +65,7 @@ class SignUpVC: UIViewController {
                     if let error = error {
                         self?.displayAlert(title: "Sorry", message: error.localizedDescription);
                     } else {
-                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, merge: false, viewController: self!);
+                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, numberOfTransactions: self!.numberOfTransactions, merge: false, viewController: self!);
                     }
                 }
             } else {

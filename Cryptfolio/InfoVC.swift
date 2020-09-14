@@ -430,6 +430,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     private func chartSetup(data: Array<Double>, isDay:Bool) {
         self.chart_view.removeAllSeries();
+        self.chart_view.hideHighlightLineOnTouchEnd = true;
         let series = ChartSeries(data);
         series.area = true;
         if (!((data.first?.isLess(than: data.last!))!)) {

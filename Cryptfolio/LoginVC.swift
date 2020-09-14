@@ -21,6 +21,8 @@ class LoginVC: UIViewController {
 
     public var highscore:Double = 0.0;
     public var change:String = "";
+    public var numberOfOwnedCoin:Int = 0;
+    public var numberOfTransactions:Int = 0;
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,7 +66,7 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, viewController: self!);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, numberOfTransactions: self!.numberOfTransactions, viewController: self!);
             }
         }
         

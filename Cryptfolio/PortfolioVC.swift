@@ -230,6 +230,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         dateFormatter.dateFormat = "EEEE, MMMM d";
         return dateFormatter.string(from: date);
    }
+    
+    private func getNewCurrentDate(format:String) -> String {
+        let date = Date(timeIntervalSince1970: Double(Date().timeIntervalSince1970))
+        let dateFormatter = DateFormatter();
+        dateFormatter.timeStyle = DateFormatter.Style.medium;
+        dateFormatter.dateStyle = DateFormatter.Style.medium;
+        dateFormatter.timeZone = .current;
+        dateFormatter.dateFormat = format;
+        return dateFormatter.string(from: date);
+    }
        
     private func getTickerData() -> Void {
         CryptoData.getCryptoData { [weak self] (ticker, error) in
@@ -289,21 +299,42 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
         
         // load in holdings array
-        guard let loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else {
+        guard var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else {
             self.mainPortfolio_lbl.text = "$0.00";
             return;
         }
         var updatedMainPortfolio:Double = 0.0;
+        var counter:Int = 0;
+        loadedHolding = loadedHolding.filter({ (holding) -> Bool in
+            return holding.amountOfCoin > 0;
+        })
         for index in 0...loadedHolding.count - 1 {
             CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { [weak self] (ticker, error) in
                 if let error = error { print(error.localizedDescription); } else {
+                    counter += 1;
                     loadedHolding[index].estCost = loadedHolding[index].amountOfCoin * ticker!.price;
                     updatedMainPortfolio += loadedHolding[index].estCost;
                     
                     self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
                     self?.portPercentChange = (self!.priceDifference / 10000);
                     
-                    // MIGHT DELETE, TOO MANY WRITES TO DATABASE
+                    if (counter == loadedHolding.count) {
+                        var loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph);
+                        if (loadedMainPortList != nil && !loadedMainPortList!.isEmpty) {
+                            if (loadedMainPortList!.count >= 100000) { loadedMainPortList!.removeFirst(); }
+                            if (!loadedMainPortList!.contains(where: { (portData) -> Bool in
+                                return portData.currentPrice.isEqual(to: updatedMainPortfolio + currentAvailFunds);
+                            })) {
+                                loadedMainPortList!.append(PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!));
+                                DataStorageHandler.saveObject(type: loadedMainPortList!, forKey: UserDefaultKeys.mainPortfolioGraph);
+                            }
+                        } else {
+                            let mainPortList:[PortfolioData] = [PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!)];
+                            DataStorageHandler.saveObject(type: mainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
+                        }
+                    }
+                    
+//                    MIGHT DELETE, TOO MANY WRITES TO DATABASE
 //                    if (index == loadedHolding.count - 1) {
 //                        print("UPDATED MAIN PORT: \(updatedMainPortfolio + currentAvailFunds)");
 //                        if let currentUser = UserDefaults.standard.string(forKey: UserDefaultKeys.username) {
@@ -314,7 +345,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 //                            }
 //                        }
 //                    }
-
+                    
                     self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
                     self?.mainPortPercentChange_lbl.isHidden = false;
                     self?.mainPortTimeStamp_lbl.isHidden = false;
@@ -338,14 +369,32 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.username);
-        let firebaseAuth = FirebaseAuth.Auth.auth();
-        do {
-            try firebaseAuth.signOut();
-            self.displayAlert(title: "Signed Out!", message: "You successfuly signed out");
-        } catch let signOutError as NSError {
-          print ("Error signing out: %@", signOutError)
+        //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
+//        let firebaseAuth = FirebaseAuth.Auth.auth();
+//        do {
+//            try firebaseAuth.signOut();
+//            self.displayAlert(title: "Signed Out!", message: "You successfully signed out");
+//        } catch let signOutError as NSError {
+//          print ("Error signing out: %@", signOutError)
+//        }
+        var temp = self.mainPortfolio_lbl.text!;
+        temp.removeFirst();
+        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
+        var change:String = "";
+        if (String(self.portPercentChange).first != "-") {
+            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
+        } else {
+            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
-
+        guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
+        if (loadedMainPortList.count < 2) { return; }
+        print("SIZE OF LIST: \(loadedMainPortList.count)");
+        let mainPortDataVC = self.storyboard?.instantiateViewController(withIdentifier: "mainPortDataVC") as! MainPortfolioDataVC;
+        mainPortDataVC.setDataSet(dataSet: loadedMainPortList);
+        mainPortDataVC.setPortfolio(portfolio: "$\(String(format: "%.2f", highscore))");
+        mainPortDataVC.setChange(change: change);
+        mainPortDataVC.hidesBottomBarWhenPushed = true;
+        self.navigationController?.pushViewController(mainPortDataVC, animated: true);
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
@@ -491,11 +540,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
-            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, viewController: self);
+            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), numberOfTransactions: self.getNumberOfTranscations(), viewController: self);
         } else {
             let loginVC = self.storyboard?.instantiateViewController(withIdentifier: "loginVC") as! LoginVC;
             loginVC.highscore = highscore;
             loginVC.change = change;
+            loginVC.numberOfOwnedCoin = self.getNumberOfOwnedCoin();
+            loginVC.numberOfTransactions = self.getNumberOfTranscations();
             loginVC.hidesBottomBarWhenPushed = true;
             self.navigationController?.pushViewController(loginVC, animated: true);
         }
@@ -843,7 +894,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     
     
-    // MARK: - Hide all views
+    // MARK: - Hide all views and Helper Methods
     
     private func hideViews(hidden:Bool) -> Void {
         self.addCoin_btn.isHidden = hidden;
@@ -873,6 +924,23 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.nameCol_img.isHidden = hidden;
         self.priceCol_img.isHidden = hidden;
         self.holdingCol_img.isHidden = hidden;
+    }
+    
+    private func getNumberOfOwnedCoin() -> Int {
+        guard var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else { return 0; }
+        loadedHoldings = loadedHoldings.filter({ (holding) -> Bool in
+            return holding.amountOfCoin > 0;
+        })
+        return loadedHoldings.count;
+    }
+    
+    private func getNumberOfTranscations() -> Int {
+        guard let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else { return 0; }
+        var sum:Int = 0;
+        for holding in loadedHoldings {
+            sum += holding.amountOfCoins.count;
+        }
+        return sum;
     }
     
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {

@@ -18,6 +18,8 @@ public struct User : Codable {
     let username:String;
     let highscore:Double;
     let change:String;
+    let numberOfOwnedCoin:Int;
+    let numberOfTransactions:Int;
 }
 
 
@@ -33,9 +35,9 @@ public class DatabaseManager {
         db.collection("users").document(username).setData(data, merge: merge, completion: completion);
     }
     
-    public static func writeUserData(email:String, username:String, highscore:Double, change:String, merge:Bool, viewController:UIViewController) -> Void {
+    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, numberOfTransactions:Int, merge:Bool, viewController:UIViewController) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
-        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change], merge: merge) { (error) in
+        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "numberOfTransactions":numberOfTransactions], merge: merge) { (error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
@@ -44,6 +46,8 @@ public class DatabaseManager {
                 leaderboardInfoVC.currentUsername = username;
                 leaderboardInfoVC.currentHighscore = highscore;
                 leaderboardInfoVC.currentChange = change;
+                leaderboardInfoVC.currentOwnedCoin = numberOfOwnedCoin;
+                leaderboardInfoVC.currentTransactions = numberOfTransactions;
                 viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
             }
         }
@@ -72,7 +76,7 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(email:String, highscore:Double, change:String, viewController:UIViewController) -> Void {
+    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, numberOfTransactions:Int, viewController:UIViewController) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection("users").getDocuments { (snapshot, error) in
             if let error = error {
@@ -85,7 +89,7 @@ public class DatabaseManager {
                         let foundEmail = docData["email"] as! String;
                         let foundUser = docData["username"] as? String;
                         if (foundEmail.lowercased() == email.lowercased() && foundUser != nil) {
-                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change]) { (error) in
+                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "numberOfTransactions":numberOfTransactions]) { (error) in
                                 if let error = error {
                                     SVProgressHUD.dismiss();
                                     print(error.localizedDescription);
@@ -95,6 +99,8 @@ public class DatabaseManager {
                                     leaderboardInfoVC.currentUsername = foundUser!;
                                     leaderboardInfoVC.currentHighscore = highscore;
                                     leaderboardInfoVC.currentChange = change;
+                                    leaderboardInfoVC.currentOwnedCoin = numberOfCoin;
+                                    leaderboardInfoVC.currentTransactions = numberOfTransactions;
                                     viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
                                 }
                             }
@@ -124,7 +130,9 @@ public class DatabaseManager {
                         let username = docData["username"] as! String;
                         let highscore = docData["highscore"] as! Double;
                         let change = docData["change"] as! String;
-                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change);
+                        let numberOfOwnedCoin = docData["numberOfOwnedCoin"] as? Int;
+                        let numberOfTransactions = docData["numberOfTransactions"] as? Int;
+                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, numberOfTransactions: numberOfTransactions ?? 0);
                         completion(user, nil);
                     }
                 } else {

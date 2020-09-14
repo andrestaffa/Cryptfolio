@@ -18,6 +18,7 @@
 		2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2010F1F323FE1240007B4343 /* CustomCell.swift */; };
 		2016FEB524F2E6E200E38535 /* HoldingVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016FEB424F2E6E200E38535 /* HoldingVC.swift */; };
 		2016FEB724F2EF7300E38535 /* HistoryVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2016FEB624F2EF7300E38535 /* HistoryVC.swift */; };
+		201BB224250E98C1004310BA /* MainPortfolioDataVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 201BB223250E98C1004310BA /* MainPortfolioDataVC.swift */; };
 		2035B58524784F6100626463 /* NewsTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B58424784F6100626463 /* NewsTBVC.swift */; };
 		2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */; };
 		2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */; };
@@ -64,6 +65,7 @@
 		2010F1F323FE1240007B4343 /* CustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomCell.swift; sourceTree = "<group>"; };
 		2016FEB424F2E6E200E38535 /* HoldingVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HoldingVC.swift; sourceTree = "<group>"; };
 		2016FEB624F2EF7300E38535 /* HistoryVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryVC.swift; sourceTree = "<group>"; };
+		201BB223250E98C1004310BA /* MainPortfolioDataVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainPortfolioDataVC.swift; sourceTree = "<group>"; };
 		202A15892404EA5E003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		202A15902404EA93003C1EB3 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2035B58424784F6100626463 /* NewsTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVC.swift; sourceTree = "<group>"; };
@@ -137,6 +139,7 @@
 				2010F1F123FE1202007B4343 /* HomeTBVC.swift */,
 				206ABFBE23FE346F00198C12 /* InfoVC.swift */,
 				204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */,
+				201BB223250E98C1004310BA /* MainPortfolioDataVC.swift */,
 				20AF258324633AC4000265A5 /* TradeVC.swift */,
 				208A2F5424649382004D2B39 /* AddFundsVC.swift */,
 				2035B58424784F6100626463 /* NewsTBVC.swift */,
@@ -316,6 +319,7 @@
 			files = (
 				20F218F82506DB69002A01AC /* LoginVC.swift in Sources */,
 				2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */,
+				201BB224250E98C1004310BA /* MainPortfolioDataVC.swift in Sources */,
 				2053C4CF245F851B00A04769 /* Coin.swift in Sources */,
 				20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */,
 				208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */,
