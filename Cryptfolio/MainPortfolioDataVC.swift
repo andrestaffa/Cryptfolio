@@ -16,11 +16,13 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
     @IBOutlet weak var change_lbl: UILabel!
     @IBOutlet weak var graphPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
-    @IBOutlet weak var chartInterval_seg: UISegmentedControl!
+    @IBOutlet weak var holderView: UIView!
     
     private var pricesSet:Array<Double> = Array<Double>();
     private var dateSet:Array<String> = Array<String>();
     private var prevIndex:Int = -1;
+    
+    private var circleView = UIView();
     
     private var currentPortfolio:String = "";
     private var currentChange:String = "";
@@ -43,6 +45,14 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
             self.change_lbl.attributedText = self.attachImageToString(text: self.currentChange, image: #imageLiteral(resourceName: "sortUpArrow"));
         }
 
+        self.chart_view.topInset = 20.0;
+        self.chart_view.bottomInset = 0.0;
+        
+        self.holderView.layer.borderColor = UIColor.orange.cgColor;
+        self.holderView.layer.cornerRadius = 15.0;
+        self.holderView.clipsToBounds = true;
+        self.holderView.layer.borderWidth = 1.0;
+
         
         self.setChartData();
         self.title = "Main Portfolio";
@@ -58,44 +68,52 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex)
                 self.graphPrice_lbl.text = "$\(String(format: "%.2f", value!)), \(self.dateSet[dataIndex!])";
                 self.graphPrice_lbl.isHidden = false;
-                print("LEFT: \(left)")
                 if (dataIndex! != self.prevIndex) {
-//                    self.vibrate(style: .light);
+                    if (dataIndex!.isMultiple(of: 2)) {
+                        self.vibrate(style: .light);
+                    }
+                    self.circleView.isHidden = false;
+                    self.circleView.removeFromSuperview();
+                    let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.pricesSet.min()!)) / CGFloat(self.pricesSet.max()! - self.pricesSet.min()!);
+                    let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
+                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
+                    self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
+                    self.circleView.clipsToBounds = true;
+                    self.circleView.backgroundColor = .darkGray;
+                    self.circleView.layer.borderColor = UIColor.orange.cgColor;
+                    self.circleView.layer.borderWidth = 1.0;
+                    self.chart_view.addSubview(circleView);
                 }
                 self.prevIndex = dataIndex!;
                 let deviceBool = UIDevice.current.userInterfaceIdiom == .pad;
                 let rightValue:CGFloat = deviceBool ? 750.0 : 295.0;
-                let errorMargin:CGFloat = deviceBool ? 78.0 : 65.0;
-                let otherErrorMargin:CGFloat = deviceBool ? 85.0 : 75.0;
+                let offset:CGFloat = 90.0
                 
-                if (left <= 75.0) {
-                    UIView.animate(withDuration: 0.5) {
-                        self.view.layoutIfNeeded();
-                        self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2 - errorMargin), y: 0.0);
-                    }
+                if (left <= 80.0) {
+                    self.graphPrice_lbl.frame.origin.x = -self.graphPrice_lbl.bounds.width / 2 + offset
                 } else if (left >= rightValue) {
-                    UIView.animate(withDuration: 0.5) {
-                        self.view.layoutIfNeeded();
-                        self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2 + otherErrorMargin), y: 0.0);
-                    }
+                    self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2 - (self.view.frame.width - left) + offset), y: 0.0);
                 } else {
-                    UIView.animate(withDuration: 0.1) {
-                        self.view.layoutIfNeeded();
-                        self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2), y: 0.0);
-                    }
+                    self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2), y: 0.0);
                 }
             }
         }
     }
     
     func didFinishTouchingChart(_ chart: Chart) {
-        self.graphPrice_lbl.transform = .identity;
+        UIView.animate(withDuration: 0.1) {
+            self.graphPrice_lbl.transform = .identity;
+        }
         self.graphPrice_lbl.text = "Touch and Hold Chart to Begin";
+        self.circleView.isHidden = true;
     }
     
     func didEndTouchingChart(_ chart: Chart) {
-        self.graphPrice_lbl.transform = .identity;
+        UIView.animate(withDuration: 0.1) {
+            self.graphPrice_lbl.transform = .identity;
+        }
         self.graphPrice_lbl.text = "Touch and Hold Chart to Begin";
+        self.circleView.isHidden = true;
     }
     
     private func setChartData() {
@@ -146,9 +164,8 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
     }
     
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
-        impactFeedbackGenerator.prepare();
-        impactFeedbackGenerator.impactOccurred();
+        let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light);
+        impactFeedbackGenerator.impactOccurred()
     }
 
     

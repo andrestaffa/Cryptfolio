@@ -107,12 +107,14 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     @objc func trade() {
+        self.vibrate(style: .light);
         let tradeVC = storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
         tradeVC.ticker = self.coin!.ticker;
         self.present(tradeVC, animated: true, completion: nil);
     }
     
     @objc func addCoin() {
+        self.vibrate(style: .light);
         DataStorageHandler.saveObject(type: self.coin!, forKey: UserDefaultKeys.coinKey);
         var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
         loadedCoins.append(self.coin!);
