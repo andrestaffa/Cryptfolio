@@ -18,11 +18,22 @@ class LoginVC: UIViewController {
     @IBOutlet weak var createAccont_lbl: UILabel!
     @IBOutlet weak var signUp_btn: UIButton!
     
-
-    public var highscore:Double = 0.0;
-    public var change:String = "";
-    public var numberOfOwnedCoin:Int = 0;
-    public var numberOfTransactions:Int = 0;
+    // member variables
+    private var highscore:Double = 0.0;
+    private var change:String = "";
+    private var numberOfOwnedCoin:Int = 0;
+    private var portPrices:Array<Double> = Array<Double>();
+    private var portDates:Array<String> = Array<String>();
+    
+    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>) {
+        super.init(coder: coder);
+        self.highscore = highscore;
+        self.change = change;
+        self.numberOfOwnedCoin = numberOfOwnedCoin;
+        self.portPrices = portPrices;
+        self.portDates = portDates;
+    }
+    public required init?(coder: NSCoder) { fatalError("Error loading LoginVC"); }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,7 +77,7 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, numberOfTransactions: self!.numberOfTransactions, viewController: self!);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, portPrices: self!.portPrices, portDates: self!.portDates, viewController: self!);
             }
         }
         
@@ -83,11 +94,12 @@ class LoginVC: UIViewController {
     @objc func signUpBtnTapped() {
         self.vibrate(style: .light);
         self.view.endEditing(true);
-        let signUpVC = self.storyboard?.instantiateViewController(withIdentifier: "signUpVC") as! SignUpVC;
-        signUpVC.highscore = self.highscore;
-        signUpVC.change = self.change;
+       if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
+            return SignUpVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoins: self.numberOfOwnedCoin, portPrices: self.portPrices, portDates: self.portDates);
+       }) {
         signUpVC.hidesBottomBarWhenPushed = true;
         self.navigationController?.pushViewController(signUpVC, animated: true);
+       } else { print("SignUpVC has not been instantiated"); }
     }
     
     private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {

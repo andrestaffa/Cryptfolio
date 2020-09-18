@@ -18,14 +18,35 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
     @IBOutlet weak var chart_view: Chart!
     @IBOutlet weak var holderView: UIView!
     
+    // memeber variables
     private var pricesSet:Array<Double> = Array<Double>();
     private var dateSet:Array<String> = Array<String>();
-    private var prevIndex:Int = -1;
-    
-    private var circleView = UIView();
-    
     private var currentPortfolio:String = "";
     private var currentChange:String = "";
+    
+    private var prevIndex:Int = -1;
+    private var circleView = UIView();
+
+    
+    public init?(coder: NSCoder, pricesSet:Array<Double>, dateSet:Array<String>, currentPortfolio:String, currentChange:String) {
+        super.init(coder: coder)
+        self.pricesSet = pricesSet;
+        self.dateSet = dateSet;
+        self.currentPortfolio = currentPortfolio;
+        self.currentChange = currentChange;
+    }
+    
+    public init?(coder:NSCoder, dataSet:Array<PortfolioData>, currentPortfolio:String, currentChange:String) {
+        super.init(coder: coder);
+        for portData in dataSet {
+            self.pricesSet.append(portData.currentPrice);
+            self.dateSet.append(portData.currentDate);
+        }
+        self.currentPortfolio = currentPortfolio;
+        self.currentChange = currentChange;
+    }
+    
+    public required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented"); }
     
     override func viewWillAppear(_ animated: Bool) {
     }
@@ -82,7 +103,7 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
                     self.circleView.backgroundColor = .darkGray;
                     self.circleView.layer.borderColor = UIColor.orange.cgColor;
                     self.circleView.layer.borderWidth = 1.0;
-                    self.chart_view.addSubview(circleView);
+                    self.chart_view.addSubview(self.circleView);
                 }
                 self.prevIndex = dataIndex!;
                 let deviceBool = UIDevice.current.userInterfaceIdiom == .pad;
@@ -90,7 +111,7 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
                 let offset:CGFloat = 90.0
                 
                 if (left <= 80.0) {
-                    self.graphPrice_lbl.frame.origin.x = -self.graphPrice_lbl.bounds.width / 2 + offset
+                    self.graphPrice_lbl.transform = CGAffineTransform(translationX: -self.graphPrice_lbl.bounds.width / 2 + 85.0, y: 0.0);
                 } else if (left >= rightValue) {
                     self.graphPrice_lbl.transform = CGAffineTransform(translationX: left - (self.graphPrice_lbl.bounds.width / 2 - (self.view.frame.width - left) + offset), y: 0.0);
                 } else {
@@ -130,25 +151,7 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
         }
         self.chart_view.add(series);
     }
-    
-
-    // MARK: Getters and Setters
-    
-    public func setDataSet(dataSet:Array<PortfolioData>) {
-        for portData in dataSet {
-            self.pricesSet.append(portData.currentPrice);
-            self.dateSet.append(portData.currentDate);
-        }
-    }
-    
-    public func setPortfolio(portfolio:String) {
-        self.currentPortfolio = portfolio;
-    }
-    
-    public func setChange(change:String) {
-        self.currentChange = change;
-    }
-    
+            
     // MARK: Helper Methods
     
     private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {

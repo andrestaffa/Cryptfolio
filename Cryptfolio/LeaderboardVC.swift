@@ -37,22 +37,29 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var profileUsername_lbl: UILabel!
     @IBOutlet weak var profilePortfolio_lbl: UILabel!
     @IBOutlet weak var profileChange_lbl: UILabel!
-    @IBOutlet weak var profileTransactions_lbl: UILabel!
+    @IBOutlet weak var profileViewProgess_btn: UIButton!
     @IBOutlet weak var profileOwnedCoin_lbl: UILabel!
     private var profileCurrentUserIndex:Int = 0;
     
-    public var currentUsername:String = "";
-    public var currentHighscore:Double = 0.0;
-    public var currentChange:String = "";
-    public var currentOwnedCoin:Int = 0;
-    public var currentTransactions:Int = 0;
-
+    // member variables
+    private var currentUsername:String = "";
+    private var currentHighscore:Double = 0.0;
+    private var currentChange:String = "";
     
     private var theRank:String = "0";
-    
     private var users:Array<User> = Array<User>();
     private var isLoading:Bool = true;
 
+    
+    public init?(coder:NSCoder, currentUsername:String, currentHighscore:Double, currentChange:String) {
+        super.init(coder: coder);
+        self.currentUsername = currentUsername;
+        self.currentHighscore = currentHighscore;
+        self.currentChange = currentChange;
+    }
+    public required init?(coder: NSCoder) { fatalError("Error loading SignUpVC"); }
+
+    
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.navigationController?.navigationBar.barTintColor = .clear;
@@ -91,6 +98,9 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePanGesture)))
         self.profileInfoBtn.addTarget(self, action: #selector(reportUserTapped), for: .touchUpInside);
         self.profileExit.addTarget(self, action: #selector(exitProfileTapped), for: .touchUpInside);
+        self.profileViewProgess_btn.setTitleColor(.orange, for: .normal);
+        self.profileViewProgess_btn.setTitleColor(.orange, for: .highlighted);
+        self.profileViewProgess_btn.addTarget(self, action: #selector(self.viewProgressTapped), for: .touchUpInside);
         
         self.hideStats(hidden: true);
         self.username_lbl.text = self.currentUsername;
@@ -186,13 +196,10 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.setChange(change: &self.profileChange_lbl, changeString: self.users[indexPath.row].change);
         if (self.users[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) {
             self.profileUsername_lbl.textColor = .orange;
-        } else { if #available(iOS 13.0, *) {
-            self.profileUsername_lbl.textColor = .label
         } else {
-            self.profileUsername_lbl.textColor = .black;
-            }; }
+            self.profileUsername_lbl.textColor = .label;
+        }
         self.profileOwnedCoin_lbl.text = "\(self.users[indexPath.row].numberOfOwnedCoin)";
-        self.profileTransactions_lbl.text = "\(self.users[indexPath.row].numberOfTransactions)";
         
         self.profileView.isHidden = false;
         self.profileViewCenterY.constant = 0;
@@ -206,6 +213,20 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     // MARK: ProfileView Methods
+    
+    @objc func viewProgressTapped() {
+        self.vibrate(style: .light);
+        if (self.users[self.profileCurrentUserIndex].portPrices.count < 3) {
+            self.displayAlert(title: "Sorry", message: "\(self.users[self.profileCurrentUserIndex].username) does not have enough information to display yet!");
+            return;
+        }
+        if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
+            return MainPortfolioDataVC(coder: coder, pricesSet: self.users[self.profileCurrentUserIndex].portPrices, dateSet: self.users[self.profileCurrentUserIndex].portDates, currentPortfolio: String(format: "%.2f", self.users[self.profileCurrentUserIndex].highscore), currentChange: self.users[self.profileCurrentUserIndex].change);
+        }) {
+            mainPortDataVC.hidesBottomBarWhenPushed = true;
+            self.navigationController?.pushViewController(mainPortDataVC, animated: true);
+        } else { print("MainPortDataVC does not exist"); }
+    }
     
     @objc func reportUserTapped() {
         let alert = UIAlertController(title: "Report User", message: "", preferredStyle: .alert);
@@ -344,6 +365,11 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.present(alert, animated: true, completion: nil);
     }
 
+    private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+        let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: .light);
+        impactFeedbackGenerator.impactOccurred()
+    }
+    
 }
 
 public class LeaderboardCell : UITableViewCell {

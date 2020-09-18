@@ -19,12 +19,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         UITabBar.appearance().tintColor = UIColor.orange
-        if #available(iOS 13.0, *) {
-            window?.overrideUserInterfaceStyle = .dark
-        }
+        window?.overrideUserInterfaceStyle = .dark
         FirebaseApp.configure();
         GADMobileAds.sharedInstance().start(completionHandler: nil);
         
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
+            UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
+            UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
+        }
         return true
     }
 

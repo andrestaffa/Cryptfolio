@@ -19,7 +19,8 @@ public struct User : Codable {
     let highscore:Double;
     let change:String;
     let numberOfOwnedCoin:Int;
-    let numberOfTransactions:Int;
+    let portPrices:Array<Double>;
+    let portDates:Array<String>;
 }
 
 
@@ -35,20 +36,18 @@ public class DatabaseManager {
         db.collection("users").document(username).setData(data, merge: merge, completion: completion);
     }
     
-    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, numberOfTransactions:Int, merge:Bool, viewController:UIViewController) -> Void {
+    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>, merge:Bool, viewController:UIViewController) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
-        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "numberOfTransactions":numberOfTransactions], merge: merge) { (error) in
+        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "portPrices":portPrices, "portDates":portDates], merge: merge) { (error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
                 SVProgressHUD.dismiss();
-                let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
-                leaderboardInfoVC.currentUsername = username;
-                leaderboardInfoVC.currentHighscore = highscore;
-                leaderboardInfoVC.currentChange = change;
-                leaderboardInfoVC.currentOwnedCoin = numberOfOwnedCoin;
-                leaderboardInfoVC.currentTransactions = numberOfTransactions;
-                viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
+                if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                    return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change);
+                }) {
+                    viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                } else { print("LeaderboardVC has not been instantiated"); }
             }
         }
     }
@@ -76,7 +75,7 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, numberOfTransactions:Int, viewController:UIViewController) -> Void {
+    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, portPrices:Array<Double>, portDates:Array<String>, viewController:UIViewController) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection("users").getDocuments { (snapshot, error) in
             if let error = error {
@@ -89,19 +88,17 @@ public class DatabaseManager {
                         let foundEmail = docData["email"] as! String;
                         let foundUser = docData["username"] as? String;
                         if (foundEmail.lowercased() == email.lowercased() && foundUser != nil) {
-                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "numberOfTransactions":numberOfTransactions]) { (error) in
+                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "portPrices":portPrices, "portDates":portDates]) { (error) in
                                 if let error = error {
                                     SVProgressHUD.dismiss();
                                     print(error.localizedDescription);
                                 } else {
                                     SVProgressHUD.dismiss();
-                                    let leaderboardInfoVC = viewController.storyboard?.instantiateViewController(withIdentifier: "leaderboardVC") as! LeaderboardVC;
-                                    leaderboardInfoVC.currentUsername = foundUser!;
-                                    leaderboardInfoVC.currentHighscore = highscore;
-                                    leaderboardInfoVC.currentChange = change;
-                                    leaderboardInfoVC.currentOwnedCoin = numberOfCoin;
-                                    leaderboardInfoVC.currentTransactions = numberOfTransactions;
-                                    viewController.navigationController?.pushViewController(leaderboardInfoVC, animated: true);
+                                    if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                        return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change);
+                                    }) {
+                                        viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                                    } else { print("LeaderboardVC has not been instantiated"); }
                                 }
                             }
                             return;
@@ -131,8 +128,9 @@ public class DatabaseManager {
                         let highscore = docData["highscore"] as! Double;
                         let change = docData["change"] as! String;
                         let numberOfOwnedCoin = docData["numberOfOwnedCoin"] as? Int;
-                        let numberOfTransactions = docData["numberOfTransactions"] as? Int;
-                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, numberOfTransactions: numberOfTransactions ?? 0);
+                        let portPrices = docData["portPrices"] as! Array<Double>;
+                        let portDates = docData["portDates"] as! Array<String>;
+                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, portPrices: portPrices, portDates: portDates);
                         completion(user, nil);
                     }
                 } else {

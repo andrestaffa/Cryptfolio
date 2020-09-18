@@ -18,11 +18,21 @@ class SignUpVC: UIViewController {
     @IBOutlet weak var alreadyHave_btn: UILabel!
     @IBOutlet weak var signIn_btn: UIButton!
     
-    public var highscore:Double = 0.0;
-    public var change:String = "";
-    public var numberOfOwnedCoins:Int = 0;
-    public var numberOfTransactions:Int = 0;
+    private var highscore:Double = 0.0;
+    private var change:String = "";
+    private var numberOfOwnedCoins:Int = 0;
+    private var portPrices:Array<Double> = Array<Double>();
+    private var portDates:Array<String> = Array<String>();
     
+    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoins:Int, portPrices:Array<Double>, portDates:Array<String>) {
+        super.init(coder: coder);
+        self.highscore = highscore;
+        self.change = change;
+        self.numberOfOwnedCoins = numberOfOwnedCoins;
+        self.portPrices = portPrices;
+        self.portDates = portDates;
+    }
+    public required init?(coder: NSCoder) { fatalError("Error loading SignUpVC"); }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -65,7 +75,7 @@ class SignUpVC: UIViewController {
                     if let error = error {
                         self?.displayAlert(title: "Sorry", message: error.localizedDescription);
                     } else {
-                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, numberOfTransactions: self!.numberOfTransactions, merge: false, viewController: self!);
+                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, portPrices: self!.portPrices, portDates: self!.portDates, merge: false, viewController: self!);
                     }
                 }
             } else {

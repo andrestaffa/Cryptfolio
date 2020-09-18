@@ -29,4 +29,8 @@ public class UserDefaultKeys {
     // Traking Data
     public static let mainPortfolioGraph = "mainPortfolioGraph";
     
+    // first time lanching app
+    public static let isNotFirstTime = "isNotFirstTime";
+    public static let didAnimateWithOneCoin = "didAnimateWithOneCoin";
+    
 }
