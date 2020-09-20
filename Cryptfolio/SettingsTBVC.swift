@@ -9,6 +9,7 @@
 import GoogleMobileAds;
 import UIKit;
 import SVProgressHUD;
+import FirebaseAuth;
 
 private class Section {
     public var title:String;
@@ -24,6 +25,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var generalItems = Array<Section>();
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
+    private var accountItems = Array<Section>();
     private var rewardedAd:GADRewardedAd?;
     private var isLoading:Bool = true;
     private var isMoneyAd:Bool = false;
@@ -103,7 +105,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         // section 1 - General
         self.generalItems.append(Section(title: "Reset portfolio", image: UIImage(named: "Images/btc.png")!));
-        self.generalItems.append(Section(title: "Watch ad for for bonus $", image: UIImage(named: "Images/neo.png")!));
+        self.generalItems.append(Section(title: "Watch ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
         self.generalItems.append(Section(title: "Watch ad for investing tip", image: UIImage(named: "Images/bch.png")!));
         self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
         
@@ -116,6 +118,9 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         // section 3 - References
         self.referenceItems.append(Section(title: "News sources", image: UIImage(named: "Images/etc.png")!));
         self.referenceItems.append(Section(title: "References", image: UIImage(named: "Images/usdt.png")!));
+        
+        // section 4 - Account
+        self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
         
     }
 
@@ -142,6 +147,13 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         case 2:
             self.setTextOfHeader(label: sectionLabel, text: "REFERENCES");
             headerView.addSubview(sectionLabel)
+            break;
+        case 3:
+            if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                self.setTextOfHeader(label: sectionLabel, text: "ACCOUNT");
+                headerView.addSubview(sectionLabel);
+            }
+            break;
         default:
             break;
         }
@@ -153,7 +165,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 3;
+        return 4;
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -164,6 +176,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             return self.feedbackItems.count;
         case 2:
             return self.referenceItems.count;
+        case 3:
+            return self.accountItems.count;
         default:
             return 0;
         }
@@ -201,7 +215,16 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             break;
         case 2:
             cell.textLabel!.text = self.referenceItems[indexPath.row].title;
-            //cell.imageView!.image = self.referenceItems[indexPath.row].image;
+            //cell.imageView!.image = self.referenceItems[indexPath.row].image
+        case 3:
+            if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                cell.isHidden = false;
+                cell.textLabel?.text = self.accountItems[indexPath.row].title;
+                cell.textLabel?.textColor = .red;
+            } else {
+                cell.isHidden = true;
+            }
+            break;
         default:
             break;
         }
@@ -242,6 +265,10 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         case (2, 1):
             self.references();
             break;
+        case (3, 0):
+            print("YO")
+            self.signOutPressed();
+            break;
         default:
             break;
         }
@@ -251,6 +278,22 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private func setTextOfHeader(label:UILabel!, text: String) {
         label.text = text;
         label.sizeToFit();
+    }
+    
+    private func signOutPressed() {
+        let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to sign out?", preferredStyle: .alert);
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
+            let firebaseAuth = FirebaseAuth.Auth.auth();
+            do {
+                try firebaseAuth.signOut();
+                self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
+                self?.tableView.reloadData();
+            } catch let signOutError as NSError {
+                print ("Error signing out: %@", signOutError)
+            }
+        }))
+        self.present(alertController, animated: true, completion: nil);
     }
     
     private func resetPortfolio() -> Void {

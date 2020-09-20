@@ -27,7 +27,6 @@
 		2062A22124ED920800185BF8 /* TipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2062A22024ED920800185BF8 /* TipManager.swift */; };
 		206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 206ABFBE23FE346F00198C12 /* InfoVC.swift */; };
 		2078010C24EC8554001BDC81 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 2078010B24EC8554001BDC81 /* GoogleService-Info.plist */; };
-		208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 208A2F5424649382004D2B39 /* AddFundsVC.swift */; };
 		209965C124EEE8020091F0F1 /* TipVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 209965C024EEE8020091F0F1 /* TipVC.swift */; };
 		209FB61F24077BD400253759 /* Images in Resources */ = {isa = PBXBuildFile; fileRef = 209FB61E24077BD400253759 /* Images */; };
 		20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE1D132486D1C300A68054 /* AboutVC.swift */; };
@@ -77,7 +76,6 @@
 		206ABFBE23FE346F00198C12 /* InfoVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVC.swift; sourceTree = "<group>"; };
 		20726D5C2404E9810042C9E9 /* Alamofire.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Alamofire.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		2078010B24EC8554001BDC81 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		208A2F5424649382004D2B39 /* AddFundsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFundsVC.swift; sourceTree = "<group>"; };
 		209965C024EEE8020091F0F1 /* TipVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipVC.swift; sourceTree = "<group>"; };
 		209FB61E24077BD400253759 /* Images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Images; sourceTree = "<group>"; };
 		20AE1D132486D1C300A68054 /* AboutVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutVC.swift; sourceTree = "<group>"; };
@@ -141,7 +139,6 @@
 				204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */,
 				201BB223250E98C1004310BA /* MainPortfolioDataVC.swift */,
 				20AF258324633AC4000265A5 /* TradeVC.swift */,
-				208A2F5424649382004D2B39 /* AddFundsVC.swift */,
 				2035B58424784F6100626463 /* NewsTBVC.swift */,
 				20DAB4D0247EF3DB00DD57CC /* SettingsTBVC.swift */,
 				20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */,
@@ -322,7 +319,6 @@
 				201BB224250E98C1004310BA /* MainPortfolioDataVC.swift in Sources */,
 				2053C4CF245F851B00A04769 /* Coin.swift in Sources */,
 				20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */,
-				208A2F5524649382004D2B39 /* AddFundsVC.swift in Sources */,
 				2035B58524784F6100626463 /* NewsTBVC.swift in Sources */,
 				2062A22124ED920800185BF8 /* TipManager.swift in Sources */,
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,

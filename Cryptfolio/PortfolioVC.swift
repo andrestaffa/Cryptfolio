@@ -73,6 +73,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
         
+        if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
+            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 3 ? false : true;
+        } else { self.mainPortData_btn.isEnabled = false; }
+        
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
@@ -352,19 +356,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                             DataStorageHandler.saveObject(type: mainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
                         }
                     }
-                    
-//                    MIGHT DELETE, TOO MANY WRITES TO DATABASE
-//                    if (index == loadedHolding.count - 1) {
-//                        print("UPDATED MAIN PORT: \(updatedMainPortfolio + currentAvailFunds)");
-//                        if let currentUser = UserDefaults.standard.string(forKey: UserDefaultKeys.username) {
-//                            if (String(self.portPercentChange).first == "-" && !self.portPercentChange.isZero) {
-//                                DatabaseManager.writeUserData(username: currentUser, merge: true, data: ["highscore":(updatedMainPortfolio + currentAvailFunds), "change":"\(String(format: "%.2f", self.portPercentChange * 100))%"]);
-//                            } else {
-//                                DatabaseManager.writeUserData(username: currentUser, merge: true, data: ["highscore":(updatedMainPortfolio + currentAvailFunds), "change":"+\(String(format: "%.2f", self.portPercentChange * 100))%"]);
-//                            }
-//                        }
-//                    }
-                    
                     self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
                     self?.mainPortPercentChange_lbl.isHidden = false;
                     self?.mainPortTimeStamp_lbl.isHidden = false;
@@ -378,24 +369,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     @objc private func availFundsTapped() -> Void {
-        let addFundsVC = storyboard?.instantiateViewController(withIdentifier: "addFundsVC") as! AddFundsVC;
-        addFundsVC.title = "Add Funds";
-        self.navigationController?.pushViewController(addFundsVC, animated: true);
+        print("Avail Tapped");
     }
     
     @objc private func mainPortTapped() -> Void {
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.username);
-        //UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
-//        let firebaseAuth = FirebaseAuth.Auth.auth();
-//        do {
-//            try firebaseAuth.signOut();
-//            self.displayAlert(title: "Signed Out!", message: "You successfully signed out");
-//        } catch let signOutError as NSError {
-//          print ("Error signing out: %@", signOutError)
-//        }
+        self.vibrate(style: .light);
         var temp = self.mainPortfolio_lbl.text!;
         temp.removeFirst();
         let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
@@ -405,13 +383,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         } else {
             change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
-        guard var loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
+        guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
         if (loadedMainPortList.count < 3) { return; }
         print("SIZE OF LIST: \(loadedMainPortList.count)");
-        loadedMainPortList.removeAll { (portData) -> Bool in
-            return portData.currentPrice <= 5000;
-        };
-        DataStorageHandler.saveObject(type: loadedMainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
         if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
             return MainPortfolioDataVC(coder: coder, dataSet: loadedMainPortList, currentPortfolio: String(format: "%.2f", highscore), currentChange: change);
         }) {

@@ -76,7 +76,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 //        backButton.addTarget(self, action: #selector(backBtnTapped), for: .touchUpInside);
 //        let leftBarButton = UIBarButtonItem(customView: backButton);
         self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "dashboardIcon"), style: .plain, target: self, action: #selector(backBtnTapped));
-        self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBtnTapped));
+        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBtnTapped));
     }
     
     override func viewDidLoad() {
@@ -184,6 +184,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
         if (self.users[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) { self.profileInfoBtn.isHidden = true; }
+        self.profileViewProgess_btn.isEnabled = self.users[indexPath.row].portPrices.count < 3 ? false : true;
         self.profileCurrentUserIndex = indexPath.row;
         self.adjustViewsForAnimation(alpha: 0.5);
         self.tableView.isUserInteractionEnabled = false;
@@ -216,10 +217,6 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @objc func viewProgressTapped() {
         self.vibrate(style: .light);
-        if (self.users[self.profileCurrentUserIndex].portPrices.count < 3) {
-            self.displayAlert(title: "Sorry", message: "\(self.users[self.profileCurrentUserIndex].username) does not have enough information to display yet!");
-            return;
-        }
         if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
             return MainPortfolioDataVC(coder: coder, pricesSet: self.users[self.profileCurrentUserIndex].portPrices, dateSet: self.users[self.profileCurrentUserIndex].portDates, currentPortfolio: String(format: "%.2f", self.users[self.profileCurrentUserIndex].highscore), currentChange: self.users[self.profileCurrentUserIndex].change);
         }) {
