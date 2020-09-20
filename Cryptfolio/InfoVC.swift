@@ -9,6 +9,7 @@
 import UIKit
 import SwiftChart;
 import Alamofire;
+import SafariServices;
 
 public class CoinData {
     
@@ -52,6 +53,9 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var view5: UIView!
     @IBOutlet weak var view6: UIView!
     
+    private var circleView:UIView = UIView();
+    private var prevIndex:Int = 0;
+    
     // Public member variables
     public var coin:Coin?;
     private var isTradingMode:Bool = false;
@@ -72,12 +76,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.navigationController?.navigationBar.shadowImage = nil;
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
         
-        CryptoData.getCoinData(id: coin!.ticker.id) { (ticker, error) in
+        CryptoData.getCoinData(id: coin!.ticker.id) { [weak self] (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.coin!.ticker = ticker!;
-                self.updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
+                self?.coin!.ticker = ticker!;
+                self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
             }
         }
         
@@ -106,12 +110,14 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     @objc func trade() {
+        self.vibrate(style: .light);
         let tradeVC = storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
         tradeVC.ticker = self.coin!.ticker;
         self.present(tradeVC, animated: true, completion: nil);
     }
     
     @objc func addCoin() {
+        self.vibrate(style: .light);
         DataStorageHandler.saveObject(type: self.coin!, forKey: UserDefaultKeys.coinKey);
         var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
         loadedCoins.append(self.coin!);
@@ -171,28 +177,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableView.deselectRow(at: indexPath, animated: true);
         switch indexPath.row {
         case 0:
-            openLink(linkToSite: self.coin!.ticker.website);
+            let safariVC = SFSafariViewController(url: URL(string: self.coin!.ticker.website)!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 1:
-            openLink(linkToSite: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum");
+            let safariVC = SFSafariViewController(url: URL(string: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 2:
-            openLink(linkToSite: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en");
+            let safariVC = SFSafariViewController(url: URL(string: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         case 3:
-            openLink(linkToSite: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())");
+            let safariVC = SFSafariViewController(url: URL(string: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())")!)
+            self.present(safariVC, animated: true, completion: nil);
             break;
         default:
             break;
-        }
-    }
-    
-    private func openLink(linkToSite:String) {
-        let link = linkToSite;
-        if let url = URL(string: link) {
-            UIApplication.shared.open(url);
-        } else {
-            displayAlert(title: "Oops...", message: "Link does not exist")
         }
     }
     
@@ -418,15 +419,15 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
         self.activityIndicator.startAnimating();
-        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { (history, error) in
+        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { [weak self] (history, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.chart_view.isHidden = false;
-                self.activityIndicator.stopAnimating();
-                self.dataPoints = history!.prices;
-                self.timestamps = history!.timestamps;
-                self.chartSetup(data: self.dataPoints, isDay: false)
+                self?.chart_view.isHidden = false;
+                self?.activityIndicator.stopAnimating();
+                self?.dataPoints = history!.prices;
+                self?.timestamps = history!.timestamps;
+                self?.chartSetup(data: self!.dataPoints, isDay: false)
                 
             }
         }
@@ -434,10 +435,16 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     private func chartSetup(data: Array<Double>, isDay:Bool) {
         self.chart_view.removeAllSeries();
+        self.chart_view.hideHighlightLineOnTouchEnd = true;
+        self.chart_view.topInset = 20.0;
+        self.chart_view.bottomInset = 0.0;
+        self.chart_view.showXLabelsAndGrid = false;
+        self.chart_view.lineWidth = 3.0;
+        self.chart_view.labelColor = UIColor.white;
         let series = ChartSeries(data);
         series.area = true;
         if (!((data.first?.isLess(than: data.last!))!)) {
-            series.color = ChartColors.darkRedColor();
+            series.color = ChartColors.redColor();
         } else {
             series.color = ChartColors.greenColor();
         }
@@ -525,30 +532,52 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 }
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex);
                 self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(10000.0 * value!) / 10000.0))";
-                if (left < self.view.frame.width / 6) {
-                    self.chartPrice_lbl.frame.origin.x = (self.view.frame.width / 6) - 175.0;
+                
+                // calcualte height
+                if (dataIndex! != self.prevIndex) {
+                    if (dataIndex!.isMultiple(of: 2)) { self.vibrate(style: .light); }
+                    self.circleView.isHidden = false;
+                    self.circleView.removeFromSuperview();
+                    let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.dataPoints.min()!)) / CGFloat(self.dataPoints.max()! - self.dataPoints.min()!);
+                    let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
+                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
+                    self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
+                    self.circleView.clipsToBounds = true;
+                    self.circleView.backgroundColor = .darkGray;
+                    self.circleView.layer.borderColor = UIColor.orange.cgColor;
+                    self.circleView.layer.borderWidth = 1.0;
+                    self.chart_view.addSubview(self.circleView);
                 }
-                if (left > self.view.frame.width / 1.3) {
-                    self.chartPrice_lbl.frame.origin.x = (self.view.frame.width / 1.3) - 175.0
+                self.prevIndex = dataIndex!;
+                
+                let deviceBool = UIDevice.current.userInterfaceIdiom == .pad;
+                let rightValue:CGFloat = deviceBool ? 750.0 : 295.0;
+                let offset:CGFloat = 90.0
+                if (left <= 80.0) {
+                    self.chartPrice_lbl.transform = CGAffineTransform(translationX: -self.chartPrice_lbl.bounds.width / 2 + 85.0, y: 0.0);
+                } else if (left >= rightValue) {
+                    self.chartPrice_lbl.transform = CGAffineTransform(translationX: left - (self.chartPrice_lbl.bounds.width / 2 - (self.view.frame.width - left) + offset), y: 0.0);
+                } else {
+                    self.chartPrice_lbl.transform = CGAffineTransform(translationX: left - (self.chartPrice_lbl.bounds.width / 2), y: 0.0);
                 }
-                if (left >= 66.5 && left <= 296.0) {
-                    self.chartPrice_lbl.frame.origin.x = left - 175.0;
-                }
+
+                
             }
         }
     }
     
     func didFinishTouchingChart(_ chart: Chart) {
         self.chartPrice_lbl.isHidden = true;
+        self.circleView.isHidden = true;
     }
     
     func didEndTouchingChart(_ chart: Chart) {
         self.chartPrice_lbl.isHidden = true;
+        self.circleView.isHidden = true;
     }
     
     private func vibrate(style:UIImpactFeedbackGenerator.FeedbackStyle) -> Void {
         let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: style);
-        impactFeedbackgenerator.prepare()
         impactFeedbackgenerator.impactOccurred()
     }
     

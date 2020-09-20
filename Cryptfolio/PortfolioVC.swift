@@ -6,15 +6,22 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
+import UIKit;
 import SwiftChart;
 import SVProgressHUD;
+import FirebaseAuth;
 
 class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, CellDelegate {
     
     @IBOutlet weak var collectionView: UICollectionView!
     @IBOutlet weak var subtitleLbl: UILabel!;
     @IBOutlet weak var mainTitleLbl: UILabel!;
+    @IBOutlet weak var leaderboard_btn: UIButton!
+    @IBOutlet weak var mainPortData_btn: UIButton!
+    
+    private var isSubmitLogin:Bool = true;
+    private var alert:UIAlertController = UIAlertController();
+    private var alertButton:UIButton = UIButton();
     
     @IBOutlet weak var addCoin_btn: UIButton!
     @IBOutlet weak var welcome_lbl: UILabel!
@@ -27,7 +34,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var mainPortfolio_lbl: UILabel!
     @IBOutlet weak var mainPortTimeStamp_lbl: UILabel!
     @IBOutlet weak var mainPortPercentChange_lbl: UILabel!
-    @IBOutlet weak var mainPort_img: UIImageView!
     @IBOutlet weak var nameCol_btn: UIButton!
     @IBOutlet weak var priceCol_btn: UIButton!
     @IBOutlet weak var holdingCol_btn: UIButton!
@@ -49,6 +55,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private static var indexOptionsPrice = 0;
     private static var indexOptionsHolding = 0;
     
+    private static var runOnce:Bool = false;
+    
 
     
     override func viewWillAppear(_ animated: Bool) {
@@ -60,8 +68,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.tabBarController?.tabBar.isHidden = false;
         
+        self.leaderboard_btn.isUserInteractionEnabled = true;
+        
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
+        
+        if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
+            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 3 ? false : true;
+        } else { self.mainPortData_btn.isEnabled = false; }
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -74,7 +88,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.updateCells();
         self.loadData();
         self.tableVIew.reloadData();
-        
+                
     }
     
     override func viewDidLoad() {
@@ -120,20 +134,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
         self.availableFunds_lbl.addGestureRecognizer(availFundsTap);
         
-        self.mainPortfolio_lbl.isUserInteractionEnabled = true;
-        let mainPortTap = UITapGestureRecognizer(target: self, action: #selector(mainPortTapped));
-        self.mainPortfolio_lbl.addGestureRecognizer(mainPortTap);
+        self.mainPortData_btn.addTarget(self, action: #selector(self.mainPortTapped), for: .touchUpInside);
         
         self.mainPortPercentChange_lbl.isUserInteractionEnabled = true;
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
         self.mainPortPercentChange_lbl.addGestureRecognizer(mainPortPercentTap);
         
         // Animations
-        self.collectionView.alpha = 0.0;
-        //self.mainTitleLbl.alpha = 0.0;
-        self.subtitleLbl.alpha = 0.0;
-        UIView.animate(withDuration: 6, delay: 0, options: .allowUserInteraction, animations: { self.collectionView.alpha = 1;  }, completion: nil)
-        UIView.animate(withDuration: 3, delay: 0, options: .allowUserInteraction, animations: { self.subtitleLbl.alpha = 1; /*self.mainTitleLbl.alpha = 1;*/ }, completion: nil)
+        self.animateCollectionViewAndTitles();
+        self.animateStartScreen();
         
         self.subtitleLbl.text = self.getNewCurrentDate();
         
@@ -156,10 +165,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         if (String(self.tickers[indexPath.item].ticker.changePrecent24H).first! == "-") {
             cell.percentChangeLbl.attributedText = self.attachImageToString(text: "\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortDownArrow"));
-            cell.percentChangeLbl.textColor = ChartColors.darkRedColor();
+            cell.percentChangeLbl.textColor = ChartColors.redColor();
         } else {
             cell.percentChangeLbl.attributedText = self.attachImageToString(text: "+\(String(format: "%.2f", self.tickers[indexPath.item].ticker.changePrecent24H))%", image: #imageLiteral(resourceName: "sortUpArrow"));
-            cell.percentChangeLbl.textColor = ChartColors.darkGreenColor();
+            cell.percentChangeLbl.textColor = ChartColors.greenColor();
         }
         
         return cell;
@@ -172,28 +181,57 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     
-    func autoScroll () {
+   private func autoScroll () {
         if (self.viewDisappeared) {
             return;
         }
         var co = self.collectionView.contentOffset.x;
         var no = co + 0.5;
-        if (no >= 3700) {
+        if (no >= 3500) {
             self.collectionView.contentOffset.x = -350.0;
             co = self.collectionView.contentOffset.x;
             no = co + 0.5;
         }
         UIView.animate(withDuration: 0.001, delay: 0, options: .allowUserInteraction, animations: { [weak self]() -> Void in
             self?.collectionView.contentOffset = CGPoint(x: no, y: 0);
-            }) { [weak self](finished) -> Void in
+            }) { [weak self] (finished) -> Void in
                 self?.autoScroll();
         }
+    }
+    
+    private func animateCollectionViewAndTitles() {
+        self.collectionView.alpha = 0.0;
+        //self.mainTitleLbl.alpha = 0.0;
+        self.subtitleLbl.alpha = 0.0;
+        UIView.animate(withDuration: 6, delay: 0, options: .allowUserInteraction, animations: { self.collectionView.alpha = 1;  }, completion: nil)
+        UIView.animate(withDuration: 3, delay: 0, options: .allowUserInteraction, animations: { self.subtitleLbl.alpha = 1; /*self.mainTitleLbl.alpha = 1;*/ }, completion: nil)
+    }
+    
+    private func animateStartScreen() {
+        self.welcome_lbl.alpha = 0.0;
+        self.appName_lbl.alpha = 0.0;
+        self.addCoin_btn.alpha = 0.0;
+        UIView.animate(withDuration: 8, delay: 0, options: .allowUserInteraction, animations: { self.addCoin_btn.alpha = 1; }, completion: nil)
+        UIView.animate(withDuration: 3, delay: 0, options: .allowUserInteraction, animations: { self.welcome_lbl.alpha = 1; }, completion: nil)
+        UIView.animate(withDuration: 1, delay: 0, options: .allowUserInteraction, animations: { self.appName_lbl.alpha = 1; }, completion: nil)
     }
     
     private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {
         let attachment = NSTextAttachment()
         attachment.image = image
         attachment.bounds = CGRect(x: 0.5, y: -0.3, width: 8, height: 8)
+        let masterStirng = NSMutableAttributedString(string: "")
+        let percentString = NSMutableAttributedString(string: text);
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(percentString)
+        masterStirng.append(imageAttachment)
+        return masterStirng;
+    }
+    
+    private func attachImageToStringNew(text:String, image:UIImage) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        attachment.image = image
+        attachment.bounds = CGRect(x: 1, y: -1.5, width: 12, height: 12)
         let masterStirng = NSMutableAttributedString(string: "")
         let percentString = NSMutableAttributedString(string: text);
         let imageAttachment = NSAttributedString(attachment: attachment)
@@ -211,16 +249,26 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         dateFormatter.dateFormat = "EEEE, MMMM d";
         return dateFormatter.string(from: date);
    }
+    
+    private func getNewCurrentDate(format:String) -> String {
+        let date = Date(timeIntervalSince1970: Double(Date().timeIntervalSince1970))
+        let dateFormatter = DateFormatter();
+        dateFormatter.timeStyle = DateFormatter.Style.medium;
+        dateFormatter.dateStyle = DateFormatter.Style.medium;
+        dateFormatter.timeZone = .current;
+        dateFormatter.dateFormat = format;
+        return dateFormatter.string(from: date);
+    }
        
     private func getTickerData() -> Void {
-        CryptoData.getCryptoData { (ticker, error) in
+        CryptoData.getCryptoData { [weak self] (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
                 if (ticker!.name != "Matic Network") {
                     if let imageUI = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png") {
-                        self.tickers.append(Coin(ticker: ticker!, image: Image(withImage: imageUI)));
-                        self.collectionView.reloadData();
+                        self?.tickers.append(Coin(ticker: ticker!, image: Image(withImage: imageUI)));
+                        self?.collectionView.reloadData();
                     }
                 }
             }
@@ -246,133 +294,104 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.tableVIew.reloadData();
         // update the current coinList;
         for coin in self.coins {
-            CryptoData.getCoinData(id: coin.ticker.id) { (ticker, error) in
+            CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                     print("no internet")
                     return;
                 } else {
-                    print("bad 1")
                     coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
                     coin.ticker = ticker!;
-                    self.isLoading = false;
-                    self.tableVIew.reloadData();
-                    self.writeCoinArray();
+                    self?.isLoading = false;
+                    self?.tableVIew.reloadData();
+                    self?.writeCoinArray();
                 }
             }
         }
     }
     
     public func loadData() -> Void {
-        //writeCoinArray();
+    
         
         // load in available funds
-        let availableFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
-        var currentAvailFunds:Double = 0.0;
-        if (availableFunds != nil) {
-            currentAvailFunds = availableFunds!;
-            var tempAvailString = String(format: "%.2f", availableFunds!);
-            if (tempAvailString.first == "-") {
-                tempAvailString.removeFirst();
-                self.availableFunds_lbl.text = "$\(tempAvailString)"
-            } else {
-                self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))"
-            }
-        } else {
-            self.availableFunds_lbl.text = "$0.00";
-        }
+        let currentAvailFunds = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+        self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
         
-        // load in main portfolio amount (update with the all the users holdings)
-        let mainPortfolio = UserDefaults.standard.value(forKey: UserDefaultKeys.mainPortfolioKey) as? Double;
-        if (mainPortfolio != nil) {
-            self.mainPortPercentChange_lbl.isHidden = false;
-            self.mainPortTimeStamp_lbl.isHidden = false;
-            self.mainPort_img.isHidden = false;
-            self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", mainPortfolio!))"
-            
-            // load in holdings array
-            if let loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
-                //var portPercentChange:Double = 0.0;
-                var updatedMainPortfolio:Double = 0.0;
-                for index in 0...loadedHolding.count - 1 {
-                    CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { (ticker, error) in
-                        if let error = error {
-                            print(error.localizedDescription);
-                            print("no internet");
-                            return;
+        // load in holdings array
+        guard var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else {
+            self.mainPortfolio_lbl.text = "$0.00";
+            return;
+        }
+        var updatedMainPortfolio:Double = 0.0;
+        var counter:Int = 0;
+        loadedHolding = loadedHolding.filter({ (holding) -> Bool in
+            return holding.amountOfCoin > 0;
+        })
+        if (loadedHolding.isEmpty) {
+            self.mainPortfolio_lbl.text = "$0.00";
+            return;
+        }
+        for index in 0...loadedHolding.count - 1 {
+            CryptoData.getCoinData(id: loadedHolding[index].ticker.id) { [weak self] (ticker, error) in
+                if let error = error { print(error.localizedDescription); } else {
+                    counter += 1;
+                    loadedHolding[index].estCost = loadedHolding[index].amountOfCoin * ticker!.price;
+                    updatedMainPortfolio += loadedHolding[index].estCost;
+                    
+                    self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
+                    self?.portPercentChange = (self!.priceDifference / 10000);
+                    
+                    if (counter == loadedHolding.count) {
+                        var loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph);
+                        if (loadedMainPortList != nil && !loadedMainPortList!.isEmpty) {
+                            if (!loadedMainPortList!.contains(where: { (portData) -> Bool in
+                                return portData.currentPrice.isEqual(to: updatedMainPortfolio + currentAvailFunds);
+                            })) {
+                                if (loadedMainPortList!.count >= 100000) { loadedMainPortList!.removeFirst(); }
+                                loadedMainPortList!.append(PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!));
+                                DataStorageHandler.saveObject(type: loadedMainPortList!, forKey: UserDefaultKeys.mainPortfolioGraph);
+                            }
                         } else {
-                            print("bad 2");
-                            // update estCost
-                            loadedHolding[index].estCost = loadedHolding[index].amountOfCoin * ticker!.price;
-                            updatedMainPortfolio += loadedHolding[index].estCost;
-                            
-//                            let priceDifference:Double = -(loadedHolding[index].ticker.price - ticker!.price);
-//                            portPercentChange += (priceDifference / loadedHolding[index].ticker.price) / Double(loadedHolding.count);
-//                            let updatedChange = mainPortfolio! + (mainPortfolio! * portPercentChange);
-//                            self.priceDifference = updatedChange - mainPortfolio! // maybe updatedChange;
-                            
-                            self.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
-                            self.portPercentChange = (self.priceDifference / 10000);
-                            
-                            print("Price Difference: \(self.priceDifference)");
-                            print("Portfolio Percent Change: \(self.portPercentChange)")
-                            print("Bought at price: \(loadedHolding[index].ticker.price)");
-                            print("Bought at percent change at: \(loadedHolding[index].ticker.changePrecent24H)")
-                            var tempUpChange = String(format: "%.2f", updatedMainPortfolio);
-                            if (tempUpChange.first == "-") {
-                                tempUpChange.removeFirst();
-                                self.mainPortfolio_lbl.text = "$\(tempUpChange)";
-                            } else {
-                                self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
-                            }
-                            if (updatedMainPortfolio.isZero || self.mainPortfolio_lbl.text! == "$0.00") {
-                                self.mainPortPercentChange_lbl.isHidden = true;
-                                self.mainPortTimeStamp_lbl.isHidden = true;
-                                self.mainPort_img.isHidden = true;
-                            } else {
-                                self.mainPortPercentChange_lbl.isHidden = false;
-                                self.mainPortTimeStamp_lbl.isHidden = false;
-                                self.mainPort_img.isHidden = false;
-                            }
-                            if (String(self.portPercentChange).first == "-" && !self.portPercentChange.isZero) {
-                                self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightRed.png");
-                                self.mainPortPercentChange_lbl.textColor = ChartColors.darkRedColor();
-                                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", self.portPercentChange * 100))%"
-                               // self.portPercentChange = self.portPercentChange;
-                            } else {
-                                self.mainPort_img.image = UIImage(named: "Images/InfoImages/lightGreen.png");
-                                var mainPortPercentString = String(self.portPercentChange);
-                                if (mainPortPercentString.first == "-") { mainPortPercentString.removeFirst(); self.portPercentChange = Double(mainPortPercentString)! }
-                                //self.portPercentChange = self.portPercentChange;
-                                if (self.traitCollection.userInterfaceStyle == .dark) {
-                                    self.mainPortPercentChange_lbl.textColor = ChartColors.darkGreenColor();
-                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.portPercentChange * 100))%"
-                                } else {
-                                    self.mainPortPercentChange_lbl.textColor = ChartColors.greenColor();
-                                    self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.portPercentChange * 100))%"
-                                }
-                            }
+                            let mainPortList:[PortfolioData] = [PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!)];
+                            DataStorageHandler.saveObject(type: mainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
                         }
                     }
+                    self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
+                    self?.mainPortPercentChange_lbl.isHidden = false;
+                    self?.mainPortTimeStamp_lbl.isHidden = false;
+                    
+                    self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
+                    self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
                 }
             }
-            
-        } else {
-            self.mainPortfolio_lbl.text = "$0.00";
-            self.mainPortPercentChange_lbl.isHidden = true;
-            self.mainPortTimeStamp_lbl.isHidden = true;
-            self.mainPort_img.isHidden = true;
         }
+        
     }
     
     @objc private func availFundsTapped() -> Void {
-        let addFundsVC = storyboard?.instantiateViewController(withIdentifier: "addFundsVC") as! AddFundsVC;
-        addFundsVC.title = "Add Funds";
-        self.navigationController?.pushViewController(addFundsVC, animated: true);
+        print("Avail Tapped");
     }
     
     @objc private func mainPortTapped() -> Void {
-        print("go to mainPortFolioVC");
+        self.vibrate(style: .light);
+        var temp = self.mainPortfolio_lbl.text!;
+        temp.removeFirst();
+        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
+        var change:String = "";
+        if (String(self.portPercentChange).first != "-") {
+            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
+        } else {
+            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
+        }
+        guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
+        if (loadedMainPortList.count < 3) { return; }
+        print("SIZE OF LIST: \(loadedMainPortList.count)");
+        if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
+            return MainPortfolioDataVC(coder: coder, dataSet: loadedMainPortList, currentPortfolio: String(format: "%.2f", highscore), currentChange: change);
+        }) {
+            mainPortDataVC.hidesBottomBarWhenPushed = true;
+            self.navigationController?.pushViewController(mainPortDataVC, animated: true);
+        } else { print("MainPortDataVC does not exist"); }
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
@@ -502,15 +521,45 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
     }
     
-    @objc private func goToHoldingsVC() -> Void {
-        // REMOVE THIS LATER
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+    @IBAction func leaderboardBtnTapped(_ sender: Any) {
+        self.vibrate(style: .light);
+        self.leaderboard_btn.isUserInteractionEnabled = false;
+        self.isSubmitLogin = true;
+        var temp = self.mainPortfolio_lbl.text!;
+        temp.removeFirst();
+        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
+        var change:String = "";
+        if (String(self.portPercentChange).first != "-") {
+            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
+        } else {
+            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
+        }
         
+        var portPrices:Array<Double> = Array<Double>();
+        var portDates:Array<String> = Array<String>();
+        if let mainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
+            for i in 0..<mainPortData.count {
+                portPrices.append(mainPortData[i].currentPrice);
+                portDates.append(mainPortData[i].currentDate);
+            }
+        }
+
+        // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
+        if (FirebaseAuth.Auth.auth().currentUser != nil) {
+            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin()	, portPrices: portPrices, portDates: portDates, viewController: self)
+        } else {
+            if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
+                return LoginVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoin: self.getNumberOfOwnedCoin(), portPrices: portPrices, portDates: portDates);
+            }) {
+                loginVC.hidesBottomBarWhenPushed = true;
+                self.navigationController?.pushViewController(loginVC, animated: true);
+            } else { print("LoginVC has not been instantiated"); }
+        }
+    }
+
+    @objc private func goToHoldingsVC() -> Void {
         let holdingVC = self.storyboard?.instantiateViewController(withIdentifier: "holdingVC") as! HoldingVC;
         self.navigationController?.pushViewController(holdingVC, animated: true);
-        
     }
     
     private func changeAllCellsProperties(configure:(TickerScreenCell, Int) -> Void) -> Void {
@@ -525,17 +574,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.vibrate(style: .light);
         PortfolioVC.counter += 1;
         if (PortfolioVC.counter % 2 != 0) {
-            if (String(self.portPercentChange).first != "-") {
-                self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.priceDifference))";
-            } else {
-                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", self.priceDifference))";
-            }
+            self.mainPortPercentChange_lbl.attributedText = String(self.portPercentChange).first != "-" ? self.attachImageToStringNew(text: "+\(String(format: "%.2f", self.priceDifference))", image: #imageLiteral(resourceName: "sortUpArrow") ) : self.attachImageToStringNew(text: "\(String(format: "%.2f", self.priceDifference))", image: #imageLiteral(resourceName: "sortDownArrow"));
         } else {
-            if (String(self.portPercentChange).first != "-") {
-                self.mainPortPercentChange_lbl.text = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
-            } else {
-                self.mainPortPercentChange_lbl.text = "\(String(format: "%.2f", self.portPercentChange * 100))%";
-            }
+            self.mainPortPercentChange_lbl.attributedText = String(self.portPercentChange).first != "-" ? self.attachImageToStringNew(text: "+\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow") ) : self.attachImageToStringNew(text: "\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow"));
         }
     }
     
@@ -562,21 +603,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.vibrate(style: .light);
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (currentFunds != nil) {
-            CryptoData.getCoinData(id: coinSet[indexPathRow].ticker.id) { (ticker, error) in
+            CryptoData.getCoinData(id: coinSet[indexPathRow].ticker.id) { [weak self] (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
                     let amountCoin = currentFunds! / ticker!.price;
                     if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker!)) {
-                        self.loadData();
-                        self.tableVIew.reloadData();
+                        self?.loadData();
+                        self?.tableVIew.reloadData();
                     } else {
                         //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
                     }
                 }
             }
         } else {
-            displayAlert(title: "Sorry", message: "Insufficient funds")
+            self.displayAlert(title: "Sorry", message: "Insufficient funds")
         }
     }
     
@@ -590,16 +631,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 break;
             }
         }
-        CryptoData.getCoinData(id: currentHoldings!.ticker.id) { (ticker, error) in
+        CryptoData.getCoinData(id: currentHoldings!.ticker.id) { [weak self] (ticker, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
                 let amountCost = currentHoldings!.amountOfCoin * ticker!.price;
                 if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker!)) {
-                    self.loadData();
-                    self.tableVIew.reloadData();
+                    self?.loadData();
+                    self?.tableVIew.reloadData();
                 } else {
-                    self.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
+                    self?.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
                 }
             }
         }
@@ -637,11 +678,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             self.hideColTitleLabels(hidden: true);
             self.hideColTitleImages(hidden: true);
             styleButton(button: &self.addCoin_btn);
+            self.addCoin_btn.layer.cornerRadius = 10.0;
             self.mainPortPercentChange_lbl.isHidden = true;
             self.mainPortTimeStamp_lbl.isHidden = true;
-            self.mainPort_img.isHidden = true;
             tableView.separatorStyle = .none;
-            tableView.backgroundView = self.multipleViews;
+            //tableView.backgroundView = self.multipleViews;
             return 0;
         }
         if (self.isLoading) {
@@ -655,7 +696,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             self.hideFunds(hidden: true);
             self.mainPortPercentChange_lbl.isHidden = true;
             self.mainPortTimeStamp_lbl.isHidden = true;
-            self.mainPort_img.isHidden = true;
             self.hideColTitleLabels(hidden: true);
             self.hideColTitleImages(hidden: true);
             tableView.separatorStyle = .none;
@@ -696,10 +736,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             tableView.endUpdates();
             if (self.coins.count == 0) {
                 self.styleButton(button: &self.addCoin_btn);
+                self.addCoin_btn.layer.cornerRadius = 10.0;
                 self.hideViews(hidden: false);
                 self.hideFunds(hidden: true);
                 self.hideColTitleLabels(hidden: true);
-                tableView.backgroundView = self.multipleViews;
+                //tableView.backgroundView = self.multipleViews;
                 tableView.separatorStyle = .none;
             }
             self.writeCoinArray();
@@ -816,7 +857,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // format percent change
         if (String(coinSet[indexPath.row].ticker.changePrecent24H).first != "-") {
             if (self.traitCollection.userInterfaceStyle == .dark) {
-                cell.percentChange_lbl.textColor = ChartColors.darkGreenColor();
+                cell.percentChange_lbl.textColor = ChartColors.greenColor();
             } else {
                 cell.percentChange_lbl.textColor = ChartColors.greenColor();
             }
@@ -824,7 +865,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             //self.appendZero(string: &theoPercentString);
             cell.percentChange_lbl.text = "+\(theoPercentString)%"
         } else {
-            cell.percentChange_lbl.textColor = ChartColors.darkRedColor();
+            cell.percentChange_lbl.textColor = ChartColors.redColor();
             let theoPercentString = String(format: "%.2f", coinSet[indexPath.row].ticker.changePrecent24H);
             //self.appendZero(string: &theoPercentString);
             cell.percentChange_lbl.text = "\(theoPercentString)%"
@@ -860,13 +901,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     
     
-    // MARK: - Hide all views
+    // MARK: - Hide all views and Helper Methods
     
     private func hideViews(hidden:Bool) -> Void {
         self.addCoin_btn.isHidden = hidden;
         self.welcome_lbl.isHidden = hidden;
         self.appName_lbl.isHidden = hidden;
         self.multipleViews.isHidden = hidden;
+        self.animateStartScreen();
     }
     
     private func hideFunds(hidden:Bool) -> Void {
@@ -877,6 +919,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.subtitleLbl.isHidden = hidden;
         self.mainTitleLbl.isHidden = hidden;
         self.collectionView.isHidden = hidden;
+        self.leaderboard_btn.isHidden = hidden;
+        self.mainPortData_btn.isHidden = hidden;
     }
     
     private func hideColTitleLabels(hidden:Bool) -> Void {
@@ -889,6 +933,23 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.nameCol_img.isHidden = hidden;
         self.priceCol_img.isHidden = hidden;
         self.holdingCol_img.isHidden = hidden;
+    }
+    
+    private func getNumberOfOwnedCoin() -> Int {
+        guard var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else { return 0; }
+        loadedHoldings = loadedHoldings.filter({ (holding) -> Bool in
+            return holding.amountOfCoin > 0;
+        })
+        return loadedHoldings.count;
+    }
+    
+    private func getNumberOfTranscations() -> Int {
+        guard let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else { return 0; }
+        var sum:Int = 0;
+        for holding in loadedHoldings {
+            sum += holding.amountOfCoins.count;
+        }
+        return sum;
     }
     
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {

@@ -11,14 +11,26 @@ import  UIKit;
 
 public class UserDefaultKeys {
     
+    // Coin Managment
     public static let coinKey = "coinKey";
     public static let coinArrayKey = "coinArrayKey";
     public static let availableFundsKey = "availableFundsKey";
     public static let mainPortfolioKey = "mainPortfolioKey";
     public static let holdingsKey = "holdingsKey";
+    
     // Investing Tips
     public static let investingTipsKey = "investingTipsKey";
     public static let randomIndex = "randomIndex";
     public static let foundAllTips = "foundAllTips";
+    
+    // Leaderboard
+    public static let username = "username";
+    
+    // Traking Data
+    public static let mainPortfolioGraph = "mainPortfolioGraph";
+    
+    // first time lanching app
+    public static let isNotFirstTime = "isNotFirstTime";
+    public static let didAnimateWithOneCoin = "didAnimateWithOneCoin";
     
 }

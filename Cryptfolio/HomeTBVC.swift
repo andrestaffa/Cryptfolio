@@ -88,7 +88,7 @@ class HomeTBVC: UITableViewController {
         if (!self.loading) {
             self.loading = true;
         }
-        CryptoData.getCryptoData { (ticker, error) in
+        CryptoData.getCryptoData { [weak self] (ticker, error) in
             if let error = error {
                 print(error.localizedDescription)
             } else {
@@ -96,18 +96,18 @@ class HomeTBVC: UITableViewController {
                 if (imageUI != nil) {
                     if (ticker!.name != "Matic Network") {
                         let image = Image(withImage: imageUI!);
-                        self.coins.append(Coin(ticker: ticker!, image: image));
-                        if (self.counter < 2) {
-                            self.prevLength = (self.coins.count);
+                        self?.coins.append(Coin(ticker: ticker!, image: image));
+                        if (self!.counter < 2) {
+                            self?.prevLength = (self!.coins.count);
                         }
-                        if ((self.coins.count) > self.prevLength) {
-                            self.coins.removeSubrange((0...self.prevLength - 1));
+                        if ((self!.coins.count) > self!.prevLength) {
+                            self?.coins.removeSubrange((0...self!.prevLength - 1));
                         }
                     }
                 }
             }
-            self.loading = false;
-            self.tableView.reloadData();
+            self?.loading = false;
+            self?.tableView.reloadData();
         }
     }
     

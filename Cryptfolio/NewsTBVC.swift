@@ -8,6 +8,7 @@
 
 import UIKit;
 import SVProgressHUD;
+import SafariServices;
 
 class NewsTBVC: UITableViewController {
 
@@ -40,20 +41,20 @@ class NewsTBVC: UITableViewController {
         if (!self.isLoading) {
             self.isLoading = true;
         }
-        CryptoData.getNewsData { (news, error) in
+        CryptoData.getNewsData { [weak self] (news, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self.newsList.append(news!);
-                if (self.counter < 2) {
-                    self.prevLength = (self.newsList.count);
+                self?.newsList.append(news!);
+                if (self!.counter < 2) {
+                    self!.prevLength = (self!.newsList.count);
                 }
-                if ((self.newsList.count) > self.prevLength) {
-                    self.newsList.removeSubrange((0...self.prevLength - 1));
+                if ((self!.newsList.count) > self!.prevLength) {
+                    self?.newsList.removeSubrange((0...self!.prevLength - 1));
                 }
             }
-            self.isLoading = false;
-            self.tableView.reloadData();
+            self?.isLoading = false;
+            self?.tableView.reloadData();
         }
         
     }
@@ -97,23 +98,15 @@ class NewsTBVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
-        openLink(linkToSite: self.newsList[indexPath.row].url);
-    }
-    
-    private func openLink(linkToSite:String) {
-        let link = linkToSite;
-        if let url = URL(string: link) {
-            UIApplication.shared.open(url);
-        } else {
-            displayAlert(title: "Oops...", message: "Link does not exist")
-        }
+        let safariVC = SFSafariViewController(url: URL(string: self.newsList[indexPath.row].url)!);
+        self.present(safariVC, animated: true, completion: nil);
     }
     
     func displayAlert(title:String, message:String) {
         let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
         let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
         alert.addAction(defaultButton)
-        present(alert, animated: true, completion: nil);
+        self.present(alert, animated: true, completion: nil);
     }
     
     private func dateFormatter(time:Double) -> String {
