@@ -46,6 +46,7 @@ public class DatabaseManager {
                 if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
                     return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change);
                 }) {
+                    leaderboardVC.hidesBottomBarWhenPushed = true;
                     viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                 } else { print("LeaderboardVC has not been instantiated"); }
             }
@@ -97,6 +98,7 @@ public class DatabaseManager {
                                     if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
                                         return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change);
                                     }) {
+                                        leaderboardVC.hidesBottomBarWhenPushed = true;
                                         viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                                     } else { print("LeaderboardVC has not been instantiated"); }
                                 }

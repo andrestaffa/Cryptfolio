@@ -75,7 +75,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
             self.mainPortData_btn.isEnabled = loadedMainPortData.count < 3 ? false : true;
-        } else { self.mainPortData_btn.isEnabled = false; }
+            self.mainPortData_btn.tintColor = loadedMainPortData.count < 3 ? .darkGray : .systemOrange;
+        } else {
+            self.mainPortData_btn.isEnabled = false;
+            self.mainPortData_btn.tintColor = .darkGray;
+        }
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -793,6 +797,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         infoVC.coin = self.coins[indexPath.row];
         self.navigationController?.pushViewController(infoVC, animated: true);
+    }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50.0;
     }
     
     // MARK: - Button Methods

@@ -81,6 +81,8 @@ class TradeVC: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard));
         self.view.addGestureRecognizer(tap);
         
+        self.amount_txt.backgroundColor = .black;
+        
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let amountTap = UITapGestureRecognizer(target: self, action: #selector(amountTapped));
         self.availableFunds_lbl.addGestureRecognizer(amountTap);
