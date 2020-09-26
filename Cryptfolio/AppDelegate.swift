@@ -9,6 +9,7 @@
 import UIKit
 import CoreData
 import Firebase
+import SVProgressHUD;
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -20,6 +21,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         UITabBar.appearance().tintColor = UIColor.orange
         window?.overrideUserInterfaceStyle = .dark
+        SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
         GADMobileAds.sharedInstance().start(completionHandler: nil);
         

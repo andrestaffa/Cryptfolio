@@ -75,7 +75,7 @@ class SignUpVC: UIViewController {
                     if let error = error {
                         self?.displayAlert(title: "Sorry", message: error.localizedDescription);
                     } else {
-                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, portPrices: self!.portPrices, portDates: self!.portDates, merge: false, viewController: self!);
+                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, portPrices: self!.portPrices, portDates: self!.portDates, merge: false, viewController: self!, isPortVC: false);
                     }
                 }
             } else {

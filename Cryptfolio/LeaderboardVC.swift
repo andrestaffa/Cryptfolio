@@ -50,6 +50,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     private var users:Array<User> = Array<User>();
     private var filterUsers:Array<User> = Array<User>();
     private var isLoading:Bool = true;
+    private var isPortVC:Bool?;
     
     // search controller setup
     private let searchController = UISearchController(searchResultsController: nil)
@@ -61,11 +62,12 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
 
     
-    public init?(coder:NSCoder, currentUsername:String, currentHighscore:Double, currentChange:String) {
+    public init?(coder:NSCoder, currentUsername:String, currentHighscore:Double, currentChange:String, isPortVC:Bool) {
         super.init(coder: coder);
         self.currentUsername = currentUsername;
         self.currentHighscore = currentHighscore;
         self.currentChange = currentChange;
+        self.isPortVC = isPortVC;
     }
     public required init?(coder: NSCoder) { fatalError("Error loading SignUpVC"); }
 
@@ -79,14 +81,10 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
          self.tabBarController?.tabBar.isHidden = true;
         
         // custom nav back button
-        self.navigationItem.backBarButtonItem = nil;
-//        let backButton = UIButton();
-//        backButton.setImage(#imageLiteral(resourceName: "exitImage"), for: .normal);
-//        backButton.frame = CGRect(x: 0.0, y: 0.0, width: 2.0, height: 2.0);
-//        backButton.addTarget(self, action: #selector(backBtnTapped), for: .touchUpInside);
-//        let leftBarButton = UIBarButtonItem(customView: backButton);
-        self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "dashboardIcon"), style: .plain, target: self, action: #selector(backBtnTapped));
-        //self.navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addBtnTapped));
+        if (!self.isPortVC!) {
+            self.navigationItem.backBarButtonItem = nil;
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "dashboardIcon"), style: .plain, target: self, action: #selector(backBtnTapped));
+        }
     }
     
     override func viewDidLoad() {
@@ -236,8 +234,9 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     private func configureProfileView(userList:Array<User>, indexPath:IndexPath) {
         if (userList[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) { self.profileInfoBtn.isHidden = true; }
         self.profileViewProgess_btn.isEnabled = userList[indexPath.row].portPrices.count < 3 ? false : true;
-        if (userList[indexPath.row].portPrices.count < 3) {
+        if (userList[indexPath.row].portPrices.count < 30) {
             self.profileViewProgess_btn.setTitleColor(.darkGray, for: .normal)
+            self.profileViewProgess_btn.isEnabled = false;
         } else {
             self.profileViewProgess_btn.setTitleColor(.orange, for: .normal);
         }

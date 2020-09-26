@@ -77,7 +77,7 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, portPrices: self!.portPrices, portDates: self!.portDates, viewController: self!);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, portPrices: self!.portPrices, portDates: self!.portDates, viewController: self!, isPortVC: false);
             }
         }
         

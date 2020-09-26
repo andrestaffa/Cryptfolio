@@ -107,6 +107,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chartPrice_lbl.isHidden = true;
         self.dayChart();
         
+        self.description_view.translatesAutoresizingMaskIntoConstraints = false;
+        self.description_view.sizeToFit();
+        self.description_view.isScrollEnabled = false;
+        
     }
     
     @objc func trade() {
@@ -235,25 +239,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         if #available(iOS 13.0, *) {
             self.timeStamp_seg.selectedSegmentTintColor = UIColor.orange
         }
-        self.views.append(self.view1);
-        self.views.append(self.view2);
-        self.views.append(self.view3);
-        self.views.append(self.view4);
-        self.views.append(self.view5);
-        self.views.append(self.view6);
-        if (traitCollection.userInterfaceStyle == .light) {
-            for view in self.views {
-                view.backgroundColor = UIColor.init(red: 192/255, green: 192/255, blue: 192/255, alpha: 1);
-            }
-        } else {
-            for view in self.views {
-                view.backgroundColor = UIColor.init(red: 105/255, green: 105/255, blue: 105/255, alpha: 1);
-            }
-        }
+//        self.views.append(self.view1);
+//        self.views.append(self.view2);
+//        self.views.append(self.view3);
+//        self.views.append(self.view4);
+//        self.views.append(self.view5);
+//        self.views.append(self.view6);
+
     }
     
     private func setGoodDescription(ticker:Ticker) -> String {
-        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased()) {
+        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased()) {
             let charset = CharacterSet(charactersIn: ".")
             let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
             var resultString = Array<String>();
@@ -262,8 +258,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     resultString.append(arr[i]);
                 }
             }
-            //resultString.append("");
-            return resultString.joined(separator: ".");
+            var desc = resultString.joined(separator: ".");
+            if (desc.last != ".") {
+                desc.append(".");
+            }
+            return desc;
         } else if (ticker.name.lowercased() == "TrueUSD".lowercased()) {
             return "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
         } else if (ticker.name.lowercased() == "Paxos Standard".lowercased()) {
@@ -277,8 +276,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     resultString.append(arr[i]);
                 }
             }
-            //resultString.append("");
-            return resultString.joined(separator: ".");
+            var desc = resultString.joined(separator: ".");
+            if (desc.last != ".") {
+                desc.append(".");
+            }
+            return desc;
         }
     }
     

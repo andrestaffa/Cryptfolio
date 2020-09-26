@@ -90,29 +90,27 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
                 self.graphPrice_lbl.text = "$\(String(format: "%.2f", value!)), \(self.dateSet[dataIndex!])";
                 self.graphPrice_lbl.isHidden = false;
                 if (dataIndex! != self.prevIndex) {
-                    if (self.pricesSet.count >= 50) {
-                        if (dataIndex!.isMultiple(of: 2)) {
-                            self.vibrate(style: .light);
-                        }
-                        self.circleView.isHidden = false;
-                        self.circleView.removeFromSuperview();
-                        
-                        // calc y pos
-                        let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.pricesSet.min()!)) / CGFloat(self.pricesSet.max()! - self.pricesSet.min()!);
-                        let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
-                        
-                        // calc x pos
-                        let widthPercentage:CGFloat = (CGFloat(dataIndex! + 1) / CGFloat(self.pricesSet.count));
-                        let currentWidth = widthPercentage * self.chart_view.frame.width;
-                        
-                        self.circleView = UIView(frame: CGRect(x: (currentWidth) - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
-                        self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
-                        self.circleView.clipsToBounds = true;
-                        self.circleView.backgroundColor = .darkGray;
-                        self.circleView.layer.borderColor = UIColor.orange.cgColor;
-                        self.circleView.layer.borderWidth = 1.0;
-                        self.chart_view.addSubview(self.circleView);
+                    if (dataIndex!.isMultiple(of: 2)) {
+                        self.vibrate(style: .light);
                     }
+                    self.circleView.isHidden = false;
+                    self.circleView.removeFromSuperview();
+                    
+                    // calc y pos
+                    let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.pricesSet.min()!)) / CGFloat(self.pricesSet.max()! - self.pricesSet.min()!);
+                    let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
+                    
+                    // calc x pos
+                    let widthPercentage:CGFloat = (CGFloat(dataIndex! + 1) / CGFloat(self.pricesSet.count));
+                    let currentWidth = widthPercentage * self.chart_view.frame.width;
+                    
+                    self.circleView = UIView(frame: CGRect(x: (currentWidth) - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
+                    self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
+                    self.circleView.clipsToBounds = true;
+                    self.circleView.backgroundColor = .darkGray;
+                    self.circleView.layer.borderColor = UIColor.orange.cgColor;
+                    self.circleView.layer.borderWidth = 1.0;
+                    self.chart_view.addSubview(self.circleView);
                 }
                 self.prevIndex = dataIndex!;
                 let deviceBool = UIDevice.current.userInterfaceIdiom == .pad;

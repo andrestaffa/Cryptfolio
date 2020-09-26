@@ -36,7 +36,7 @@ public class DatabaseManager {
         db.collection("users").document(username).setData(data, merge: merge, completion: completion);
     }
     
-    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>, merge:Bool, viewController:UIViewController) -> Void {
+    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "portPrices":portPrices, "portDates":portDates], merge: merge) { (error) in
             if let error = error {
@@ -44,7 +44,7 @@ public class DatabaseManager {
             } else {
                 SVProgressHUD.dismiss();
                 if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
-                    return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change);
+                    return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
                 }) {
                     leaderboardVC.hidesBottomBarWhenPushed = true;
                     viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
@@ -76,7 +76,7 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, portPrices:Array<Double>, portDates:Array<String>, viewController:UIViewController) -> Void {
+    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, portPrices:Array<Double>, portDates:Array<String>, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection("users").getDocuments { (snapshot, error) in
             if let error = error {
@@ -96,7 +96,7 @@ public class DatabaseManager {
                                 } else {
                                     SVProgressHUD.dismiss();
                                     if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
-                                        return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change);
+                                        return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
                                     }) {
                                         leaderboardVC.hidesBottomBarWhenPushed = true;
                                         viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
