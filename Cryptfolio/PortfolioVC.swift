@@ -76,8 +76,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
         
         if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
-            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 30 ? false : true;
-            self.mainPortData_btn.tintColor = loadedMainPortData.count < 30 ? .darkGray : .systemOrange;
+            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 25 ? false : true;
+            self.mainPortData_btn.tintColor = loadedMainPortData.count < 25 ? .darkGray : .systemOrange;
         } else {
             self.mainPortData_btn.isEnabled = false;
             self.mainPortData_btn.tintColor = .darkGray;
@@ -118,9 +118,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.navigationItem.titleView = self.navTitleWithImageAndText(titleText: "ryptfolio", imageIcon: #imageLiteral(resourceName: "appLogo"));
         
+        // assign some properties
         self.appName_lbl.textColor = .systemOrange;
         self.appName_lbl.attributedText = self.attachImageToStringTitle(text: "ryptfolio", image: #imageLiteral(resourceName: "appLogo"), color: .systemOrange, bounds: CGRect(x: 8.0, y: -10.0, width: 50, height: 50));
-
+//        let oldMainPort = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+//        self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", oldMainPort))";
+        
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
@@ -430,9 +433,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         if (mainPortChange != 0.0) {
                             if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
                                 self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
+                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
                                 self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
+                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
@@ -485,7 +490,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
         guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
-        if (loadedMainPortList.count < 30) { return; }
+        if (loadedMainPortList.count < 25) { return; }
         print("SIZE OF LIST: \(loadedMainPortList.count)");
         if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
             return MainPortfolioDataVC(coder: coder, dataSet: loadedMainPortList, currentPortfolio: String(format: "%.2f", highscore), currentChange: change);
@@ -1064,6 +1069,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         return sum;
     }
     
+    private func glowAffect(view:UIView, color:UIColor) {
+        view.layer.shadowColor  = color.cgColor;
+        view.layer.shadowRadius = 6.0;
+        view.layer.shadowOpacity = 1;
+        view.layer.shadowOffset = CGSize(width: 2.5, height: 2.5);
+        view.layer.masksToBounds = false;
+    }
+    
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
         let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
         impactFeedbackGenerator.prepare();
@@ -1075,4 +1088,18 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 public class TickerScreenCell: UICollectionViewCell {
     @IBOutlet weak var symbolLbl: UILabel!
     @IBOutlet weak var percentChangeLbl: UILabel!
+}
+
+extension String {
+
+  func toLengthOf(length:Int) -> String {
+            if length <= 0 {
+                return self
+            } else if let to = self.index(self.startIndex, offsetBy: length, limitedBy: self.endIndex) {
+                return self.substring(from: to)
+
+            } else {
+                return ""
+            }
+        }
 }

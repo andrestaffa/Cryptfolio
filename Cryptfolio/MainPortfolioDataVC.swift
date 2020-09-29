@@ -87,7 +87,7 @@ class MainPortfolioDataVC: UIViewController, ChartDelegate  {
             if dataIndex != nil {
                 // The series at serieIndex has been touched
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex)
-                self.graphPrice_lbl.text = "$\(String(format: "%.2f", value!)), \(self.dateSet[dataIndex!])";
+                self.graphPrice_lbl.text = "\(self.dateSet[dataIndex!]) $\(String(format: "%.2f", value!))";
                 self.graphPrice_lbl.isHidden = false;
                 if (dataIndex! != self.prevIndex) {
                     if (dataIndex!.isMultiple(of: 2)) {

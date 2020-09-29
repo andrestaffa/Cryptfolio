@@ -45,12 +45,13 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     private var currentUsername:String = "";
     private var currentHighscore:Double = 0.0;
     private var currentChange:String = "";
+    private var isPortVC:Bool?;
     
     private var theRank:String = "0";
     private var users:Array<User> = Array<User>();
     private var filterUsers:Array<User> = Array<User>();
     private var isLoading:Bool = true;
-    private var isPortVC:Bool?;
+    private var maxNumberOfUsers:Int = 101;
     
     // search controller setup
     private let searchController = UISearchController(searchResultsController: nil)
@@ -83,7 +84,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         // custom nav back button
         if (!self.isPortVC!) {
             self.navigationItem.backBarButtonItem = nil;
-            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "dashboardIcon"), style: .plain, target: self, action: #selector(backBtnTapped));
+            self.navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "mainPortDataImg"), style: .plain, target: self, action: #selector(backBtnTapped));
         }
     }
     
@@ -158,8 +159,8 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             if (self.isFiltering) {
                 return self.filterUsers.count;
             } else {
-                if (self.users.count > 100) {
-                    return 101;
+                if (self.users.count > self.maxNumberOfUsers - 1) {
+                    return self.maxNumberOfUsers;
                 } else {
                     return self.users.count;
                 }
@@ -192,13 +193,25 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 cell.rank_lbl.text = "\(self.users[indexPath.row].rank)";
                 cell.username_lbl.text = self.users[indexPath.row].username;
                 cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[indexPath.row].highscore))";
-                if (indexPath.row == 100) {
+                if (indexPath.row == self.maxNumberOfUsers - 1) {
+                    var isUserBeingDisplayed:Bool = true;
+                    for i in 1...self.maxNumberOfUsers - 1 {
+                        if (Int(self.users[Int(self.theRank)! - 1].rank) == i) {
+                            isUserBeingDisplayed = false;
+                            break;
+                        }
+                    }
                     if (self.users[Int(self.theRank)! - 1].username.lowercased() == currentUsername.lowercased()) {
-                        self.setChange(change: &cell.change_lbl, changeString: self.users[Int(self.theRank)! - 1].change)
-                        cell.rank_lbl.text = "\(self.users[Int(self.theRank)! - 1].rank)";
-                        cell.username_lbl.text = self.users[Int(self.theRank)! - 1].username;
-                        cell.username_lbl.textColor = .orange;
-                        cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[Int(self.theRank)! - 1].highscore))";
+                        if (isUserBeingDisplayed) {
+                            cell.isHidden = false;
+                            self.setChange(change: &cell.change_lbl, changeString: self.users[Int(self.theRank)! - 1].change)
+                            cell.rank_lbl.text = "\(self.users[Int(self.theRank)! - 1].rank)";
+                            cell.username_lbl.text = self.users[Int(self.theRank)! - 1].username;
+                            cell.username_lbl.textColor = .orange;
+                            cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[Int(self.theRank)! - 1].highscore))";
+                        } else {
+                            cell.isHidden = true;
+                        }
                     }
                 } else {
                     if (self.users[indexPath.row].username.lowercased() == currentUsername.lowercased()) {
@@ -213,10 +226,11 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
         self.searchController.searchBar.endEditing(true);
+        let currentIndex:Int = indexPath.row == self.maxNumberOfUsers - 1 ? Int(self.theRank)! - 1 : indexPath.row;
         if (self.isFiltering) {
-            self.configureProfileView(userList: self.filterUsers, indexPath: indexPath);
+            self.configureProfileView(userList: self.filterUsers, index: currentIndex);
         } else {
-            self.configureProfileView(userList: self.users, indexPath: indexPath);
+            self.configureProfileView(userList: self.users, index: currentIndex);
         }
         self.profileView.isHidden = false;
         self.profileViewCenterY.constant = 0;
@@ -231,31 +245,31 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     // MARK: ProfileView Methods
     
-    private func configureProfileView(userList:Array<User>, indexPath:IndexPath) {
-        if (userList[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) { self.profileInfoBtn.isHidden = true; }
-        self.profileViewProgess_btn.isEnabled = userList[indexPath.row].portPrices.count < 3 ? false : true;
-        if (userList[indexPath.row].portPrices.count < 30) {
+    private func configureProfileView(userList:Array<User>, index:Int) {
+        if (userList[index].username.lowercased() == self.currentUsername.lowercased()) { self.profileInfoBtn.isHidden = true; }
+        self.profileViewProgess_btn.isEnabled = userList[index].portPrices.count < 3 ? false : true;
+        if (userList[index].portPrices.count < 25) {
             self.profileViewProgess_btn.setTitleColor(.darkGray, for: .normal)
             self.profileViewProgess_btn.isEnabled = false;
         } else {
             self.profileViewProgess_btn.setTitleColor(.orange, for: .normal);
         }
-        self.profileCurrentUserIndex = indexPath.row;
+        self.profileCurrentUserIndex = index;
         self.adjustViewsForAnimation(alpha: 0.5);
         self.tableView.isUserInteractionEnabled = false;
         
         // configure profileView
-        self.profileRank_lbl.text = userList[indexPath.row].rank;
-        self.profileUsername_lbl.text = userList[indexPath.row].username;
-        self.profilePortfolio_lbl.text = "$\(String(format: "%.2f", userList[indexPath.row].highscore))";
+        self.profileRank_lbl.text = userList[index].rank;
+        self.profileUsername_lbl.text = userList[index].username;
+        self.profilePortfolio_lbl.text = "$\(String(format: "%.2f", userList[index].highscore))";
         
-        self.setChange(change: &self.profileChange_lbl, changeString: userList[indexPath.row].change);
-        if (userList[indexPath.row].username.lowercased() == self.currentUsername.lowercased()) {
+        self.setChange(change: &self.profileChange_lbl, changeString: userList[index].change);
+        if (userList[index].username.lowercased() == self.currentUsername.lowercased()) {
             self.profileUsername_lbl.textColor = .orange;
         } else {
             self.profileUsername_lbl.textColor = .label;
         }
-        self.profileOwnedCoin_lbl.text = "\(userList[indexPath.row].numberOfOwnedCoin)";
+        self.profileOwnedCoin_lbl.text = "\(userList[index].numberOfOwnedCoin)";
         
     }
     

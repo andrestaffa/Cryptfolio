@@ -49,10 +49,10 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             }
             for holding in loadedHoldings {
                 if (holding.prices.count >= 10000) {
-                    holding.prices.removeFirst(5000);
-                    holding.amountOfCoins.removeFirst(5000);
-                    holding.dateAddedList.removeFirst(5000);
-                    holding.isBuyList.removeFirst(5000);
+                    holding.prices.removeFirst(1000)
+                    holding.amountOfCoins.removeFirst(1000);
+                    holding.dateAddedList.removeFirst(1000);
+                    holding.isBuyList.removeFirst(1000);
                 }
             }
             DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);

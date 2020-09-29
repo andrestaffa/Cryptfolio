@@ -78,6 +78,7 @@ public class DatabaseManager {
     
     public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, portPrices:Array<Double>, portDates:Array<String>, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
+        DatabaseManager.hideTabBar(view: viewController);
         db.collection("users").getDocuments { (snapshot, error) in
             if let error = error {
                 SVProgressHUD.dismiss();
@@ -141,5 +142,29 @@ public class DatabaseManager {
             }
         }
     }
+    
+    private static func hideTabBar(view:UIViewController) {
+        var frame = view.tabBarController?.tabBar.frame
+        frame!.origin.y = view.view.frame.size.height + (frame?.size.height)!
+        UIView.animate(withDuration: 0.5, animations: {
+            view.tabBarController?.tabBar.frame = frame!
+        }) { (done) in
+            if (done) {
+                view.tabBarController?.tabBar.isHidden = true;
+            }
+        }
+    }
+    
+//    private static func showTabBar(view:UIViewController) {
+//        var frame = view.tabBarController?.tabBar.frame
+//        frame!.origin.y = view.view.frame.size.height - (frame?.size.height)!
+//        UIView.animate(withDuration: 0.5, animations: {
+//            view.tabBarController?.tabBar.frame = frame!
+//        }) { (done) in
+//            if (done) {
+//                view.tabBarController?.tabBar.isHidden = false;
+//            }
+//        }
+//    }
 
 }

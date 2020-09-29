@@ -149,6 +149,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
             let rightBarButton = UIBarButtonItem(customView: tradeButton);
             self.navigationItem.rightBarButtonItem = rightBarButton;
+//            let button = UIButton()
+//            button.setImage(#imageLiteral(resourceName: "trade"), for: .normal);
+//            button.addTarget(self, action: #selector(self.trade), for: .touchUpInside);
+//            let barButton = UIBarButtonItem(customView: button)
+//            self.navigationItem.rightBarButtonItem = barButton;
         } else {
             let addButton = UIButton();
             addButton.frame = CGRect(x:0, y:0, width:80, height:20);
