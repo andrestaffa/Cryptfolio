@@ -22,16 +22,14 @@ class LoginVC: UIViewController {
     private var highscore:Double = 0.0;
     private var change:String = "";
     private var numberOfOwnedCoin:Int = 0;
-    private var portPrices:Array<Double> = Array<Double>();
-    private var portDates:Array<String> = Array<String>();
+    private var highestHolding:String = "";
     
-    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>) {
+    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String) {
         super.init(coder: coder);
         self.highscore = highscore;
         self.change = change;
         self.numberOfOwnedCoin = numberOfOwnedCoin;
-        self.portPrices = portPrices;
-        self.portDates = portDates;
+        self.highestHolding = highestHolding;
     }
     public required init?(coder: NSCoder) { fatalError("Error loading LoginVC"); }
     
@@ -77,7 +75,7 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, portPrices: self!.portPrices, portDates: self!.portDates, viewController: self!, isPortVC: false);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false);
             }
         }
         
@@ -95,7 +93,7 @@ class LoginVC: UIViewController {
         self.vibrate(style: .light);
         self.view.endEditing(true);
        if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
-            return SignUpVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoins: self.numberOfOwnedCoin, portPrices: self.portPrices, portDates: self.portDates);
+        return SignUpVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoins: self.numberOfOwnedCoin, highestHolding: self.highestHolding);
        }) {
         signUpVC.hidesBottomBarWhenPushed = true;
         self.navigationController?.pushViewController(signUpVC, animated: true);

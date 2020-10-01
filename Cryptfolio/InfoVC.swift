@@ -68,6 +68,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     private var timestamps = Array<Double>();
     private var lastContentOffset: CGFloat = 0;
     
+    private var isDayOrWeekChart:Bool = true;
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
         
@@ -476,22 +478,27 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBAction func timestapLogHandler(_ sender: UISegmentedControl) {
         switch (sender.selectedSegmentIndex) {
         case 0:
+            self.isDayOrWeekChart = true;
             self.dayChart();
             self.vibrate(style: .light);
             break;
         case 1:
+            self.isDayOrWeekChart = true;
             self.weekChart();
             self.vibrate(style: .light);
             break;
         case 2:
+            self.isDayOrWeekChart = false;
             self.oneMonthChart();
             self.vibrate(style: .light);
             break;
         case 3:
+            self.isDayOrWeekChart = false;
             self.yearChart();
             self.vibrate(style: .light);
             break;
         case 4:
+            self.isDayOrWeekChart = false;
             self.fiveYearChart();
             self.vibrate(style: .light);
             break;
@@ -511,7 +518,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
         dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
         dateFormatter.timeZone = .current
-        dateFormatter.dateFormat = "MMM d, yyyy";
+        if (isDayOrWeekChart) {
+            dateFormatter.dateFormat = "MMM d, h:mm a";
+        } else {
+            dateFormatter.dateFormat = "MMM d, yyyy";
+        }
         let localDate = dateFormatter.string(from: date)
         //let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
         return localDate;
@@ -547,7 +558,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self.circleView.removeFromSuperview();
                     let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.dataPoints.min()!)) / CGFloat(self.dataPoints.max()! - self.dataPoints.min()!);
                     let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
-                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
+                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 10, height: 10));
                     self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
                     self.circleView.clipsToBounds = true;
                     self.circleView.backgroundColor = .darkGray;

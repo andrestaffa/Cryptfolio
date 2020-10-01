@@ -19,8 +19,7 @@ public struct User : Codable {
     let highscore:Double;
     let change:String;
     let numberOfOwnedCoin:Int;
-    let portPrices:Array<Double>;
-    let portDates:Array<String>;
+    let highestHolding:String;
 }
 
 
@@ -36,9 +35,9 @@ public class DatabaseManager {
         db.collection("users").document(username).setData(data, merge: merge, completion: completion);
     }
     
-    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {
+    public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
-        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "portPrices":portPrices, "portDates":portDates], merge: merge) { (error) in
+        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "highestHolding":highestHolding], merge: merge) { (error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
@@ -76,7 +75,7 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, portPrices:Array<Double>, portDates:Array<String>, viewController:UIViewController, isPortVC:Bool) -> Void {
+    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, highestHolding:String, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         DatabaseManager.hideTabBar(view: viewController);
         db.collection("users").getDocuments { (snapshot, error) in
@@ -90,7 +89,7 @@ public class DatabaseManager {
                         let foundEmail = docData["email"] as! String;
                         let foundUser = docData["username"] as? String;
                         if (foundEmail.lowercased() == email.lowercased() && foundUser != nil) {
-                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "portPrices":portPrices, "portDates":portDates]) { (error) in
+                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "highestHolding":highestHolding]) { (error) in
                                 if let error = error {
                                     SVProgressHUD.dismiss();
                                     print(error.localizedDescription);
@@ -131,9 +130,8 @@ public class DatabaseManager {
                         let highscore = docData["highscore"] as! Double;
                         let change = docData["change"] as! String;
                         let numberOfOwnedCoin = docData["numberOfOwnedCoin"] as? Int;
-                        let portPrices = docData["portPrices"] as! Array<Double>;
-                        let portDates = docData["portDates"] as! Array<String>;
-                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, portPrices: portPrices, portDates: portDates);
+                        let highestHolding = docData["highestHolding"] as? String;
+                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, highestHolding: highestHolding ?? "No Holding" );
                         completion(user, nil);
                     }
                 } else {

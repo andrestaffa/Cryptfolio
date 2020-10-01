@@ -17,7 +17,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var subtitleLbl: UILabel!;
     @IBOutlet weak var mainTitleLbl: UILabel!;
     @IBOutlet weak var leaderboard_btn: UIButton!
-    @IBOutlet weak var mainPortData_btn: UIButton!
     
     private var isSubmitLogin:Bool = true;
     private var alert:UIAlertController = UIAlertController();
@@ -59,6 +58,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private static var runOnce:Bool = false;
     
+    
+    // DELETE AFTER
+    private var signedInFirstTime:Bool = false;
+    
 
     
     override func viewWillAppear(_ animated: Bool) {
@@ -75,13 +78,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
         
-        if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
-            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 25 ? false : true;
-            self.mainPortData_btn.tintColor = loadedMainPortData.count < 25 ? .darkGray : .systemOrange;
-        } else {
-            self.mainPortData_btn.isEnabled = false;
-            self.mainPortData_btn.tintColor = .darkGray;
-        }
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -146,8 +142,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
         self.availableFunds_lbl.addGestureRecognizer(availFundsTap);
-        
-        self.mainPortData_btn.addTarget(self, action: #selector(self.mainPortTapped), for: .touchUpInside);
         
         self.mainPortPercentChange_lbl.isUserInteractionEnabled = true;
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
@@ -233,21 +227,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     
-   private func autoScroll () {
+    private func autoScroll () {
         if (self.viewDisappeared) {
             return;
         }
         var co = self.collectionView.contentOffset.x;
         var no = co + 0.5;
-        if (no >= 3500) {
+        if (no >= 3000) {
             self.collectionView.contentOffset.x = -350.0;
             co = self.collectionView.contentOffset.x;
             no = co + 0.5;
         }
         UIView.animate(withDuration: 0.001, delay: 0, options: .allowUserInteraction, animations: { [weak self]() -> Void in
             self?.collectionView.contentOffset = CGPoint(x: no, y: 0);
-            }) { [weak self] (finished) -> Void in
-                self?.autoScroll();
+        }) { [weak self] (finished) -> Void in
+            self?.autoScroll();
         }
     }
     
@@ -447,19 +441,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                             UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
                         }
-                        var loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph);
-                        if (loadedMainPortList != nil && !loadedMainPortList!.isEmpty) {
-                            if (!loadedMainPortList!.contains(where: { (portData) -> Bool in
-                                return portData.currentPrice.isEqual(to: updatedMainPortfolio + currentAvailFunds);
-                            })) {
-                                if (loadedMainPortList!.count >= 100000) { loadedMainPortList!.removeFirst(); }
-                                loadedMainPortList!.append(PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!));
-                                DataStorageHandler.saveObject(type: loadedMainPortList!, forKey: UserDefaultKeys.mainPortfolioGraph);
-                            }
-                        } else {
-                            let mainPortList:[PortfolioData] = [PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!)];
-                            DataStorageHandler.saveObject(type: mainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
-                        }
                     }
                     
                     self?.mainPortPercentChange_lbl.isHidden = false;
@@ -478,27 +459,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
         UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
+        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
     }
     
-    @objc private func mainPortTapped() -> Void {
-        self.vibrate(style: .light);
-        let highscore:Double = self.portfolio + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
-        var change:String = "";
-        if (String(self.portPercentChange).first != "-") {
-            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
-        } else {
-            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
-        }
-        guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
-        if (loadedMainPortList.count < 25) { return; }
-        print("SIZE OF LIST: \(loadedMainPortList.count)");
-        if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
-            return MainPortfolioDataVC(coder: coder, dataSet: loadedMainPortList, currentPortfolio: String(format: "%.2f", highscore), currentChange: change);
-        }) {
-            mainPortDataVC.hidesBottomBarWhenPushed = true;
-            self.navigationController?.pushViewController(mainPortDataVC, animated: true);
-        } else { print("MainPortDataVC does not exist"); }
-    }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
         self.vibrate(style: .light);
@@ -639,21 +602,24 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
         
-        var portPrices:Array<Double> = Array<Double>();
-        var portDates:Array<String> = Array<String>();
-        if let mainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
-            for i in 0..<mainPortData.count {
-                portPrices.append(mainPortData[i].currentPrice);
-                portDates.append(mainPortData[i].currentDate);
+        var highestHolding:String = "NA";
+        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            if (!loadedHoldings.isEmpty) {
+                let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
+                    return holding.estCost < nextHolding.estCost;
+                }
+                if (hold!.amountOfCoin > 0) {
+                    highestHolding = hold!.ticker.symbol.uppercased();
+                }
             }
         }
 
         // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
-            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin()	, portPrices: portPrices, portDates: portDates, viewController: self, isPortVC: true);
+            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding, viewController: self, isPortVC: true);
         } else {
             if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
-                return LoginVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoin: self.getNumberOfOwnedCoin(), portPrices: portPrices, portDates: portDates);
+                return LoginVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding);
             }) {
                 loginVC.hidesBottomBarWhenPushed = true;
                 self.navigationController?.pushViewController(loginVC, animated: true);
@@ -1034,7 +1000,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.mainTitleLbl.isHidden = hidden;
         self.collectionView.isHidden = hidden;
         self.leaderboard_btn.isHidden = hidden;
-        self.mainPortData_btn.isHidden = hidden;
         self.navigationItem.titleView?.isHidden = hidden;
         self.navigationController?.navigationBar.isHidden = hidden;
         self.tabBarController?.tabBar.isHidden = hidden;
@@ -1088,18 +1053,4 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 public class TickerScreenCell: UICollectionViewCell {
     @IBOutlet weak var symbolLbl: UILabel!
     @IBOutlet weak var percentChangeLbl: UILabel!
-}
-
-extension String {
-
-  func toLengthOf(length:Int) -> String {
-            if length <= 0 {
-                return self
-            } else if let to = self.index(self.startIndex, offsetBy: length, limitedBy: self.endIndex) {
-                return self.substring(from: to)
-
-            } else {
-                return ""
-            }
-        }
 }

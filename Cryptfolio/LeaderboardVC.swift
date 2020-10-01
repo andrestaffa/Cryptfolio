@@ -37,8 +37,8 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var profileUsername_lbl: UILabel!
     @IBOutlet weak var profilePortfolio_lbl: UILabel!
     @IBOutlet weak var profileChange_lbl: UILabel!
-    @IBOutlet weak var profileViewProgess_btn: UIButton!
     @IBOutlet weak var profileOwnedCoin_lbl: UILabel!
+    @IBOutlet weak var profileHighestHolding_lbl: UILabel!
     private var profileCurrentUserIndex:Int = 0;
     
     // member variables
@@ -107,9 +107,6 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePanGesture)))
         self.profileInfoBtn.addTarget(self, action: #selector(reportUserTapped), for: .touchUpInside);
         self.profileExit.addTarget(self, action: #selector(exitProfileTapped), for: .touchUpInside);
-        self.profileViewProgess_btn.setTitleColor(.orange, for: .normal);
-        self.profileViewProgess_btn.setTitleColor(.orange, for: .highlighted);
-        self.profileViewProgess_btn.addTarget(self, action: #selector(self.viewProgressTapped), for: .touchUpInside);
         
         self.hideStats(hidden: true);
         self.username_lbl.text = self.currentUsername;
@@ -125,7 +122,6 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         navigationItem.searchController = searchController;
         definesPresentationContext = true;
 
-        //self.title = "Leaderboard";
         self.getUserData();
         
     }
@@ -247,18 +243,12 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     private func configureProfileView(userList:Array<User>, index:Int) {
         if (userList[index].username.lowercased() == self.currentUsername.lowercased()) { self.profileInfoBtn.isHidden = true; }
-        self.profileViewProgess_btn.isEnabled = userList[index].portPrices.count < 3 ? false : true;
-        if (userList[index].portPrices.count < 25) {
-            self.profileViewProgess_btn.setTitleColor(.darkGray, for: .normal)
-            self.profileViewProgess_btn.isEnabled = false;
-        } else {
-            self.profileViewProgess_btn.setTitleColor(.orange, for: .normal);
-        }
         self.profileCurrentUserIndex = index;
         self.adjustViewsForAnimation(alpha: 0.5);
         self.tableView.isUserInteractionEnabled = false;
         
         // configure profileView
+        self.profileHighestHolding_lbl.text = userList[index].highestHolding;
         self.profileRank_lbl.text = userList[index].rank;
         self.profileUsername_lbl.text = userList[index].username;
         self.profilePortfolio_lbl.text = "$\(String(format: "%.2f", userList[index].highscore))";
@@ -272,26 +262,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileOwnedCoin_lbl.text = "\(userList[index].numberOfOwnedCoin)";
         
     }
-    
-    @objc func viewProgressTapped() {
-        self.vibrate(style: .light);
-        if (self.isFiltering) {
-            if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
-                return MainPortfolioDataVC(coder: coder, pricesSet: self.filterUsers[self.profileCurrentUserIndex].portPrices, dateSet: self.filterUsers[self.profileCurrentUserIndex].portDates, currentPortfolio: String(format: "%.2f", self.filterUsers[self.profileCurrentUserIndex].highscore), currentChange: self.filterUsers[self.profileCurrentUserIndex].change);
-            }) {
-                mainPortDataVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(mainPortDataVC, animated: true);
-            } else { print("MainPortDataVC does not exist"); }
-        } else {
-            if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
-                return MainPortfolioDataVC(coder: coder, pricesSet: self.users[self.profileCurrentUserIndex].portPrices, dateSet: self.users[self.profileCurrentUserIndex].portDates, currentPortfolio: String(format: "%.2f", self.users[self.profileCurrentUserIndex].highscore), currentChange: self.users[self.profileCurrentUserIndex].change);
-            }) {
-                mainPortDataVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(mainPortDataVC, animated: true);
-            } else { print("MainPortDataVC does not exist"); }
-        }
-    }
-    
+        
     @objc func reportUserTapped() {
         let alert = UIAlertController(title: "Report User", message: "", preferredStyle: .alert);
         alert.addTextField();
