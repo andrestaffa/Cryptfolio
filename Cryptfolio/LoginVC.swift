@@ -75,10 +75,9 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false, isLogin: true);
             }
         }
-        
     }
 
     @objc func forgotBtnTapped() {
@@ -92,12 +91,7 @@ class LoginVC: UIViewController {
     @objc func signUpBtnTapped() {
         self.vibrate(style: .light);
         self.view.endEditing(true);
-       if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
-        return SignUpVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoins: self.numberOfOwnedCoin, highestHolding: self.highestHolding);
-       }) {
-        signUpVC.hidesBottomBarWhenPushed = true;
-        self.navigationController?.pushViewController(signUpVC, animated: true);
-       } else { print("SignUpVC has not been instantiated"); }
+        self.navigationController?.popViewController(animated: true);
     }
     
     private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {

@@ -58,12 +58,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private static var runOnce:Bool = false;
     
-    
-    // DELETE AFTER
-    private var signedInFirstTime:Bool = false;
-    
-
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         self.navigationController?.navigationBar.prefersLargeTitles = false;
@@ -77,7 +71,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
-        
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -108,6 +101,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         layout.scrollDirection = .horizontal
         self.collectionView.collectionViewLayout = layout;
         
+        
         // setup tableView
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
@@ -117,8 +111,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // assign some properties
         self.appName_lbl.textColor = .systemOrange;
         self.appName_lbl.attributedText = self.attachImageToStringTitle(text: "ryptfolio", image: #imageLiteral(resourceName: "appLogo"), color: .systemOrange, bounds: CGRect(x: 8.0, y: -10.0, width: 50, height: 50));
-//        let oldMainPort = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
-//        self.mainPortfolio_lbl.text = "$\(String(format: "%.2f", oldMainPort))";
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -456,10 +448,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @objc private func availFundsTapped() -> Void {
         print("Avail Tapped");
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
-        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
     }
     
     
@@ -616,14 +608,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 
         // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
-            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding, viewController: self, isPortVC: true);
+            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding, viewController: self, isPortVC: true, isLogin: false);
         } else {
-            if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
-                return LoginVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding);
+            if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
+                return SignUpVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoins: self.getNumberOfOwnedCoin(), highestHolding: highestHolding);
             }) {
-                loginVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(loginVC, animated: true);
-            } else { print("LoginVC has not been instantiated"); }
+                signUpVC.hidesBottomBarWhenPushed = true;
+                self.navigationController?.pushViewController(signUpVC, animated: true);
+            } else { print("signUpBC has not been instantiated"); }
         }
     }
 

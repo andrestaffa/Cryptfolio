@@ -78,7 +78,9 @@ class TradeVC: UIViewController {
                 }
             }
         } else {
-            self.ownedCoin_lbl.text = "0.00";
+            self.ownedCoin_lbl.text = "NA";
+            self.ownedCoin_lbl.transform = CGAffineTransform(translationX: 0, y: 4.7);
+            self.ownedAmountCoin_txt.text = "";
         }
         
     }
@@ -104,7 +106,9 @@ class TradeVC: UIViewController {
         // switch button settings
         self.switchState_btn.addTarget(self, action: #selector(self.switchButtonTapped), for: .touchUpInside);
         
-        self.ownedCoin_lbl.text = "0.00"
+        self.ownedCoin_lbl.text = "NA";
+        self.ownedCoin_lbl.transform = CGAffineTransform(translationX: 0, y: 4.7);
+        self.ownedAmountCoin_txt.text = "";
         self.ownedCoinStatic_lbl.text = "Owned \(ticker!.symbol.uppercased())"
         
         // TODO: - Add a View Controller where the user can view their order history and see their holdings
@@ -113,8 +117,8 @@ class TradeVC: UIViewController {
     
     @objc func switchButtonTapped() {
         self.vibrate(style: .light);
-        let alertMessage = self.isUSDAmount ? "Switch to entering the amount of coin for orders" : "Switch to entering the USD amount for coin orders";
-        let alertController = UIAlertController(title: "Switch", message: alertMessage, preferredStyle: .alert);
+        let alertMessage = self.isUSDAmount ? "Switch to entering the amount of coin for orders" : "Switch to entering the amount of USD for orders";
+        let alertController = UIAlertController(title: "Switch Purchase Type", message: alertMessage, preferredStyle: .alert);
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
         alertController.addAction(UIAlertAction(title: "Switch", style: UIAlertAction.Style.default, handler: { [weak self] (action) in
             self?.isUSDAmount = !self!.isUSDAmount;
@@ -240,7 +244,7 @@ class TradeVC: UIViewController {
     
     private func setUpVC() {
         self.marketPrice_lbl.text = "$\(String(format: "%.2f", self.ticker!.price))";
-        self.amount_txt.placeholder = self.isUSDAmount ? "Enter amount of USD" : "Enter amount of \(self.ticker!.symbol.uppercased()) to buy/sell";
+        self.amount_txt.placeholder = self.isUSDAmount ? "Enter amount of USD to buy/sell" : "Enter amount of \(self.ticker!.symbol.uppercased()) to buy/sell";
         self.estCost.text = self.isUSDAmount ? "AMT OF COIN" : "EST COST";
         self.cost_lbl.text = "$ - "
         self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";

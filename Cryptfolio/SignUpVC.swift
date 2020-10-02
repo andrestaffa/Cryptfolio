@@ -85,8 +85,12 @@ class SignUpVC: UIViewController {
     
     @objc func signInTapped() {
         self.vibrate(style: .light);
-        self.view.endEditing(true);
-        self.navigationController?.popViewController(animated: true);
+        if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
+            return LoginVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoin: self.numberOfOwnedCoins, highestHolding: self.highestHolding);
+        }) {
+         loginVC.hidesBottomBarWhenPushed = true;
+         self.navigationController?.pushViewController(loginVC, animated: true);
+        } else { print("SignUpVC has not been instantiated"); }
     }
     
     private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {

@@ -5,7 +5,6 @@
 //  Created by Andre Staffa on 2020-05-27.
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
-
 import GoogleMobileAds;
 import UIKit;
 import SVProgressHUD;
@@ -39,7 +38,6 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         self.getData();
 
         // animations
-
         
     }
 

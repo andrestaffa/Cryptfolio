@@ -75,7 +75,30 @@ public class DatabaseManager {
         }
     }
     
-    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, highestHolding:String, viewController:UIViewController, isPortVC:Bool) -> Void {
+    public static func findUserByEmail(email:String, completion:@escaping (Double?, Error?) -> Void) -> Void {
+        db.collection("users").getDocuments { (snapshot, error) in
+            if let error = error {
+                print(error.localizedDescription);
+                completion(nil, error)
+            } else {
+                if let snapshot = snapshot {
+                    for i in 0...snapshot.documents.count - 1 {
+                        let docData = snapshot.documents[i].data();
+                        let foundEmail = docData["email"] as! String;
+                        if (foundEmail.lowercased() == email.lowercased()) {
+                            let highscore = docData["highscore"] as! Double;
+                            completion(highscore, nil);
+                            return;
+                        }
+                    }
+                    completion(nil, error);
+                }
+            }
+        }
+    }
+    
+    public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, highestHolding:String, viewController:UIViewController, isPortVC:Bool, isLogin:Bool) -> Void {
+        let data = isLogin ? ["change":change, "numberOfOwnedCoin":0, "highestHolding":"NA"] : ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "highestHolding":highestHolding];
         SVProgressHUD.show(withStatus: "Loading...");
         DatabaseManager.hideTabBar(view: viewController);
         db.collection("users").getDocuments { (snapshot, error) in
@@ -89,18 +112,38 @@ public class DatabaseManager {
                         let foundEmail = docData["email"] as! String;
                         let foundUser = docData["username"] as? String;
                         if (foundEmail.lowercased() == email.lowercased() && foundUser != nil) {
-                            DatabaseManager.writeUserData(username: foundUser!, merge: true, data: ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "highestHolding":highestHolding]) { (error) in
-                                if let error = error {
-                                    SVProgressHUD.dismiss();
-                                    print(error.localizedDescription);
-                                } else {
-                                    SVProgressHUD.dismiss();
-                                    if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
-                                        return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
-                                    }) {
-                                        leaderboardVC.hidesBottomBarWhenPushed = true;
-                                        viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
-                                    } else { print("LeaderboardVC has not been instantiated"); }
+                            if (isLogin) {
+                                let usernameLogin = docData["username"] as! String;
+                                let highscoreLogin = docData["highscore"] as! Double;
+                                let changeLogin = docData["change"] as! String;
+                                UserDefaults.standard.set(0.0, forKey: UserDefaultKeys.mainPortfolioKey);
+                                UserDefaults.standard.set(highscoreLogin, forKey: UserDefaultKeys.availableFundsKey);
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.holdingsKey);
+                                DatabaseManager.writeUserData(username: usernameLogin, merge: true, data: ["change":changeLogin, "numberOfOwnedCoin":0, "highestHolding":"NA"]) { (error) in
+                                    if let error = error { print(error.localizedDescription) } else {
+                                        SVProgressHUD.dismiss();
+                                        if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                            return LeaderboardVC(coder: coder, currentUsername: usernameLogin, currentHighscore: highscoreLogin, currentChange: changeLogin, isPortVC: isPortVC);
+                                        }) {
+                                            leaderboardVC.hidesBottomBarWhenPushed = true;
+                                            viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                                        } else { print("LeaderboardVC has not been instantiated"); }
+                                    }
+                                }
+                            } else {
+                                DatabaseManager.writeUserData(username: foundUser!, merge: true, data: data) { (error) in
+                                    if let error = error {
+                                        SVProgressHUD.dismiss();
+                                        print(error.localizedDescription);
+                                    } else {
+                                        SVProgressHUD.dismiss();
+                                        if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                            return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
+                                        }) {
+                                            leaderboardVC.hidesBottomBarWhenPushed = true;
+                                            viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                                        } else { print("LeaderboardVC has not been instantiated"); }
+                                    }
                                 }
                             }
                             return;

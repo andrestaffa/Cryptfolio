@@ -40,6 +40,7 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             });
             if (loadedHoldings.isEmpty) {
                 self.searchController.searchBar.isHidden = true;
+                self.tableView.isHidden = true;
                 self.title = "";
                 self.messageLbl.numberOfLines = 0;
                 self.messageLbl.lineBreakMode = .byWordWrapping;
