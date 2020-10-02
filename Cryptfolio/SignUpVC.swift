@@ -21,16 +21,14 @@ class SignUpVC: UIViewController {
     private var highscore:Double = 0.0;
     private var change:String = "";
     private var numberOfOwnedCoins:Int = 0;
-    private var portPrices:Array<Double> = Array<Double>();
-    private var portDates:Array<String> = Array<String>();
+    private var highestHolding:String = "";
     
-    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoins:Int, portPrices:Array<Double>, portDates:Array<String>) {
+    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoins:Int, highestHolding:String) {
         super.init(coder: coder);
         self.highscore = highscore;
         self.change = change;
         self.numberOfOwnedCoins = numberOfOwnedCoins;
-        self.portPrices = portPrices;
-        self.portDates = portDates;
+        self.highestHolding = highestHolding;
     }
     public required init?(coder: NSCoder) { fatalError("Error loading SignUpVC"); }
     
@@ -63,7 +61,7 @@ class SignUpVC: UIViewController {
         self.vibrate(style: .medium);
         self.view.endEditing(true);
         
-        if (self.username_txt.text == nil || self.username_txt.text!.isEmpty || self.username_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
+        if (self.username_txt.text == nil || self.username_txt.text!.isEmpty || self.username_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.username_txt.text!.count > 15 || self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
             self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.password_txt.text!.count < 5) {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
             return;
@@ -75,7 +73,7 @@ class SignUpVC: UIViewController {
                     if let error = error {
                         self?.displayAlert(title: "Sorry", message: error.localizedDescription);
                     } else {
-                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, portPrices: self!.portPrices, portDates: self!.portDates, merge: false, viewController: self!);
+                        DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, highestHolding: self!.highestHolding,  merge: false, viewController: self!, isPortVC: false);
                     }
                 }
             } else {
@@ -87,8 +85,12 @@ class SignUpVC: UIViewController {
     
     @objc func signInTapped() {
         self.vibrate(style: .light);
-        self.view.endEditing(true);
-        self.navigationController?.popViewController(animated: true);
+        if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
+            return LoginVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoin: self.numberOfOwnedCoins, highestHolding: self.highestHolding);
+        }) {
+         loginVC.hidesBottomBarWhenPushed = true;
+         self.navigationController?.pushViewController(loginVC, animated: true);
+        } else { print("SignUpVC has not been instantiated"); }
     }
     
     private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {
@@ -108,11 +110,7 @@ class SignUpVC: UIViewController {
         let distanceFromImage:CGFloat = 25.0;
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
-        if (UIDevice.current.userInterfaceIdiom == .pad) {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: (self.view.frame.width) - 130.0, height: 1.0);
-        } else {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: textField.frame.width - distanceFromImage, height: 1.0);
-        }
+        bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
         bottomLine.backgroundColor = UIColor.white.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);

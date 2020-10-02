@@ -109,9 +109,9 @@ public class OrderHandler {
                     if (holdings[i].ticker.name == ticker.name) {
                         let prevHolding = holdings[i];
                         prevHolding.amountOfCoin -= amountOfCoin;
-                        if (prevHolding.amountOfCoin.isLessThanOrEqualTo(0.0)) { prevHolding.amountOfCoin = 0.00 }
+                        if (prevHolding.amountOfCoin.isLess(than: 0.0) || OrderHandler.almostEqual(prevHolding.amountOfCoin, 0.0)) { prevHolding.amountOfCoin = 0.00 }
                         prevHolding.estCost -= amountCost;
-                        if (prevHolding.ticker.name == ticker.name && prevHolding.amountOfCoin.isZero) { prevHolding.estCost = 0.00; }
+                        if (prevHolding.ticker.name == ticker.name && prevHolding.estCost.isLess(than: 0.0) || OrderHandler.almostEqual(prevHolding.estCost, 0.0)) { prevHolding.estCost = 0.00; }
                         prevHolding.ticker = ticker;
                         prevHolding.amountOfCoins.insert(amountOfCoin, at: 0);
                         prevHolding.prices.insert(ticker.price, at: 0);
@@ -156,6 +156,10 @@ public class OrderHandler {
     private static func betterAlert(title:String, message:String) -> Void {
         let alert = UIAlertView(title: title, message: message, delegate: nil, cancelButtonTitle: "OK");
         alert.show();
+    }
+    
+    static func almostEqual(_ a: Double, _ b: Double) -> Bool {
+        return a >= b.nextDown && a <= b.nextUp
     }
     
 

@@ -40,6 +40,7 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
             });
             if (loadedHoldings.isEmpty) {
                 self.searchController.searchBar.isHidden = true;
+                self.tableView.isHidden = true;
                 self.title = "";
                 self.messageLbl.numberOfLines = 0;
                 self.messageLbl.lineBreakMode = .byWordWrapping;
@@ -47,6 +48,15 @@ class HoldingVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
                 self.messageLbl.text = "You have not made any trades yet! As soon as you buy/sell coins your trade history will show up here";
                 return;
             }
+            for holding in loadedHoldings {
+                if (holding.prices.count >= 10000) {
+                    holding.prices.removeFirst(1000)
+                    holding.amountOfCoins.removeFirst(1000);
+                    holding.dateAddedList.removeFirst(1000);
+                    holding.isBuyList.removeFirst(1000);
+                }
+            }
+            DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
             self.searchController.searchBar.isHidden = false;
             self.title = "Select A Coin";
             self.messageLbl.isHidden = true;

@@ -79,11 +79,7 @@ class ForgotVC: UIViewController {
         let distanceFromImage:CGFloat = 25.0;
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
-        if (UIDevice.current.userInterfaceIdiom == .pad) {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: (self.view.frame.width) - 130.0, height: 1.0);
-        } else {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: textField.frame.width - distanceFromImage, height: 1.0);
-        }
+        bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
         bottomLine.backgroundColor = UIColor.white.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);

@@ -68,6 +68,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     private var timestamps = Array<Double>();
     private var lastContentOffset: CGFloat = 0;
     
+    private var isDayOrWeekChart:Bool = true;
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
         
@@ -107,6 +109,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chartPrice_lbl.isHidden = true;
         self.dayChart();
         
+        self.description_view.translatesAutoresizingMaskIntoConstraints = false;
+        self.description_view.sizeToFit();
+        self.description_view.isScrollEnabled = false;
+        
     }
     
     @objc func trade() {
@@ -145,6 +151,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
             let rightBarButton = UIBarButtonItem(customView: tradeButton);
             self.navigationItem.rightBarButtonItem = rightBarButton;
+//            let button = UIButton()
+//            button.setImage(#imageLiteral(resourceName: "trade"), for: .normal);
+//            button.addTarget(self, action: #selector(self.trade), for: .touchUpInside);
+//            let barButton = UIBarButtonItem(customView: button)
+//            self.navigationItem.rightBarButtonItem = barButton;
         } else {
             let addButton = UIButton();
             addButton.frame = CGRect(x:0, y:0, width:80, height:20);
@@ -235,25 +246,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         if #available(iOS 13.0, *) {
             self.timeStamp_seg.selectedSegmentTintColor = UIColor.orange
         }
-        self.views.append(self.view1);
-        self.views.append(self.view2);
-        self.views.append(self.view3);
-        self.views.append(self.view4);
-        self.views.append(self.view5);
-        self.views.append(self.view6);
-        if (traitCollection.userInterfaceStyle == .light) {
-            for view in self.views {
-                view.backgroundColor = UIColor.init(red: 192/255, green: 192/255, blue: 192/255, alpha: 1);
-            }
-        } else {
-            for view in self.views {
-                view.backgroundColor = UIColor.init(red: 105/255, green: 105/255, blue: 105/255, alpha: 1);
-            }
-        }
+//        self.views.append(self.view1);
+//        self.views.append(self.view2);
+//        self.views.append(self.view3);
+//        self.views.append(self.view4);
+//        self.views.append(self.view5);
+//        self.views.append(self.view6);
+
     }
     
     private func setGoodDescription(ticker:Ticker) -> String {
-        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased()) {
+        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased()) {
             let charset = CharacterSet(charactersIn: ".")
             let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
             var resultString = Array<String>();
@@ -262,8 +265,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     resultString.append(arr[i]);
                 }
             }
-            //resultString.append("");
-            return resultString.joined(separator: ".");
+            var desc = resultString.joined(separator: ".");
+            if (desc.last != ".") {
+                desc.append(".");
+            }
+            return desc;
         } else if (ticker.name.lowercased() == "TrueUSD".lowercased()) {
             return "TrueUSD is a USD-pegged stablecoin, that provides its users with regular attestations of escrowed balances, full collateral and legal protection against the misappropriation of the underlying USD. TrueUSD is issued by the TrustToken platform, the platform that has partnered with registered fiduciaries and banks that hold the funds backing the TrueUSD tokens.";
         } else if (ticker.name.lowercased() == "Paxos Standard".lowercased()) {
@@ -277,8 +283,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     resultString.append(arr[i]);
                 }
             }
-            //resultString.append("");
-            return resultString.joined(separator: ".");
+            var desc = resultString.joined(separator: ".");
+            if (desc.last != ".") {
+                desc.append(".");
+            }
+            return desc;
         }
     }
     
@@ -469,22 +478,27 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBAction func timestapLogHandler(_ sender: UISegmentedControl) {
         switch (sender.selectedSegmentIndex) {
         case 0:
+            self.isDayOrWeekChart = true;
             self.dayChart();
             self.vibrate(style: .light);
             break;
         case 1:
+            self.isDayOrWeekChart = true;
             self.weekChart();
             self.vibrate(style: .light);
             break;
         case 2:
+            self.isDayOrWeekChart = false;
             self.oneMonthChart();
             self.vibrate(style: .light);
             break;
         case 3:
+            self.isDayOrWeekChart = false;
             self.yearChart();
             self.vibrate(style: .light);
             break;
         case 4:
+            self.isDayOrWeekChart = false;
             self.fiveYearChart();
             self.vibrate(style: .light);
             break;
@@ -504,7 +518,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
         dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
         dateFormatter.timeZone = .current
-        dateFormatter.dateFormat = "MMM d, yyyy";
+        if (isDayOrWeekChart) {
+            dateFormatter.dateFormat = "MMM d, h:mm a";
+        } else {
+            dateFormatter.dateFormat = "MMM d, yyyy";
+        }
         let localDate = dateFormatter.string(from: date)
         //let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
         return localDate;
@@ -540,7 +558,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self.circleView.removeFromSuperview();
                     let heightPercent:CGFloat = (CGFloat(value!) - CGFloat(self.dataPoints.min()!)) / CGFloat(self.dataPoints.max()! - self.dataPoints.min()!);
                     let currentHeight = ((heightPercent) * (self.chart_view.frame.height - self.chart_view.topInset));
-                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 13, height: 13));
+                    self.circleView = UIView(frame: CGRect(x: left - self.circleView.frame.width / 2, y: ((self.chart_view.frame.height - currentHeight) - self.circleView.frame.height / 2), width: 10, height: 10));
                     self.circleView.layer.cornerRadius = self.circleView.frame.width / 2;
                     self.circleView.clipsToBounds = true;
                     self.circleView.backgroundColor = .darkGray;

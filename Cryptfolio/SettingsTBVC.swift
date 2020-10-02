@@ -5,7 +5,6 @@
 //  Created by Andre Staffa on 2020-05-27.
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
-
 import GoogleMobileAds;
 import UIKit;
 import SVProgressHUD;
@@ -26,40 +25,24 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
     private var accountItems = Array<Section>();
-    private var rewardedAd:GADRewardedAd?;
-    private var isLoading:Bool = true;
+    private var isLoading:Bool = false;
     private var isMoneyAd:Bool = false;
     private var watchedAd:Bool = false;
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-            self.rewardedAd = self.createAndLoadRewardedAd();
-        }
-        
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.title = "Settings"
         self.navigationController?.navigationBar.tintColor = .orange
         self.getData();
+
+        // animations
         
     }
-    
+
     // MARK: - Reward Ad Methods
     
-    private func createAndLoadRewardedAd() -> GADRewardedAd? {
-        self.rewardedAd = GADRewardedAd(adUnitID: "ca-app-pub-3940256099942544/1712485313");
-        self.rewardedAd?.load(GADRequest()) { error in
-            if let error = error {
-                print("Loading failed: \(error)");
-            } else {
-                self.isLoading = false;
-                self.tableView.reloadData();
-                print("Loading Succeeded");
-            }
-        };
-        return self.rewardedAd;
-    }
     
     func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
         self.watchedAd = true;
@@ -76,17 +59,33 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         if (self.watchedAd) {
             self.watchedAd = false;
             if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-                displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
+                if (self.isMoneyAd) {
+                    self.isMoneyAd = false;
+                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                    displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
+                } else {
+                    displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
+                    self.generalItems.removeAll();
+                    self.referenceItems.removeAll();
+                    self.feedbackItems.removeAll();
+                    self.accountItems.removeAll();
+                    self.getData();
+                    self.tableView.reloadData();
+                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                }
             } else if (!self.isMoneyAd) {
-                self.rewardedAd = self.createAndLoadRewardedAd();
+                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
                 displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
             } else {
                 self.isMoneyAd = false;
-                self.rewardedAd = self.createAndLoadRewardedAd();
+                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
                 displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
             }
         } else {
-            self.rewardedAd = self.createAndLoadRewardedAd();
+            if (self.isMoneyAd) {
+                self.isMoneyAd = false;
+            }
+            GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
         }
     }
     
@@ -104,10 +103,14 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private func getData() -> Void {
         
         // section 1 - General
-        self.generalItems.append(Section(title: "Reset portfolio", image: UIImage(named: "Images/btc.png")!));
-        self.generalItems.append(Section(title: "Watch ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
-        self.generalItems.append(Section(title: "Watch ad for investing tip", image: UIImage(named: "Images/bch.png")!));
-        self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+            self.generalItems.append(Section(title: "Watch Ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
+            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        } else {
+            self.generalItems.append(Section(title: "Watch Ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
+            self.generalItems.append(Section(title: "Watch Ad for investing tip", image: UIImage(named: "Images/bch.png")!));
+            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        }
         
         // section 2 - Feedback and Support
         self.feedbackItems.append(Section(title: "Rate on App Store", image: UIImage(named: "Images/xrp.png")!));
@@ -189,23 +192,45 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         
         switch indexPath.section {
         case 0:
-            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips) && indexPath.row == 2) {
-                cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
-                cell.textLabel!.text = self.generalItems[2].title;
-                cell.isUserInteractionEnabled = false;
-            } else {
-                if (self.isLoading && indexPath.row == 1) {
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+                if (self.isLoading && indexPath.row == 0) {
                     cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
-                    cell.textLabel!.text = self.generalItems[1].title;
-                    cell.isUserInteractionEnabled = false;
-                } else if (self.isLoading && indexPath.row == 2) {
-                    cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
-                    cell.textLabel!.text = self.generalItems[2].title;
+                    self.glowAffect(view: cell.textLabel!, color: .clear);
+                    cell.textLabel!.text = self.generalItems[0].title;
                     cell.isUserInteractionEnabled = false;
                 } else {
                     cell.isUserInteractionEnabled = true;
                     cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
                     cell.textLabel!.text = self.generalItems[indexPath.row].title;
+                    if (indexPath.row == 0) {
+                        cell.textLabel?.textColor = .systemOrange;
+                        self.glowAffect(view: cell.textLabel!, color: .orange);
+                    }
+                    if (indexPath.row == 1) {
+                        cell.textLabel?.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
+                        self.glowAffect(view: cell.textLabel!, color: .clear);
+                    }
+                }
+            } else {
+                if (self.isLoading && indexPath.row == 0) {
+                    cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
+                    self.glowAffect(view: cell.textLabel!, color: .clear);
+                    cell.textLabel!.text = self.generalItems[0].title;
+                    cell.isUserInteractionEnabled = false;
+                }
+                else if (self.isLoading && indexPath.row == 1) {
+                    cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
+                    self.glowAffect(view: cell.textLabel!, color: .clear);
+                    cell.textLabel!.text = self.generalItems[1].title;
+                    cell.isUserInteractionEnabled = false;
+                } else {
+                    cell.isUserInteractionEnabled = true;
+                    cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
+                    cell.textLabel!.text = self.generalItems[indexPath.row].title;
+                    if (indexPath.row == 0 || indexPath.row == 1) {
+                        cell.textLabel?.textColor = .systemOrange;
+                        self.glowAffect(view: cell.textLabel!, color: .orange);
+                    }
                 }
             }
             break;
@@ -234,17 +259,57 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
+        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+            switch (indexPath.section, indexPath.row) {
+            case (0, 0):
+                self.watchAdForMoney();
+                break;
+            case (0, 1):
+                self.viewInvestingTips();
+                break;
+            case (1, 0):
+                self.rateOnAppStore();
+                break;
+            case (1, 1):
+                self.shareCryptfolio();
+                break;
+            case (1, 2):
+                self.sendBugReport();
+                break;
+            case (1, 3):
+                self.aboutCryptfolio();
+                break;
+            case (2, 0):
+                self.newsReferences();
+                break;
+            case (2, 1):
+                self.references();
+                break;
+            case (3, 0):
+                print("YO")
+                self.signOutPressed();
+                break;
+            default:
+                break;
+            }
+        } else {
+            self.switchConditions(indexPath: indexPath);
+        }
+    }
+    
+    private func switchConditions(indexPath:IndexPath) -> Void {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            self.resetPortfolio();
-            break;
-        case (0, 1):
             self.watchAdForMoney();
             break;
-        case (0, 2):
-            self.watchAdForInvestingTip();
+        case (0, 1):
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+                self.viewInvestingTips();
+            } else {
+                self.watchAdForInvestingTip();
+            }
             break;
-        case (0, 3):
+        case (0, 2):
             self.viewInvestingTips();
             break;
         case (1, 0):
@@ -272,7 +337,14 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         default:
             break;
         }
-        
+    }
+    
+    private func glowAffect(view:UIView, color:UIColor) {
+        view.layer.shadowColor = color.cgColor;
+        view.layer.shadowRadius = 1.0;
+        view.layer.shadowOpacity = 1;
+        view.layer.shadowOffset = .zero;
+        view.layer.masksToBounds = false;
     }
     
     private func setTextOfHeader(label:UILabel!, text: String) {
@@ -306,17 +378,17 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
     
     private func watchAdForInvestingTip() -> Void {
-        if (self.rewardedAd!.isReady) {
-            self.rewardedAd!.present(fromRootViewController: self, delegate: self);
+        if (GADManager.rewardedAd!.isReady) {
+            GADManager.rewardedAd!.present(fromRootViewController: self, delegate: self);
         } else {
             displayAlertNormal(title: "Error", message: "Ad was not loaded yet! Please try again", style: .default);
         }
     }
     
     private func watchAdForMoney() -> Void {
-        if (self.rewardedAd!.isReady) {
+        if (GADManager.rewardedAd!.isReady) {
             self.isMoneyAd = true;
-            self.rewardedAd!.present(fromRootViewController: self, delegate: self);
+            GADManager.rewardedAd!.present(fromRootViewController: self, delegate: self);
         } else {
             displayAlertNormal(title: "Error", message: "Ad was not loaded yet! Please try again", style: .default);
         }

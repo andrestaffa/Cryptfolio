@@ -21,6 +21,7 @@ class HomeTBVC: UITableViewController {
     
     // Public member variables
     public var isAdding = false;
+    public var portfolioVC:PortfolioVC?;
     
     // Define scroll view properties
     private let searchController = UISearchController(searchResultsController: nil)
@@ -164,6 +165,9 @@ class HomeTBVC: UITableViewController {
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
             if (self.isAdding) {
+                if let portfolioVC = self.portfolioVC {
+                    portfolioVC.viewDidLoad();
+                }
                 DataStorageHandler.saveObject(type: self.filterCoins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;
@@ -172,6 +176,9 @@ class HomeTBVC: UITableViewController {
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
             if (self.isAdding) {
+                if let portfolioVC = self.portfolioVC {
+                    portfolioVC.viewDidLoad();
+                }
                 DataStorageHandler.saveObject(type: self.coins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;

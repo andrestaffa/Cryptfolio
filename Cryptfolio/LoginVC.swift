@@ -22,16 +22,14 @@ class LoginVC: UIViewController {
     private var highscore:Double = 0.0;
     private var change:String = "";
     private var numberOfOwnedCoin:Int = 0;
-    private var portPrices:Array<Double> = Array<Double>();
-    private var portDates:Array<String> = Array<String>();
+    private var highestHolding:String = "";
     
-    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoin:Int, portPrices:Array<Double>, portDates:Array<String>) {
+    public init?(coder:NSCoder, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String) {
         super.init(coder: coder);
         self.highscore = highscore;
         self.change = change;
         self.numberOfOwnedCoin = numberOfOwnedCoin;
-        self.portPrices = portPrices;
-        self.portDates = portDates;
+        self.highestHolding = highestHolding;
     }
     public required init?(coder: NSCoder) { fatalError("Error loading LoginVC"); }
     
@@ -77,10 +75,9 @@ class LoginVC: UIViewController {
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
             } else {
-                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, portPrices: self!.portPrices, portDates: self!.portDates, viewController: self!);
+                DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false, isLogin: true);
             }
         }
-        
     }
 
     @objc func forgotBtnTapped() {
@@ -94,12 +91,7 @@ class LoginVC: UIViewController {
     @objc func signUpBtnTapped() {
         self.vibrate(style: .light);
         self.view.endEditing(true);
-       if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
-            return SignUpVC(coder: coder, highscore: self.highscore, change: self.change, numberOfOwnedCoins: self.numberOfOwnedCoin, portPrices: self.portPrices, portDates: self.portDates);
-       }) {
-        signUpVC.hidesBottomBarWhenPushed = true;
-        self.navigationController?.pushViewController(signUpVC, animated: true);
-       } else { print("SignUpVC has not been instantiated"); }
+        self.navigationController?.popViewController(animated: true);
     }
     
     private func styleButton(button:inout UIButton, borderColor:CGColor) -> Void {
@@ -119,11 +111,7 @@ class LoginVC: UIViewController {
         let distanceFromImage:CGFloat = 25.0;
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
-        if (UIDevice.current.userInterfaceIdiom == .pad) {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: (self.view.frame.width) - 130.0, height: 1.0);
-        } else {
-            bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: textField.frame.width - distanceFromImage, height: 1.0);
-        }
+        bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
         bottomLine.backgroundColor = UIColor.white.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);

@@ -17,7 +17,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var subtitleLbl: UILabel!;
     @IBOutlet weak var mainTitleLbl: UILabel!;
     @IBOutlet weak var leaderboard_btn: UIButton!
-    @IBOutlet weak var mainPortData_btn: UIButton!
     
     private var isSubmitLogin:Bool = true;
     private var alert:UIAlertController = UIAlertController();
@@ -48,16 +47,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private var viewDisappeared:Bool = false;
     
     private var isLoading:Bool = true;
+    private var pressedAddCoin:Bool = false;
     private var priceDifference:Double = 0.0;
     private var portPercentChange:Double = 0.0;
+    private var portfolio:Double = 0.00;
     private static var counter = 0;
     private static var indexOptionName = 0;
     private static var indexOptionsPrice = 0;
     private static var indexOptionsHolding = 0;
     
     private static var runOnce:Bool = false;
-    
-
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -72,10 +71,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
-        
-        if let loadedMainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
-            self.mainPortData_btn.isEnabled = loadedMainPortData.count < 3 ? false : true;
-        } else { self.mainPortData_btn.isEnabled = false; }
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -95,7 +90,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         super.viewDidLoad()
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.tabBarController?.tabBar.isHidden = false;
-                
+        
         // setup collectionView
         self.getTickerData();
         self.collectionView.delegate = self;
@@ -105,12 +100,18 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         layout.minimumLineSpacing = 8;
         layout.scrollDirection = .horizontal
         self.collectionView.collectionViewLayout = layout;
-        self.autoScroll();
+        
         
         // setup tableView
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
-
+        
+        self.navigationItem.titleView = self.navTitleWithImageAndText(titleText: "ryptfolio", imageIcon: #imageLiteral(resourceName: "appLogo"));
+        
+        // assign some properties
+        self.appName_lbl.textColor = .systemOrange;
+        self.appName_lbl.attributedText = self.attachImageToStringTitle(text: "ryptfolio", image: #imageLiteral(resourceName: "appLogo"), color: .systemOrange, bounds: CGRect(x: 8.0, y: -10.0, width: 50, height: 50));
+        
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
@@ -134,19 +135,56 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let availFundsTap = UITapGestureRecognizer(target: self, action: #selector(availFundsTapped));
         self.availableFunds_lbl.addGestureRecognizer(availFundsTap);
         
-        self.mainPortData_btn.addTarget(self, action: #selector(self.mainPortTapped), for: .touchUpInside);
-        
         self.mainPortPercentChange_lbl.isUserInteractionEnabled = true;
         let mainPortPercentTap = UITapGestureRecognizer(target: self, action: #selector(mainPortPercentTapped));
         self.mainPortPercentChange_lbl.addGestureRecognizer(mainPortPercentTap);
-        
-        // Animations
-        self.animateCollectionViewAndTitles();
-        self.animateStartScreen();
-        
+
         self.subtitleLbl.text = self.getNewCurrentDate();
         
-        // TODO: - Add selection when editing
+        // Animations
+        self.autoScroll();
+        self.animateCollectionViewAndTitles();
+        self.animateStartScreen();
+    }
+    
+    func navTitleWithImageAndText(titleText: String, imageIcon: UIImage) -> UIView {
+        
+        // Creates a new UIView
+        let titleView = UIView();
+        
+        // Creates a new text label
+        let label = UILabel();
+        label.text = titleText;
+        label.sizeToFit();
+        label.center = titleView.center;
+        label.textColor = .systemOrange;
+        label.textAlignment = NSTextAlignment.center;
+        
+        // Creates the image view
+        let image = UIImageView();
+        image.image = imageIcon;
+        
+        // Maintains the image's aspect ratio:
+        let imageAspect = image.image!.size.width / image.image!.size.height;
+        // Sets the image frame so that it's immediately before the text:
+        let imageX = (label.frame.origin.x - label.frame.size.height * imageAspect - 10) + 5.0;
+        let imageY = label.frame.origin.y - 7.0;
+        
+        let imageWidth = (label.frame.size.height * imageAspect) * 1.5;
+        let imageHeight = (label.frame.size.height * 1.5);
+        
+        image.frame = CGRect(x: imageX, y: imageY, width: imageWidth, height: imageHeight);
+        
+        image.contentMode = UIView.ContentMode.scaleAspectFit;
+        
+        // Adds both the label and image view to the titleView
+        titleView.addSubview(label);
+        titleView.addSubview(image);
+        
+        // Sets the titleView frame to fit within the UINavigation Title
+        titleView.sizeToFit();
+        
+        return titleView;
         
     }
     
@@ -181,21 +219,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     
-   private func autoScroll () {
+    private func autoScroll () {
         if (self.viewDisappeared) {
             return;
         }
         var co = self.collectionView.contentOffset.x;
         var no = co + 0.5;
-        if (no >= 3500) {
+        if (no >= 3000) {
             self.collectionView.contentOffset.x = -350.0;
             co = self.collectionView.contentOffset.x;
             no = co + 0.5;
         }
         UIView.animate(withDuration: 0.001, delay: 0, options: .allowUserInteraction, animations: { [weak self]() -> Void in
             self?.collectionView.contentOffset = CGPoint(x: no, y: 0);
-            }) { [weak self] (finished) -> Void in
-                self?.autoScroll();
+        }) { [weak self] (finished) -> Void in
+            self?.autoScroll();
         }
     }
     
@@ -203,8 +241,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.collectionView.alpha = 0.0;
         //self.mainTitleLbl.alpha = 0.0;
         self.subtitleLbl.alpha = 0.0;
+        self.navigationItem.titleView?.alpha = 0.0;
         UIView.animate(withDuration: 6, delay: 0, options: .allowUserInteraction, animations: { self.collectionView.alpha = 1;  }, completion: nil)
         UIView.animate(withDuration: 3, delay: 0, options: .allowUserInteraction, animations: { self.subtitleLbl.alpha = 1; /*self.mainTitleLbl.alpha = 1;*/ }, completion: nil)
+        UIView.animate(withDuration: 7, delay: 0, options: .curveEaseIn, animations: { self.navigationItem.titleView?.alpha = 1 }, completion: nil)
     }
     
     private func animateStartScreen() {
@@ -237,6 +277,32 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let imageAttachment = NSAttributedString(attachment: attachment)
         masterStirng.append(percentString)
         masterStirng.append(imageAttachment)
+        return masterStirng;
+    }
+    
+    private func attachImageToString(text:String, image:UIImage, color:UIColor, bounds:CGRect) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        let tempImage = image.withTintColor(color);
+        attachment.image = tempImage;
+        attachment.bounds = bounds;
+        let masterStirng = NSMutableAttributedString(string: "")
+        let percentString = NSMutableAttributedString(string: text);
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(percentString)
+        masterStirng.append(imageAttachment)
+        return masterStirng;
+    }
+    
+    private func attachImageToStringTitle(text:String, image:UIImage, color:UIColor, bounds:CGRect) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        let tempImage = image.withTintColor(color);
+        attachment.image = tempImage;
+        attachment.bounds = bounds;
+        let masterStirng = NSMutableAttributedString(string: "")
+        let percentString = NSMutableAttributedString(string: text);
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(imageAttachment)
+        masterStirng.append(percentString)
         return masterStirng;
     }
     
@@ -311,14 +377,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     public func loadData() -> Void {
-    
-        
-        // load in available funds
         let currentAvailFunds = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
         self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
         
-        // load in holdings array
         guard var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else {
+            self.portfolio = 0.00;
+            self.priceDifference = (currentAvailFunds) - 10000;
+            self.portPercentChange = (self.priceDifference / 10000);
+            self.mainPortPercentChange_lbl.textColor = String(self.portPercentChange).first == "-" && !self.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
+            self.mainPortPercentChange_lbl.attributedText = String(self.portPercentChange).first == "-" && !(self.portPercentChange.isZero) ? self.attachImageToStringNew(text: "\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self.attachImageToStringNew(text: "+\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
             self.mainPortfolio_lbl.text = "$0.00";
             return;
         }
@@ -328,6 +395,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             return holding.amountOfCoin > 0;
         })
         if (loadedHolding.isEmpty) {
+            self.portfolio = 0.00;
+            self.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
+            self.portPercentChange = (self.priceDifference / 10000);
+            self.mainPortPercentChange_lbl.textColor = String(self.portPercentChange).first == "-" && !self.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
+            self.mainPortPercentChange_lbl.attributedText = String(self.portPercentChange).first == "-" && !(self.portPercentChange.isZero) ? self.attachImageToStringNew(text: "\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self.attachImageToStringNew(text: "+\(String(format: "%.2f", self.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
             self.mainPortfolio_lbl.text = "$0.00";
             return;
         }
@@ -342,21 +414,27 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self?.portPercentChange = (self!.priceDifference / 10000);
                     
                     if (counter == loadedHolding.count) {
-                        var loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph);
-                        if (loadedMainPortList != nil && !loadedMainPortList!.isEmpty) {
-                            if (!loadedMainPortList!.contains(where: { (portData) -> Bool in
-                                return portData.currentPrice.isEqual(to: updatedMainPortfolio + currentAvailFunds);
-                            })) {
-                                if (loadedMainPortList!.count >= 100000) { loadedMainPortList!.removeFirst(); }
-                                loadedMainPortList!.append(PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!));
-                                DataStorageHandler.saveObject(type: loadedMainPortList!, forKey: UserDefaultKeys.mainPortfolioGraph);
+                        self?.portfolio = updatedMainPortfolio;
+                        let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+                        if (mainPortChange != 0.0) {
+                            if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
+                                self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
+                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
+                                UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                            } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
+                                self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
+                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
+                                UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                            } else {
+                                self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
                             }
                         } else {
-                            let mainPortList:[PortfolioData] = [PortfolioData(currentPrice: updatedMainPortfolio + currentAvailFunds, currentDate: (self?.getNewCurrentDate(format: "MMM d, h:mm a"))!)];
-                            DataStorageHandler.saveObject(type: mainPortList, forKey: UserDefaultKeys.mainPortfolioGraph);
+                            print("WAS 0, adding to userDefaults");
+                            UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                            self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
                         }
                     }
-                    self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
+                    
                     self?.mainPortPercentChange_lbl.isHidden = false;
                     self?.mainPortTimeStamp_lbl.isHidden = false;
                     
@@ -370,29 +448,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @objc private func availFundsTapped() -> Void {
         print("Avail Tapped");
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
+//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
     }
     
-    @objc private func mainPortTapped() -> Void {
-        self.vibrate(style: .light);
-        var temp = self.mainPortfolio_lbl.text!;
-        temp.removeFirst();
-        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
-        var change:String = "";
-        if (String(self.portPercentChange).first != "-") {
-            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
-        } else {
-            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
-        }
-        guard let loadedMainPortList = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) else { return; }
-        if (loadedMainPortList.count < 3) { return; }
-        print("SIZE OF LIST: \(loadedMainPortList.count)");
-        if let mainPortDataVC = self.storyboard?.instantiateViewController(identifier: "mainPortDataVC", creator: { (coder) -> MainPortfolioDataVC? in
-            return MainPortfolioDataVC(coder: coder, dataSet: loadedMainPortList, currentPortfolio: String(format: "%.2f", highscore), currentChange: change);
-        }) {
-            mainPortDataVC.hidesBottomBarWhenPushed = true;
-            self.navigationController?.pushViewController(mainPortDataVC, animated: true);
-        } else { print("MainPortDataVC does not exist"); }
-    }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
         self.vibrate(style: .light);
@@ -525,9 +586,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.vibrate(style: .light);
         self.leaderboard_btn.isUserInteractionEnabled = false;
         self.isSubmitLogin = true;
-        var temp = self.mainPortfolio_lbl.text!;
-        temp.removeFirst();
-        let highscore = Double((String(format: "%.2f", Double(temp)! + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey))))!;
+        let highscore:Double = self.portfolio + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
         var change:String = "";
         if (String(self.portPercentChange).first != "-") {
             change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
@@ -535,25 +594,28 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
         
-        var portPrices:Array<Double> = Array<Double>();
-        var portDates:Array<String> = Array<String>();
-        if let mainPortData = DataStorageHandler.loadObject(type: [PortfolioData].self, forKey: UserDefaultKeys.mainPortfolioGraph) {
-            for i in 0..<mainPortData.count {
-                portPrices.append(mainPortData[i].currentPrice);
-                portDates.append(mainPortData[i].currentDate);
+        var highestHolding:String = "NA";
+        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+            if (!loadedHoldings.isEmpty) {
+                let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
+                    return holding.estCost < nextHolding.estCost;
+                }
+                if (hold!.amountOfCoin > 0) {
+                    highestHolding = hold!.ticker.symbol.uppercased();
+                }
             }
         }
 
         // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
-            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin()	, portPrices: portPrices, portDates: portDates, viewController: self)
+            DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding, viewController: self, isPortVC: true, isLogin: false);
         } else {
-            if let loginVC = self.storyboard?.instantiateViewController(identifier: "loginVC", creator: { (coder) -> LoginVC? in
-                return LoginVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoin: self.getNumberOfOwnedCoin(), portPrices: portPrices, portDates: portDates);
+            if let signUpVC = self.storyboard?.instantiateViewController(identifier: "signUpVC", creator: { (coder) -> SignUpVC? in
+                return SignUpVC(coder: coder, highscore: highscore, change: change, numberOfOwnedCoins: self.getNumberOfOwnedCoin(), highestHolding: highestHolding);
             }) {
-                loginVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(loginVC, animated: true);
-            } else { print("LoginVC has not been instantiated"); }
+                signUpVC.hidesBottomBarWhenPushed = true;
+                self.navigationController?.pushViewController(signUpVC, animated: true);
+            } else { print("signUpBC has not been instantiated"); }
         }
     }
 
@@ -678,7 +740,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             self.hideColTitleLabels(hidden: true);
             self.hideColTitleImages(hidden: true);
             styleButton(button: &self.addCoin_btn);
-            self.addCoin_btn.layer.cornerRadius = 10.0;
+            self.addCoin_btn.layer.cornerRadius = 13.0;
             self.mainPortPercentChange_lbl.isHidden = true;
             self.mainPortTimeStamp_lbl.isHidden = true;
             tableView.separatorStyle = .none;
@@ -708,6 +770,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             self.hideFunds(hidden: false);
             self.hideColTitleLabels(hidden: false);
             self.hideColTitleImages(hidden: false);
+            self.mainPortTimeStamp_lbl.isHidden = false;
+            self.mainPortPercentChange_lbl.isHidden = false;
             tableView.separatorStyle = .none;
             return self.coins.count;
         } else {
@@ -795,12 +859,19 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.navigationController?.pushViewController(infoVC, animated: true);
     }
     
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 50.0;
+    }
+    
     // MARK: - Button Methods
     
     @IBAction func pressAddCoinBtn(_ sender: Any) {
+        self.vibrate(style: .light);
         let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
         homeTBVC.isAdding = true;
+        homeTBVC.portfolioVC = self;
         self.navigationController?.pushViewController(homeTBVC, animated: true);
+        self.navigationController?.navigationBar.isHidden = false;
     }
     
     func didTap(_ cell: PortfolioVCCustomCell) {
@@ -904,6 +975,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     // MARK: - Hide all views and Helper Methods
     
     private func hideViews(hidden:Bool) -> Void {
+        if (!hidden) { self.viewDisappeared = true; }
         self.addCoin_btn.isHidden = hidden;
         self.welcome_lbl.isHidden = hidden;
         self.appName_lbl.isHidden = hidden;
@@ -920,7 +992,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.mainTitleLbl.isHidden = hidden;
         self.collectionView.isHidden = hidden;
         self.leaderboard_btn.isHidden = hidden;
-        self.mainPortData_btn.isHidden = hidden;
+        self.navigationItem.titleView?.isHidden = hidden;
+        self.navigationController?.navigationBar.isHidden = hidden;
+        self.tabBarController?.tabBar.isHidden = hidden;
     }
     
     private func hideColTitleLabels(hidden:Bool) -> Void {
@@ -950,6 +1024,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             sum += holding.amountOfCoins.count;
         }
         return sum;
+    }
+    
+    private func glowAffect(view:UIView, color:UIColor) {
+        view.layer.shadowColor  = color.cgColor;
+        view.layer.shadowRadius = 6.0;
+        view.layer.shadowOpacity = 1;
+        view.layer.shadowOffset = CGSize(width: 2.5, height: 2.5);
+        view.layer.masksToBounds = false;
     }
     
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {
