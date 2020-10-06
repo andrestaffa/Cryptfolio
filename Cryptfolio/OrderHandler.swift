@@ -100,6 +100,8 @@ public class OrderHandler {
         // load in avialbale funds
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (currentFunds != nil) {
+            print("AMOUNT OF COIN: \(amountOfCoin)");
+            print("CURRENT AMOUNT OF COIN: \(currentAmountOfCoin)");
             if (!amountOfCoin.isLessThanOrEqualTo(currentAmountOfCoin)) { // MIGHT NEED TO REMOVE "round()"
                 betterAlert(title: "Sorry", message: "You do not own \(String(format: "%.2f", amountOfCoin)) \(ticker.symbol.uppercased()) to sell.");
                 return false;

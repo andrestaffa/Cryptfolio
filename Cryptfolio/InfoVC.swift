@@ -113,6 +113,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.description_view.sizeToFit();
         self.description_view.isScrollEnabled = false;
         
+        self.name_lbl.adjustsFontSizeToFitWidth = true;
+        self.symbol_lbl.adjustsFontSizeToFitWidth = true;
+        self.price_lbl.adjustsFontSizeToFitWidth = true;
+        self.change_lbl.adjustsFontSizeToFitWidth = true;
+        self.rank_lbl.adjustsFontSizeToFitWidth = true;
+        self.volume24H_lbl.adjustsFontSizeToFitWidth = true;
+        self.marketCap_lbl.adjustsFontSizeToFitWidth = true;
+        self.maxSupply_lbl.adjustsFontSizeToFitWidth = true;
+        self.allTimeHigh_lbl.adjustsFontSizeToFitWidth = true;
+        self.daysRange_lbl.adjustsFontSizeToFitWidth = true;
+        
     }
     
     @objc func trade() {
@@ -188,20 +199,36 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         tableView.deselectRow(at: indexPath, animated: true);
         switch indexPath.row {
         case 0:
-            let safariVC = SFSafariViewController(url: URL(string: self.coin!.ticker.website)!)
-            self.present(safariVC, animated: true, completion: nil);
+            if let url = URL(string: self.coin!.ticker.website) {
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true, completion: nil);
+            } else {
+                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+            }
             break;
         case 1:
-            let safariVC = SFSafariViewController(url: URL(string: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum")!)
-            self.present(safariVC, animated: true, completion: nil);
+            if let url = URL(string: "https://www.cryptocompare.com/coins/" + "\(self.coin!.ticker.symbol.lowercased())" + "/forum") {
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true, completion: nil);
+            } else {
+                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+            }
             break;
         case 2:
-            let safariVC = SFSafariViewController(url: URL(string: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en")!)
-            self.present(safariVC, animated: true, completion: nil);
+            if let url = URL(string: "https://twitter.com/hashtag/" + "\(self.coin!.ticker.name.lowercased().replacingOccurrences(of: " ", with: ""))" + "?lang=en") {
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true, completion: nil);
+            } else {
+                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+            }
             break;
         case 3:
-            let safariVC = SFSafariViewController(url: URL(string: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())")!)
-            self.present(safariVC, animated: true, completion: nil);
+            if let url = URL(string: "https://cryptowat.ch/assets/" + "\(self.coin!.ticker.symbol.lowercased())") {
+                let safariVC = SFSafariViewController(url: url)
+                self.present(safariVC, animated: true, completion: nil);
+            } else {
+                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+            }
             break;
         default:
             break;

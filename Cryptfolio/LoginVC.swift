@@ -47,6 +47,11 @@ class LoginVC: UIViewController {
         self.password_txt.isSecureTextEntry = true;
         self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0);
         self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
+        
+        // add cancel and doner buttons on keyboard
+        self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
+        self.password_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.donePasswordButtonTapped)), onCancel: (target: self, action: #selector(self.cancelPasswordButtonTapped)), doneName: "Done");
+        
                 
         // add methods for signUp_btn, forgot_btn and login_btn
         self.login_btn.addTarget(self, action: #selector(loginBtnTapped), for: .touchUpInside);
@@ -57,6 +62,14 @@ class LoginVC: UIViewController {
         self.view.addGestureRecognizer(tap);
         
     }
+    
+    // MARK: Email keyboard button methods
+    @objc func doneEmailButtonTapped() { self.email_txt.resignFirstResponder(); }
+    @objc func cancelEmailButtonTapped() { self.email_txt.text = ""; self.email_txt.resignFirstResponder(); }
+    
+    // MARK: Password keyboard button methods
+    @objc func donePasswordButtonTapped() { self.password_txt.resignFirstResponder(); }
+    @objc func cancelPasswordButtonTapped() { self.password_txt.text = ""; self.password_txt.resignFirstResponder(); }
     
     @objc func tappedScreen() {
         self.view.endEditing(true);

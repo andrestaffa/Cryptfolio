@@ -44,6 +44,11 @@ class SignUpVC: UIViewController {
         self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0);
         self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0);
         self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
+        
+        self.username_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneUsernameButtonTapped)), onCancel: (target: self, action: #selector(self.cancelUsernameButtonTapped)), doneName: "Done");
+        self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
+        self.password_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.donePasswordButtonTapped)), onCancel: (target: self, action: #selector(self.cancelPasswordButtonTapped)), doneName: "Done");
+        
                 
         self.signUp_btn.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside);
         
@@ -52,6 +57,19 @@ class SignUpVC: UIViewController {
         self.signIn_btn.addTarget(self, action: #selector(signInTapped), for: .touchUpInside);
 
     }
+    
+    // MARK: Username keyboard button methods
+    @objc func doneUsernameButtonTapped() { self.username_txt.resignFirstResponder(); }
+    @objc func cancelUsernameButtonTapped() { self.username_txt.text = ""; self.username_txt.resignFirstResponder(); }
+    
+    // MARK: Email keyboard button methods
+    @objc func doneEmailButtonTapped() { self.email_txt.resignFirstResponder(); }
+    @objc func cancelEmailButtonTapped() { self.email_txt.text = ""; self.email_txt.resignFirstResponder(); }
+    
+    // MARK: Password keyboard button methods
+    @objc func donePasswordButtonTapped() { self.password_txt.resignFirstResponder(); }
+    @objc func cancelPasswordButtonTapped() { self.password_txt.text = ""; self.password_txt.resignFirstResponder(); }
+    
     
     @objc func tappedScreen() {
         self.view.endEditing(true);

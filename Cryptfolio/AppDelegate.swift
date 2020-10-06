@@ -6,9 +6,9 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
-import CoreData
-import Firebase
+import UIKit;
+import CoreData;
+import Firebase;
 import SVProgressHUD;
 
 @UIApplicationMain
@@ -24,12 +24,19 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
         GADMobileAds.sharedInstance().start(completionHandler: nil);
-        GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: {});
+        GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; });
         
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
+            let firebaseAuth = FirebaseAuth.Auth.auth();
+            do {
+                try firebaseAuth.signOut();
+            } catch let signOutError as NSError {
+                print ("Error signing out: %@", signOutError)
+            }
             UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
         }
+        
         return true
     }
 

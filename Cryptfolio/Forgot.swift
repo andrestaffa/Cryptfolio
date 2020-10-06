@@ -28,10 +28,16 @@ class ForgotVC: UIViewController {
         self.resetPassword_btn.addTarget(self, action: #selector(resetBtnTapped), for: .touchUpInside);
         self.signIn_btn.addTarget(self, action: #selector(signInTapped), for: .touchUpInside);
         
+        self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
+        
         let tap = UITapGestureRecognizer(target: self, action: #selector(tappedScreen));
         self.view.addGestureRecognizer(tap);
 
     }
+    
+    // MARK: Email keyboard button methods
+    @objc func doneEmailButtonTapped() { self.email_txt.resignFirstResponder(); }
+    @objc func cancelEmailButtonTapped() { self.email_txt.text = ""; self.email_txt.resignFirstResponder(); }
     
     @objc func tappedScreen() {
         self.view.endEditing(true);

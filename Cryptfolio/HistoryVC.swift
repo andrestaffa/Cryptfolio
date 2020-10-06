@@ -17,6 +17,10 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     public var holdingCoin:Holding? = nil;
     public var holdingVC:HoldingVC?;
     
+    override func viewWillAppear(_ animated: Bool) {
+        
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -70,7 +74,8 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! HistoryCell;
-        cell.amountOfCoinLbl.text = String(format: "%.2f", self.holdingCoin!.amountOfCoins[indexPath.item]);
+        
+        cell.amountOfCoinLbl.text = self.formatPrice(price: self.holdingCoin!.amountOfCoins[indexPath.item])
         cell.pricesLbl.text = self.formatPrice(price: self.holdingCoin!.prices[indexPath.item]);
         cell.dateAddedLbl.text = self.holdingCoin!.dateAddedList[indexPath.row];
         
@@ -119,7 +124,7 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         otherPrice.removeFirst();
         
         if (String(price).first == "0" || priceString.first == ".") {
-            return "\(String(format: "%.5f", price))"
+            return "\(String(format: "%.7f", price))"
         } else if (otherPrice.first == ".") {
             return "\(String(format: "%.2f", price))"
         } else {

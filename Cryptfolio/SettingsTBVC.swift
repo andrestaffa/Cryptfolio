@@ -9,6 +9,7 @@ import GoogleMobileAds;
 import UIKit;
 import SVProgressHUD;
 import FirebaseAuth;
+import SafariServices;
 
 private class Section {
     public var title:String;
@@ -25,19 +26,30 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
     private var accountItems = Array<Section>();
-    private var isLoading:Bool = false;
     private var isMoneyAd:Bool = false;
     private var watchedAd:Bool = false;
+    
+    override func viewWillAppear(_ animated: Bool) {
+        if (!GADManager.rewardedAd!.isReady) {
+            GADManager.rewardedAd = nil;
+            GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); })
+        }
+        if (FirebaseAuth.Auth.auth().currentUser != nil) {
+            self.accountItems.removeAll();
+            self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
+            self.tableView.reloadData();
+        }
+        
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        print("View did load");
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.title = "Settings"
         self.navigationController?.navigationBar.tintColor = .orange
         self.getData();
-
-        // animations
         
     }
 
@@ -54,14 +66,13 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
 
     func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
-        self.isLoading = true;
         self.tableView.reloadData();
         if (self.watchedAd) {
             self.watchedAd = false;
             if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
                 if (self.isMoneyAd) {
                     self.isMoneyAd = false;
-                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); });
                     displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
                 } else {
                     displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
@@ -71,21 +82,21 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
                     self.accountItems.removeAll();
                     self.getData();
                     self.tableView.reloadData();
-                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                    GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); });
                 }
             } else if (!self.isMoneyAd) {
-                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); });
                 displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
             } else {
                 self.isMoneyAd = false;
-                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+                GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); });
                 displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
             }
         } else {
             if (self.isMoneyAd) {
                 self.isMoneyAd = false;
             }
-            GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { self.isLoading = false; self.tableView.reloadData(); });
+            GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; self.tableView.reloadData(); });
         }
     }
     
@@ -107,13 +118,12 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             self.generalItems.append(Section(title: "Watch Ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
             self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
         } else {
-            self.generalItems.append(Section(title: "Watch Ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
-            self.generalItems.append(Section(title: "Watch Ad for investing tip", image: UIImage(named: "Images/bch.png")!));
+            self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
+            self.generalItems.append(Section(title: "Watch a video for an investing tip", image: UIImage(named: "Images/bch.png")!));
             self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
         }
         
         // section 2 - Feedback and Support
-        self.feedbackItems.append(Section(title: "Rate on App Store", image: UIImage(named: "Images/xrp.png")!));
         self.feedbackItems.append(Section(title: "Share Cryptfolio", image: UIImage(named: "Images/ltc.png")!));
         self.feedbackItems.append(Section(title: "Send bug report", image: UIImage(named: "Images/xmr.png")!));
         self.feedbackItems.append(Section(title: "About Cryptfolio", image: UIImage(named: "Images/eos.png")!));
@@ -121,9 +131,6 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         // section 3 - References
         self.referenceItems.append(Section(title: "News sources", image: UIImage(named: "Images/etc.png")!));
         self.referenceItems.append(Section(title: "References", image: UIImage(named: "Images/usdt.png")!));
-        
-        // section 4 - Account
-        self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
         
     }
 
@@ -168,7 +175,11 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
     }
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return 4;
+        if (FirebaseAuth.Auth.auth().currentUser != nil) {
+            return 4;
+        } else {
+            return 3;
+        }
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -193,7 +204,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         switch indexPath.section {
         case 0:
             if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-                if (self.isLoading && indexPath.row == 0) {
+                if (GADManager.isLoadingAd && indexPath.row == 0) {
                     cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
                     self.glowAffect(view: cell.textLabel!, color: .clear);
                     cell.textLabel!.text = self.generalItems[0].title;
@@ -212,13 +223,13 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
                     }
                 }
             } else {
-                if (self.isLoading && indexPath.row == 0) {
+                if (GADManager.isLoadingAd && indexPath.row == 0) {
                     cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
                     self.glowAffect(view: cell.textLabel!, color: .clear);
                     cell.textLabel!.text = self.generalItems[0].title;
                     cell.isUserInteractionEnabled = false;
                 }
-                else if (self.isLoading && indexPath.row == 1) {
+                else if (GADManager.isLoadingAd && indexPath.row == 1) {
                     cell.textLabel!.textColor = UIColor(red: 169/255, green: 169/255, blue: 169/255, alpha: 1);
                     self.glowAffect(view: cell.textLabel!, color: .clear);
                     cell.textLabel!.text = self.generalItems[1].title;
@@ -268,15 +279,12 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
                 self.viewInvestingTips();
                 break;
             case (1, 0):
-                self.rateOnAppStore();
-                break;
-            case (1, 1):
                 self.shareCryptfolio();
                 break;
-            case (1, 2):
+            case (1, 1):
                 self.sendBugReport();
                 break;
-            case (1, 3):
+            case (1, 2):
                 self.aboutCryptfolio();
                 break;
             case (2, 0):
@@ -286,7 +294,6 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
                 self.references();
                 break;
             case (3, 0):
-                print("YO")
                 self.signOutPressed();
                 break;
             default:
@@ -313,15 +320,12 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             self.viewInvestingTips();
             break;
         case (1, 0):
-            self.rateOnAppStore();
-            break;
-        case (1, 1):
             self.shareCryptfolio();
             break;
-        case (1, 2):
+        case (1, 1):
             self.sendBugReport();
             break;
-        case (1, 3):
+        case (1, 2):
             self.aboutCryptfolio();
             break;
         case (2, 0):
@@ -331,7 +335,6 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
             self.references();
             break;
         case (3, 0):
-            print("YO")
             self.signOutPressed();
             break;
         default:
@@ -356,13 +359,26 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to sign out?", preferredStyle: .alert);
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
         alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
+            SVProgressHUD.show(withStatus: "Loading...")
             let firebaseAuth = FirebaseAuth.Auth.auth();
-            do {
-                try firebaseAuth.signOut();
-                self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
-                self?.tableView.reloadData();
-            } catch let signOutError as NSError {
-                print ("Error signing out: %@", signOutError)
+            DatabaseManager.findUserByEmailWithAllData(email: firebaseAuth.currentUser!.email!) { [weak self] (data, error) in
+                if let _ = error { self?.displayAlertNormal(title: "Error signing out", message: "There was an error signing out. Please try again", style: .default); SVProgressHUD.dismiss(); }
+                else {
+                    let currentUsername = data!["username"] as! String;
+                    DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange)]) { (error) in
+                        if let error = error { print(error.localizedDescription); SVProgressHUD.dismiss(); } else {
+                            do {
+                                try firebaseAuth.signOut();
+                                self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
+                                self?.tableView.reloadData();
+                                SVProgressHUD.dismiss();
+                            } catch let signOutError as NSError {
+                                print ("Error signing out: %@", signOutError)
+                                SVProgressHUD.dismiss();
+                            }
+                        }
+                    }
+                }
             }
         }))
         self.present(alertController, animated: true, completion: nil);
@@ -399,18 +415,15 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         self.navigationController?.pushViewController(investingTipVC, animated: true);
     }
     
-    private func rateOnAppStore() -> Void {
-        print("rate app on app store");
-    }
-    
     private func shareCryptfolio() -> Void {
-        let activityVC = UIActivityViewController(activityItems: ["LinkToAppInAppStore.com"], applicationActivities: nil);
+        let activityVC = UIActivityViewController(activityItems: ["https://apps.apple.com/us/app/id1534361409"], applicationActivities: nil);
         activityVC.popoverPresentationController?.sourceView = self.view;
         self.present(activityVC, animated: true, completion: nil);
     }
     
     private func sendBugReport() -> Void {
-        self.openLink(linkToSite: "https://docs.google.com/forms/d/e/1FAIpQLSeJLJ9G6MthpLca6MZgCAICivIQYZOx7ly6clq6UKwx1luQeQ/viewform?vc=0&c=0&w=1");
+        let safariVC = SFSafariViewController(url: URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSeJLJ9G6MthpLca6MZgCAICivIQYZOx7ly6clq6UKwx1luQeQ/viewform?vc=0&c=0&w=1")!)
+        self.present(safariVC, animated: true, completion: nil);
     }
     
     private func aboutCryptfolio() -> Void {

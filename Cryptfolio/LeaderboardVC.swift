@@ -107,12 +107,23 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handlePanGesture)))
         self.profileInfoBtn.addTarget(self, action: #selector(reportUserTapped), for: .touchUpInside);
         self.profileExit.addTarget(self, action: #selector(exitProfileTapped), for: .touchUpInside);
+        self.profileUsername_lbl.adjustsFontSizeToFitWidth = true;
+        self.profileRank_lbl.adjustsFontSizeToFitWidth = true;
+        self.profilePortfolio_lbl.adjustsFontSizeToFitWidth = true;
+        self.profileChange_lbl.adjustsFontSizeToFitWidth = true;
+        self.profileHighestHolding_lbl.adjustsFontSizeToFitWidth = true;
+        self.profileOwnedCoin_lbl.adjustsFontSizeToFitWidth = true;
         
         self.hideStats(hidden: true);
         self.username_lbl.text = self.currentUsername;
         self.username_lbl.textColor = .orange;
         self.portfolio_lbl.text = "$\(String(format: "%.2f", self.currentHighscore))";
         setChange(change: &self.change_lbl, changeString: self.currentChange);
+        
+        self.portfolio_lbl.adjustsFontSizeToFitWidth = true;
+        self.change_lbl.adjustsFontSizeToFitWidth = true;
+        self.username_lbl.adjustsFontSizeToFitWidth = true;
+        self.rank_lbl.adjustsFontSizeToFitWidth = true;
         
         // Configure searchView
         searchController.searchResultsUpdater = self;
@@ -166,7 +177,10 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! LeaderboardCell;
-        
+        cell.rank_lbl.adjustsFontSizeToFitWidth = true;
+        cell.username_lbl.adjustsFontSizeToFitWidth = true;
+        cell.highscore_lbl.adjustsFontSizeToFitWidth = true;
+        cell.change_lbl.adjustsFontSizeToFitWidth = true;
         if (self.isLoading) {
             SVProgressHUD.show(withStatus: "Loading...");
             self.hideCells(cell: cell, hidden: true);

@@ -13,9 +13,11 @@ import GoogleMobileAds;
 public class GADManager {
     
     public static var rewardedAd:GADRewardedAd?;
+    public static var isLoadingAd:Bool = false;
     
     public static func createAndLoadRewardedAd(completion:@escaping () -> Void) -> GADRewardedAd? {
-        rewardedAd = GADRewardedAd(adUnitID: "ca-app-pub-3940256099942544/1712485313");
+        GADManager.isLoadingAd = true;
+        rewardedAd = GADRewardedAd(adUnitID: "ca-app-pub-1350200849096335/1509192136");
         rewardedAd?.load(GADRequest(), completionHandler: { (error) in
             if let error = error {
                 print(error.localizedDescription);

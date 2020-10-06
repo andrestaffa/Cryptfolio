@@ -57,6 +57,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private static var indexOptionsHolding = 0;
     
     private static var runOnce:Bool = false;
+    private var refreshPortfolioTimer:Timer? = nil;
+    private var refreshCount:Int = 0;
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -83,7 +85,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.updateCells();
         self.loadData();
         self.tableVIew.reloadData();
-                
+        if (self.refreshCount < 20) {
+            self.refreshPortfolioTimer = Timer.scheduledTimer(withTimeInterval: 90, repeats: true) {
+                (_) in
+                self.refreshCount += 1;
+                print("REFRESH COIN: \(self.refreshCount)");
+                self.loadData();
+            }
+        }
     }
     
     override func viewDidLoad() {
@@ -111,6 +120,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // assign some properties
         self.appName_lbl.textColor = .systemOrange;
         self.appName_lbl.attributedText = self.attachImageToStringTitle(text: "ryptfolio", image: #imageLiteral(resourceName: "appLogo"), color: .systemOrange, bounds: CGRect(x: 8.0, y: -10.0, width: 50, height: 50));
+        self.availableFunds_lbl.adjustsFontSizeToFitWidth = true;
+        self.mainPortfolio_lbl.adjustsFontSizeToFitWidth = true;
+        self.mainPortPercentChange_lbl.adjustsFontSizeToFitWidth = true;
         
         PortfolioVC.indexOptionName = 0;
         PortfolioVC.indexOptionsPrice = 0;
@@ -145,6 +157,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.autoScroll();
         self.animateCollectionViewAndTitles();
         self.animateStartScreen();
+        
+        
     }
     
     func navTitleWithImageAndText(titleText: String, imageIcon: UIImage) -> UIView {
@@ -188,7 +202,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
     }
     
-    override func viewDidDisappear(_ animated: Bool) { self.viewDisappeared = true; }
+    override func viewDidDisappear(_ animated: Bool) {
+        self.viewDisappeared = true;
+        self.refreshPortfolioTimer!.invalidate();
+        self.refreshPortfolioTimer = nil;
+    }
     
     // MARK: - CollecitonView Methods
     
@@ -198,7 +216,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! TickerScreenCell;
-        
+        cell.symbolLbl.adjustsFontSizeToFitWidth = true;
+        cell.percentChangeLbl.adjustsFontSizeToFitWidth = true;
         cell.symbolLbl.text = self.tickers[indexPath.item].ticker.symbol.uppercased();
         
         if (String(self.tickers[indexPath.item].ticker.changePrecent24H).first! == "-") {
@@ -663,49 +682,61 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private func quickBuy(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
         self.vibrate(style: .light);
-        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
-        if (currentFunds != nil) {
-            CryptoData.getCoinData(id: coinSet[indexPathRow].ticker.id) { [weak self] (ticker, error) in
-                if let error = error {
-                    print(error.localizedDescription);
-                } else {
-                    let amountCoin = currentFunds! / ticker!.price;
-                    if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker!)) {
-                        self?.loadData();
-                        self?.tableVIew.reloadData();
+        let alert = UIAlertController(title: "Warning", message: "Are you sure you want to use all your funds to buy \(self.coins[indexPathRow].ticker.symbol.uppercased())", preferredStyle: .alert);
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        let buyAction = UIAlertAction(title: "BUY", style: .default) { (action) in
+            let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
+            if (currentFunds != nil) {
+                CryptoData.getCoinData(id: coinSet[indexPathRow].ticker.id) { [weak self] (ticker, error) in
+                    if let error = error {
+                        print(error.localizedDescription);
                     } else {
-                        //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
+                        let amountCoin = currentFunds! / ticker!.price;
+                        if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker!)) {
+                            self?.loadData();
+                            self?.tableVIew.reloadData();
+                        } else {
+                            //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
+                        }
                     }
                 }
+            } else {
+                self.displayAlert(title: "Sorry", message: "Insufficient funds")
             }
-        } else {
-            self.displayAlert(title: "Sorry", message: "Insufficient funds")
         }
+        buyAction.titleTextColor = .green;
+        alert.addAction(buyAction);
+        self.present(alert, animated: true, completion: nil);
     }
     
     private func quickSell(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
         self.vibrate(style: .light);
-        var currentHoldings:Holding?
-        let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
-        for holding in loadedHoldings! {
-            if (holding.ticker.name == coinSet[indexPathRow].ticker.name) {
-                currentHoldings = holding;
-                break;
-            }
-        }
-        CryptoData.getCoinData(id: currentHoldings!.ticker.id) { [weak self] (ticker, error) in
-            if let error = error {
-                print(error.localizedDescription);
-            } else {
-                let amountCost = currentHoldings!.amountOfCoin * ticker!.price;
-                if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker!)) {
-                    self?.loadData();
-                    self?.tableVIew.reloadData();
-                } else {
-                    self?.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
+        let alert = UIAlertController(title: "Warning", message: "Are you sure want to sell all holdings of \(self.coins[indexPathRow].ticker.symbol.uppercased())", preferredStyle: .alert);
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        alert.addAction(UIAlertAction(title: "SELL", style: .destructive, handler: { (action) in
+            var currentHoldings:Holding?
+            let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
+            for holding in loadedHoldings! {
+                if (holding.ticker.name == coinSet[indexPathRow].ticker.name) {
+                    currentHoldings = holding;
+                    break;
                 }
             }
-        }
+            CryptoData.getCoinData(id: currentHoldings!.ticker.id) { [weak self] (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    let amountCost = currentHoldings!.amountOfCoin * ticker!.price;
+                    if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker!)) {
+                        self?.loadData();
+                        self?.tableVIew.reloadData();
+                    } else {
+                        self?.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
+                    }
+                }
+            }
+        }))
+        self.present(alert, animated: true, completion: nil);
     }
     
     // MARK: - TableView methods
@@ -906,6 +937,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     // MARK: - Display Cell Data
     
     private func displayCellData(cell:PortfolioVCCustomCell, coinSet:Array<Coin>, indexPath:IndexPath) -> Void {
+        cell.price_lbl.adjustsFontSizeToFitWidth = true;
+        cell.percentChange_lbl.adjustsFontSizeToFitWidth = true;
+        cell.name_lbl.adjustsFontSizeToFitWidth = true;
         cell.amountCoin_lbl.text = "";
         cell.amountCost_lbl.text = "";
         if (indexPath.row >= 9) {
@@ -1040,6 +1074,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         impactFeedbackGenerator.impactOccurred();
     }
 
+}
+
+extension UIAlertAction {
+    var titleTextColor: UIColor? {
+        get {
+            return self.value(forKey: "titleTextColor") as? UIColor
+        } set {
+            self.setValue(newValue, forKey: "titleTextColor")
+        }
+    }
 }
 
 public class TickerScreenCell: UICollectionViewCell {

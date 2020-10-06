@@ -96,6 +96,27 @@ public class DatabaseManager {
             }
         }
     }
+    public static func findUserByEmailWithAllData(email:String, completion:@escaping (Dictionary<String, Any>?, Error?) -> Void) -> Void {
+        db.collection("users").getDocuments { (snapshot, error) in
+            if let error = error {
+                print(error.localizedDescription);
+                completion(nil, error)
+            } else {
+                if let snapshot = snapshot {
+                    for i in 0...snapshot.documents.count - 1 {
+                        let docData = snapshot.documents[i].data();
+                        let foundEmail = docData["email"] as! String;
+                        if (foundEmail.lowercased() == email.lowercased()) {
+                            let data = docData;
+                            completion(data, nil);
+                            return;
+                        }
+                    }
+                    completion(nil, error);
+                }
+            }
+        }
+    }
     
     public static func findUser(email:String, highscore:Double, change:String, numberOfCoin:Int, highestHolding:String, viewController:UIViewController, isPortVC:Bool, isLogin:Bool) -> Void {
         let data = isLogin ? ["change":change, "numberOfOwnedCoin":0, "highestHolding":"NA"] : ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "highestHolding":highestHolding];
