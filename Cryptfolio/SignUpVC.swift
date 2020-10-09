@@ -84,7 +84,6 @@ class SignUpVC: UIViewController {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
             return;
         }
-        
         DatabaseManager.findUser(username: self.username_txt.text!) { [weak self] (foundUser) in
             if (!foundUser) {
                 FirebaseAuth.Auth.auth().createUser(withEmail: self!.email_txt.text!, password: self!.password_txt.text!) { [weak self] (result, error) in

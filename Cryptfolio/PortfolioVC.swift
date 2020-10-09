@@ -473,7 +473,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
     }
     
-    
     @IBAction func nameColButtonPressed(_ sender: Any) {
         self.vibrate(style: .light);
         if (self.isLoading) { return; }
@@ -605,7 +604,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.vibrate(style: .light);
         self.leaderboard_btn.isUserInteractionEnabled = false;
         self.isSubmitLogin = true;
-        let highscore:Double = self.portfolio + UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+        var highscore:Double = 0.0;
+        if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0) {
+            highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+        } else {
+            highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+        }
+        
         var change:String = "";
         if (String(self.portPercentChange).first != "-") {
             change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
@@ -990,7 +995,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         holding.estCost = holding.amountOfCoin * coinSet[indexPath.row].ticker.price;
                         DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
                         cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
-                        cell.amountCoin_lbl.text = "\(String(format: "%.2f", holding.amountOfCoin))";
+                        cell.amountCoin_lbl.text = self.formatPrice(price: holding.amountOfCoin);
                     }
                 }
             }
@@ -1066,6 +1071,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         view.layer.shadowOpacity = 1;
         view.layer.shadowOffset = CGSize(width: 2.5, height: 2.5);
         view.layer.masksToBounds = false;
+    }
+    
+    private func formatPrice(price:Double) -> String {
+        var priceString = String(price);
+        priceString.removeFirst();
+        var otherPrice = String(price)
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        if (String(price).first == "0" || priceString.first == ".") {
+            return "\(String(format: "%.7f", price))"
+        } else if (otherPrice.first == ".") {
+            return "\(String(format: "%.2f", price))"
+        } else {
+            return "\(String(format: "%.2f", price))"
+        }
     }
     
     private func vibrate(style: UIImpactFeedbackGenerator.FeedbackStyle) {

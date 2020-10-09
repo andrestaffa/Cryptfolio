@@ -24,8 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
         GADMobileAds.sharedInstance().start(completionHandler: nil);
-        GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { GADManager.isLoadingAd = false; });
-        
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
             let firebaseAuth = FirebaseAuth.Auth.auth();

@@ -10,6 +10,7 @@ import UIKit
 
 class TradeVC: UIViewController {
 
+    @IBOutlet weak var orderSummary_lbl: UILabel!
     @IBOutlet weak var marketPrice_lbl: UILabel!
     @IBOutlet weak var availableFunds_lbl: UILabel!
     @IBOutlet weak var amount_txt: UITextField!
@@ -71,7 +72,7 @@ class TradeVC: UIViewController {
                         break;
                     }
                     self.ownedCoin_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
-                    self.ownedAmountCoin_txt.text = "\(String(format: "%.3f", holding.amountOfCoin))";
+                    self.ownedAmountCoin_txt.text = self.formatPrice(price: holding.amountOfCoin);
                     self.ownedCoin_lbl.transform = .identity;
                     self.ownedCoin_lbl.textColor = .systemOrange;
                     self.ownedAmountCoin_txt.textColor = UIColor(red: 1, green: 215/255, blue: 0, alpha: 1);
@@ -103,7 +104,11 @@ class TradeVC: UIViewController {
         self.amount_txt.backgroundColor = .black;
         self.amount_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(doneButtonTappedForMyNumericTextField)), onCancel: (target: self, action: #selector(self.cancelButtonTappedForMyNumericTextField)), doneName: "Done");
         self.amount_txt.addTarget(self, action: #selector(self.amountTextDidChange), for: .editingChanged);
-
+        
+        self.orderSummary_lbl.text = "Order Summary (\(self.ticker!.symbol.uppercased()))";
+        self.orderSummary_lbl.font = UIFont(name: "Kohinoor Bangla", size: 17);
+        self.orderSummary_lbl.textColor = UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1);
+        self.orderSummary_lbl.adjustsFontSizeToFitWidth = true;
         
         self.availableFunds_lbl.isUserInteractionEnabled = true;
         let amountTap = UITapGestureRecognizer(target: self, action: #selector(amountTapped));
@@ -237,7 +242,10 @@ class TradeVC: UIViewController {
         self.amount_txt.placeholder = self.isUSDAmount ? "Enter amount of USD to buy/sell" : "Enter amount of \(self.ticker!.symbol.uppercased()) to buy/sell";
         self.estCost.text = self.isUSDAmount ? "AMT OF COIN" : "EST COST";
         self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - "
-        self.overview_txtView.text = "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.";
+        let combinedString = NSMutableAttributedString();
+        combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+        self.overview_txtView.attributedText = combinedString;
         self.styleButton(button: &self.fiveBtn, borderColor: UIColor.orange.cgColor);
         self.styleButton(button: &self.thousBtn, borderColor: UIColor.orange.cgColor);
         self.styleButton(button: &self.fiveThousBtn, borderColor: UIColor.orange.cgColor);
@@ -279,18 +287,28 @@ class TradeVC: UIViewController {
             self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
             if (!isTypeing) {
                 displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
+            } else {
+                let combinedString = NSMutableAttributedString();
+                combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+                combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+                self.overview_txtView.attributedText = combinedString;
             }
             return;
         }
         let result:Double = self.isUSDAmount ? amountDouble! / self.ticker!.price : amountDouble! * self.ticker!.price;
         self.calculatedAmountOfCoin = result;
         self.cost_lbl.text =  self.isUSDAmount ? "\(String(format: "%.8f", result))" : "$\(String(format: "%.2f", result))";
-        self.overview_txtView.text = "You are about to sumbit an order for \(self.amount_txt.text!) coin(s) of \(self.ticker!.name) for $\(String(round(10000.0 * self.ticker!.price) / 10000.0)) each. This order will execute at the best available price."
+        let displayText = self.isUSDAmount ? "You are about to sumbit an order for \(self.cost_lbl.text!) coin(s) of \(self.ticker!.name) for $\(String(format: "%.2f", self.ticker!.price)) each. This order will execute at the best available price." : "You are about to sumbit an order for \(self.amount_txt.text!) coin(s) of \(self.ticker!.name) for $\(String(format: "%.2f", self.ticker!.price)) each. This order will execute at the best available price."
+        let attributedString = NSMutableAttributedString(string: displayText, attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]);
+        self.overview_txtView.attributedText = attributedString;
     }
     
     private func incorrectInputLayout() -> Void {
         self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
-        self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+        let combinedString = NSMutableAttributedString();
+        combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+        self.overview_txtView.attributedText = combinedString;
         displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
     }
     
@@ -438,7 +456,11 @@ class TradeVC: UIViewController {
         if (self.amount_txt.text!.isEmpty) {
             self.view.endEditing(true);
             self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
-            self.overview_txtView.text = "Welcome to Cryptfolio's practice buy/sell dashboard. Here you can practice buying and selling cryptocurrency with the funds you have added in your account.";
+            self.overview_txtView.text = "";
+            let combinedString = NSMutableAttributedString();
+            combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+            combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+            self.overview_txtView.attributedText = combinedString;
             return;
         }
         if (amountDouble == nil) {
@@ -460,6 +482,21 @@ class TradeVC: UIViewController {
         }
         updateInfo(isTypeing: false);
         self.view.endEditing(true);
+    }
+    
+    private func formatPrice(price:Double) -> String {
+        var priceString = String(price);
+        priceString.removeFirst();
+        var otherPrice = String(price)
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        if (String(price).first == "0" || priceString.first == ".") {
+            return "\(String(format: "%.7f", price))"
+        } else if (otherPrice.first == ".") {
+            return "\(String(format: "%.2f", price))"
+        } else {
+            return "\(String(format: "%.2f", price))"
+        }
     }
     
     @objc func doneButtonTappedForMyNumericTextField() {

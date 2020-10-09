@@ -608,7 +608,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order Summary" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="93O-Fe-db2">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Order Summary (WAVES)" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="93O-Fe-db2">
                                 <rect key="frame" x="58" y="29" width="260" height="27"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="27" id="bax-Zc-ixI"/>
@@ -656,10 +656,10 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" textAlignment="justified" translatesAutoresizingMaskIntoConstraints="NO" id="DgX-nj-54x">
-                                <rect key="frame" x="11" y="359" width="342" height="69"/>
+                                <rect key="frame" x="11" y="343" width="342" height="132"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="69" id="ZuG-Bw-dbD"/>
+                                    <constraint firstAttribute="height" constant="132" id="ZuG-Bw-dbD"/>
                                 </constraints>
                                 <string key="text">You are about to sumbit an order for 2 coin(s) of bitcoin for $12357.34 each. This order will execute at the best available price.</string>
                                 <color key="textColor" systemColor="labelColor"/>
@@ -829,7 +829,7 @@
                             <constraint firstItem="lfO-X3-Vyi" firstAttribute="trailing" secondItem="KWs-RI-vgZ" secondAttribute="trailing" constant="11" id="fwc-f8-3Ns"/>
                             <constraint firstItem="8wK-go-6z4" firstAttribute="leading" secondItem="3O9-Wp-mZT" secondAttribute="leadingMargin" id="hAN-Du-di9"/>
                             <constraint firstItem="KWs-RI-vgZ" firstAttribute="centerX" secondItem="3O9-Wp-mZT" secondAttribute="centerX" id="hSk-6z-GyU"/>
-                            <constraint firstItem="DgX-nj-54x" firstAttribute="top" secondItem="qnK-8j-2sy" secondAttribute="bottom" constant="15" id="i4Z-kk-ody"/>
+                            <constraint firstItem="DgX-nj-54x" firstAttribute="top" secondItem="qnK-8j-2sy" secondAttribute="bottom" constant="-1" id="i4Z-kk-ody"/>
                             <constraint firstItem="AtC-cR-RaY" firstAttribute="baseline" secondItem="0My-OX-jom" secondAttribute="baseline" id="iix-P4-TpV"/>
                             <constraint firstItem="lfO-X3-Vyi" firstAttribute="trailing" secondItem="hBV-MF-O12" secondAttribute="trailing" constant="17" id="mTF-0c-iAG"/>
                             <constraint firstItem="lfO-X3-Vyi" firstAttribute="trailing" secondItem="1ya-qk-fTY" secondAttribute="trailing" constant="17" id="nbo-IL-yxg"/>
@@ -853,6 +853,7 @@
                         <outlet property="fiveBtn" destination="wFJ-by-wbN" id="EPj-oX-7ij"/>
                         <outlet property="fiveThousBtn" destination="LDj-3C-5AJ" id="9P5-Ir-LrW"/>
                         <outlet property="marketPrice_lbl" destination="Aps-5A-SkQ" id="ZuR-Qn-ftl"/>
+                        <outlet property="orderSummary_lbl" destination="93O-Fe-db2" id="FaS-60-rGl"/>
                         <outlet property="overview_txtView" destination="DgX-nj-54x" id="vmU-Jr-sMq"/>
                         <outlet property="ownedAmountCoin_txt" destination="dob-My-ao7" id="YeP-Hc-BnR"/>
                         <outlet property="ownedCoinStatic_lbl" destination="8wK-go-6z4" id="Yyt-9U-SDe"/>
