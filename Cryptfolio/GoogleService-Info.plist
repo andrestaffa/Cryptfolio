@@ -3,21 +3,21 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>463098218117-vrh46a9ts48epvffn115c9cfglhqgcp6.apps.googleusercontent.com</string>
+	<string>339969390577-i9ji6l5gago7p741a4tp365cj68c44ee.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.463098218117-vrh46a9ts48epvffn115c9cfglhqgcp6</string>
+	<string>com.googleusercontent.apps.339969390577-i9ji6l5gago7p741a4tp365cj68c44ee</string>
 	<key>API_KEY</key>
-	<string>AIzaSyD-gn_zq15P9GkNAG_FnwDk3GeABFtuY50</string>
+	<string>AIzaSyD4Mx-Z4Va2qafPtcAog820UD9AcoSog9s</string>
 	<key>GCM_SENDER_ID</key>
-	<string>463098218117</string>
+	<string>339969390577</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
 	<string>com.andrestaffa.cryptfolio</string>
 	<key>PROJECT_ID</key>
-	<string>cryptfolio-324e7</string>
+	<string>cryptfolio-ff1ce</string>
 	<key>STORAGE_BUCKET</key>
-	<string>cryptfolio-324e7.appspot.com</string>
+	<string>cryptfolio-ff1ce.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -29,10 +29,10 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:463098218117:ios:60a00718f5920e4ceacbec</string>
+	<string>1:339969390577:ios:358adb362a5d3e169e7650</string>
 	<key>DATABASE_URL</key>
-	<string>https://cryptfolio-324e7.firebaseio.com</string>
+	<string>https://cryptfolio-ff1ce.firebaseio.com</string>
 	<key>ADMOB_APP_ID</key>
-	<string>ca-app-pub-1350200849096335~3013845494</string>
+	<string>ca-app-pub-4245132329684597~1334697620</string>
 </dict>
 </plist>

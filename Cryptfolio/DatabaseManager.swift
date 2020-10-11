@@ -59,6 +59,11 @@ public class DatabaseManager {
                 print(error.localizedDescription);
             } else {
                 if let snapshot = snapshot {
+                    if (snapshot.documents.isEmpty) {
+                        SVProgressHUD.dismiss();
+                        completion(false);
+                        return;
+                    }
                     for i in 0...snapshot.documents.count - 1 {
                         let docData = snapshot.documents[i].data();
                         let foundUser = docData["username"] as! String;

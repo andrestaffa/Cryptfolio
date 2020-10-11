@@ -332,12 +332,18 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
         alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
             SVProgressHUD.show(withStatus: "Loading...")
+            var highscore:Double = 0.0;
+            if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0) {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+            } else {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+            }
             let firebaseAuth = FirebaseAuth.Auth.auth();
             DatabaseManager.findUserByEmailWithAllData(email: firebaseAuth.currentUser!.email!) { [weak self] (data, error) in
                 if let _ = error { self?.displayAlertNormal(title: "Error signing out", message: "There was an error signing out. Please try again", style: .default); SVProgressHUD.dismiss(); }
                 else {
                     let currentUsername = data!["username"] as! String;
-                    DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange)]) { (error) in
+                    DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":highscore]) { (error) in
                         if let error = error { print(error.localizedDescription); SVProgressHUD.dismiss(); } else {
                             do {
                                 try firebaseAuth.signOut();
@@ -371,7 +377,7 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { (error) in
             if let error = error {
                 SVProgressHUD.dismiss();
-                self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default);
+                self.displayAlertNormal(title: "Error", message: "There are no ads to show. Please try again.", style: .default);
                 print(error.localizedDescription);
             } else {
                 SVProgressHUD.dismiss();
@@ -389,7 +395,8 @@ class SettingsTBVC: UITableViewController, GADRewardedAdDelegate {
         GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { (error) in
             if let error = error {
                 SVProgressHUD.dismiss();
-                self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default);
+                self.displayAlertNormal(title: "Error", message: "There are no ads to show. Please try again.", style: .default);
+                print(error.localizedDescription)
             } else {
                 SVProgressHUD.dismiss();
                 GADManager.isLoadingAd = false;

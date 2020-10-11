@@ -9,6 +9,7 @@ target 'Cryptfolio' do
   pod 'Alamofire', '~> 5.0'
   pod 'CryptoSwift'
   pod 'Google-Mobile-Ads-SDK'
+  pod 'GoogleMobileAdsMediationAdColony'
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'
   pod 'Firebase/Database'

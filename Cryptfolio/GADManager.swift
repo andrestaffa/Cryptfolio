@@ -14,7 +14,7 @@ public class GADManager {
     
     public static var rewardedAd:GADRewardedAd?;
     public static var isLoadingAd:Bool = false;
-    private static let adUnit = "ca-app-pub-1350200849096335/9735345093";
+    private static let adUnit = "ca-app-pub-4245132329684597/5082370941";
     private static let adUnitTest = "ca-app-pub-3940256099942544/1712485313";
     
     public static func createAndLoadRewardedAd(completion:@escaping (Error?) -> Void) -> GADRewardedAd? {
