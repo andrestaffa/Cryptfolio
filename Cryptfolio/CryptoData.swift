@@ -157,10 +157,14 @@ public class CryptoData {
                 let allTimeHigh = coin["allTimeHigh"] as! Dictionary<String, Any>;
                 let allTimeHighPriceString = allTimeHigh["price"] as? String
                 let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
-                let history24hString = coin["history"] as? [String];
+                let history24hString = coin["history"] as? [String?];
                 var historyDouble = [Double]();
                 if (history24hString != nil) {
-                    historyDouble = history24hString!.map { Double($0) } as! [Double]
+                    for priceString in history24hString! {
+                        if (priceString != nil) {
+                            historyDouble.append(Double(priceString!)!);
+                        }
+                    }
                 } else {
                     historyDouble = [Double]();
                 }
@@ -198,10 +202,14 @@ public class CryptoData {
                     let allTimeHigh = coins[i]["allTimeHigh"] as! Dictionary<String, Any>;
                     let allTimeHighPriceString = allTimeHigh["price"] as? String
                     let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
-                    let history24hString = coins[i]["history"] as? [String];
+                    let history24hString = coins[i]["history"] as? [String?];
                     var historyDouble = [Double]();
                     if (history24hString != nil) {
-                        historyDouble = history24hString!.map { Double($0) } as! [Double]
+                        for priceString in history24hString! {
+                            if (priceString != nil) {
+                                historyDouble.append(Double(priceString!)!);
+                            }
+                        }
                     } else {
                         historyDouble = [Double]();
                     }

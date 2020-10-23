@@ -59,7 +59,7 @@ public class DatabaseManager {
                 print(error.localizedDescription);
             } else {
                 if let snapshot = snapshot {
-                    if (snapshot.documents.isEmpty) {
+                    if ( snapshot.isEmpty || snapshot.documents.isEmpty) {
                         SVProgressHUD.dismiss();
                         completion(false);
                         return;
