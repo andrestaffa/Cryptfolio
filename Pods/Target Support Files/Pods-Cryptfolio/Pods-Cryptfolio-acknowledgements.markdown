@@ -1,10 +1,6 @@
 # Acknowledgements
 This application makes use of the following third party libraries:
 
-## AdColony
-
-You must accept the terms and conditions on the AdColony website by registering in order to legally use the AdColony SDK. U.S. based companies will need to complete the W-9 form and send it to us, as well as complete the section on payment information on clients.adcolony.com, before publisher payments can be issued.
-
 ## Alamofire
 
 Copyright (c) 2014-2020 Alamofire Software Foundation (http://alamofire.org/)
@@ -1950,10 +1946,6 @@ Copyright 2020 Google
    limitations under the License.
 
 
-## Google-Mobile-Ads-SDK
-
-Copyright 2020 Google
-
 ## GoogleAppMeasurement
 
 Copyright 2020 Google
@@ -2163,14 +2155,6 @@ Copyright 2020 Google
    See the License for the specific language governing permissions and
    limitations under the License.
 
-
-## GoogleMobileAdsMediationAdColony
-
-Copyright 2016 Google Inc.
-
-## GoogleUserMessagingPlatform
-
-Copyright 2020 Google
 
 ## GoogleUtilities
 
@@ -2422,6 +2406,10 @@ similar to disable codesignature checks.
 More information at <a href="http://landonf.org/2009/02/index.html">Landon
 Fuller's blog</a>
 
+
+## IronSourceSDK
+
+https://platform.ironsrc.com/partners/terms-and-conditions-new-user
 
 ## PromisesObjC
 

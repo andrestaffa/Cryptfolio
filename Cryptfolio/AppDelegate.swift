@@ -23,7 +23,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.overrideUserInterfaceStyle = .dark
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
-        GADMobileAds.sharedInstance().start(completionHandler: nil);
+        IronSource.initWithAppKey("df7e7db9", adUnits: [""]);
+        ISIntegrationHelper.validateIntegration();
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
             let firebaseAuth = FirebaseAuth.Auth.auth();
