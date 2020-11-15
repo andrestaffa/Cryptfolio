@@ -21,43 +21,6 @@ private class Section {
 
 class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     
-    // MARK: - IRON SOURCE MEHTODS
-    
-    func rewardedVideoHasChangedAvailability(_ available: Bool) {
-        if (IronSource.hasRewardedVideo()) {
-            IronSource.showRewardedVideo(with: self);
-        }
-    }
-    
-    func didReceiveReward(forPlacement placementInfo: ISPlacementInfo!) {
-        print("Recieved reward from IronSource");
-    }
-    
-    func rewardedVideoDidFailToShowWithError(_ error: Error!) {
-        <#code#>
-    }
-    
-    func rewardedVideoDidOpen() {
-        <#code#>
-    }
-    
-    func rewardedVideoDidClose() {
-        <#code#>
-    }
-    
-    func rewardedVideoDidStart() {
-        <#code#>
-    }
-    
-    func rewardedVideoDidEnd() {
-        <#code#>
-    }
-    
-    func didClickRewardedVideo(_ placementInfo: ISPlacementInfo!) {
-        <#code#>
-    }
-    
-    
     private var generalItems = Array<Section>();
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
@@ -85,61 +48,58 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         self.getData();
         
     }
-
-    // MARK: - Reward Ad Methods
     
+    // MARK: - IRON SOURCE MEHTODS
     
-//    func rewardedAd(_ rewardedAd: GADRewardedAd, userDidEarn reward: GADAdReward) {
-//        self.watchedAd = true;
-//        if (self.isMoneyAd) {
-//            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 10.00, forKey: UserDefaultKeys.availableFundsKey);
-//        } else {
-//            TipManager.addRandomTip();
-//        }
-//    }
-//
-//    func rewardedAdDidDismiss(_ rewardedAd: GADRewardedAd) {
-//        self.tableView.reloadData();
-//        if (self.watchedAd) {
-//            self.watchedAd = false;
-//            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-//                if (self.isMoneyAd) {
-//                    self.isMoneyAd = false;
-//                    displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
-//                } else {
-//                    displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
-//                    self.generalItems.removeAll();
-//                    self.referenceItems.removeAll();
-//                    self.feedbackItems.removeAll();
-//                    self.accountItems.removeAll();
-//                    self.getData();
-//                    if (FirebaseAuth.Auth.auth().currentUser != nil) {
-//                        self.accountItems.removeAll();
-//                        self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
-//                    }
-//                    self.tableView.reloadData();
-//                }
-//            } else if (!self.isMoneyAd) {
-//                displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
-//            } else {
-//                self.isMoneyAd = false;
-//                displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
-//            }
-//        } else {
-//            if (self.isMoneyAd) {
-//                self.isMoneyAd = false;
-//            }
-//        }
-//    }
-    
-    private func gainMoneyReward() -> Void {
-        let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
-        if (currentFunds == nil || currentFunds!.isLessThanOrEqualTo(0.0)) {
-            UserDefaults.standard.set(100.0, forKey: UserDefaultKeys.availableFundsKey);
+    func didReceiveReward(forPlacement placementInfo: ISPlacementInfo!) {
+        self.watchedAd = true;
+        if (self.isMoneyAd) {
+            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 10.00, forKey: UserDefaultKeys.availableFundsKey);
         } else {
-            UserDefaults.standard.set(currentFunds! + 100.0, forKey: UserDefaultKeys.availableFundsKey);
+            TipManager.addRandomTip();
         }
     }
+    
+    func rewardedVideoDidClose() {
+        self.tableView.reloadData();
+        if (self.watchedAd) {
+            self.watchedAd = false;
+            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
+                if (self.isMoneyAd) {
+                    self.isMoneyAd = false;
+                    displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
+                } else {
+                    displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
+                    self.generalItems.removeAll();
+                    self.referenceItems.removeAll();
+                    self.feedbackItems.removeAll();
+                    self.accountItems.removeAll();
+                    self.getData();
+                    if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                        self.accountItems.removeAll();
+                        self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
+                    }
+                    self.tableView.reloadData();
+                }
+            } else if (!self.isMoneyAd) {
+                displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
+            } else {
+                self.isMoneyAd = false;
+                displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
+            }
+        } else {
+            if (self.isMoneyAd) {
+                self.isMoneyAd = false;
+            }
+        }
+    }
+    
+    func rewardedVideoHasChangedAvailability(_ available: Bool) {}
+    func rewardedVideoDidFailToShowWithError(_ error: Error!) {}
+    func rewardedVideoDidOpen() {}
+    func rewardedVideoDidStart() {}
+    func rewardedVideoDidEnd() {}
+    func didClickRewardedVideo(_ placementInfo: ISPlacementInfo!) {}
 
     // MARK: - Get Data
     
@@ -410,40 +370,20 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func watchAdForInvestingTip() -> Void {
-//        GADManager.rewardedAd = nil;
-//        SVProgressHUD.show(withStatus: "Loading...")
-//        GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { (error) in
-//            if let error = error {
-//                SVProgressHUD.dismiss();
-//                self.displayAlertNormal(title: "Error", message: "There are no ads to show. Please try again.", style: .default);
-//                print(error.localizedDescription);
-//            } else {
-//                SVProgressHUD.dismiss();
-//                GADManager.isLoadingAd = false;
-//                if (GADManager.rewardedAd!.isReady) {
-//                    GADManager.rewardedAd!.present(fromRootViewController: self, delegate: self);
-//                }
-//            }
-//        })
+        SVProgressHUD.show(withStatus: "Loading...");
+        if (IronSource.hasRewardedVideo()) {
+            IronSource.showRewardedVideo(with: self);
+            SVProgressHUD.dismiss();
+        }
     }
     
     private func watchAdForMoney() -> Void {
-//        GADManager.rewardedAd = nil;
-//        SVProgressHUD.show(withStatus: "Loading...")
-//        GADManager.rewardedAd = GADManager.createAndLoadRewardedAd(completion: { (error) in
-//            if let error = error {
-//                SVProgressHUD.dismiss();
-//                self.displayAlertNormal(title: "Error", message: "There are no ads to show. Please try again.", style: .default);
-//                print(error.localizedDescription)
-//            } else {
-//                SVProgressHUD.dismiss();
-//                GADManager.isLoadingAd = false;
-//                if (GADManager.rewardedAd!.isReady) {
-//                    self.isMoneyAd = true
-//                    GADManager.rewardedAd!.present(fromRootViewController: self, delegate: self);
-//                }
-//            }
-//        })
+        SVProgressHUD.show(withStatus: "Loading...");
+        if (IronSource.hasRewardedVideo()) {
+            self.isMoneyAd = true
+            IronSource.showRewardedVideo(with: self);
+            SVProgressHUD.dismiss();
+        }
     }
     
     private func viewInvestingTips() -> Void {
