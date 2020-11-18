@@ -80,7 +80,7 @@ class SignUpVC: UIViewController {
         self.view.endEditing(true);
         
         if (self.username_txt.text == nil || self.username_txt.text!.isEmpty || self.username_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.username_txt.text!.count > 15 || self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
-            self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.password_txt.text!.count < 5) {
+            self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty) {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
             return;
         }

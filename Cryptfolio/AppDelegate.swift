@@ -24,7 +24,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
         IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
-        ISIntegrationHelper.validateIntegration();
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
             let firebaseAuth = FirebaseAuth.Auth.auth();

@@ -32,7 +32,5 @@
 	<string>1:339969390577:ios:358adb362a5d3e169e7650</string>
 	<key>DATABASE_URL</key>
 	<string>https://cryptfolio-ff1ce.firebaseio.com</string>
-	<key>ADMOB_APP_ID</key>
-	<string>ca-app-pub-4245132329684597~1334697620</string>
 </dict>
 </plist>

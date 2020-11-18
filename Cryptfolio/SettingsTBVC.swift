@@ -54,7 +54,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     func didReceiveReward(forPlacement placementInfo: ISPlacementInfo!) {
         self.watchedAd = true;
         if (self.isMoneyAd) {
-            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 10.00, forKey: UserDefaultKeys.availableFundsKey);
+            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 20.00, forKey: UserDefaultKeys.availableFundsKey);
         } else {
             TipManager.addRandomTip();
         }
@@ -67,7 +67,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
                 if (self.isMoneyAd) {
                     self.isMoneyAd = false;
-                    displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
+                    displayAlertNormal(title: "Whoo!", message: "You just earned $20.00!", style: .default);
                 } else {
                     displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
                     self.generalItems.removeAll();
@@ -85,7 +85,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                 displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
             } else {
                 self.isMoneyAd = false;
-                displayAlertNormal(title: "Whoo!", message: "You just earned $10.00!", style: .default);
+                displayAlertNormal(title: "Whoo!", message: "You just earned $20.00!", style: .default);
             }
         } else {
             if (self.isMoneyAd) {
@@ -95,7 +95,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     func rewardedVideoHasChangedAvailability(_ available: Bool) {}
-    func rewardedVideoDidFailToShowWithError(_ error: Error!) {}
+    func rewardedVideoDidFailToShowWithError(_ error: Error!) { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); }
     func rewardedVideoDidOpen() {}
     func rewardedVideoDidStart() {}
     func rewardedVideoDidEnd() {}
@@ -374,6 +374,9 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         if (IronSource.hasRewardedVideo()) {
             IronSource.showRewardedVideo(with: self);
             SVProgressHUD.dismiss();
+        } else {
+            SVProgressHUD.dismiss();
+            self.displayAlertNormal(title: "Error", message: "Ad was not loaded yet. Please try again.", style: .default)
         }
     }
     
@@ -383,6 +386,9 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             self.isMoneyAd = true
             IronSource.showRewardedVideo(with: self);
             SVProgressHUD.dismiss();
+        } else {
+            SVProgressHUD.dismiss();
+            self.displayAlertNormal(title: "Error", message: "Ad was not loaded yet. Please try again.", style: .default)
         }
     }
     
