@@ -614,7 +614,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.leaderboard_btn.isUserInteractionEnabled = false;
         self.isSubmitLogin = true;
         var highscore:Double = 0.0;
-        if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0) {
+        if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && (!UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0) || self.mainPortfolio_lbl.text != "$0.00")) {
             highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
         } else {
             highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
