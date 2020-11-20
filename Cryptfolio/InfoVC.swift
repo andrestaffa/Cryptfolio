@@ -539,6 +539,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     // MARK: - Date formatting
     
     func getFormattedDate(data:Array<Double>?, index: Int) -> String {
+        if (!(index >= 0 && index < data!.count)) { return ""; }
         let timeResult = data![index];
         let date = Date(timeIntervalSince1970: timeResult / 1000);
         let dateFormatter = DateFormatter()
@@ -569,6 +570,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     // MARK: - Chart methods
     
     func didTouchChart(_ chart: Chart, indexes: [Int?], x: Double, left: CGFloat) {
+        if (self.dataPoints.isEmpty) { return; }
         for (serieIndex, dataIndex) in indexes.enumerated() {
             if (dataIndex != nil) {
                 // The series at serieIndex has been touched

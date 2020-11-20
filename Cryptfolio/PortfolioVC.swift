@@ -96,7 +96,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
         if (loadedCoins != nil) {
             if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime) && loadedCoins!.count == 1) {
-                self.displayAlert(title: "Disclaimer\n", message: "Everything in this app is practice.\n\n This app is designed for you to understand what trading is like without risk.", submitTitle: "Continue");
+                self.displayAlert(title: "Disclaimer\n", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is designed for you to learn buying and selling cryptocurrency with real-time updated prices", submitTitle: "Continue");
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
             }
         }

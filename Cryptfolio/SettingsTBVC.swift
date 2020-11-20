@@ -377,7 +377,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func showDisclaimer() -> Void {
-        self.displayAlertNormal(title: "Disclaimer\n", message: "Everything in this app is practice.\n\n This app is designed for you to understand what trading is like without risk.", submitTitle: "Continue", style: .default);
+        self.displayAlertNormal(title: "Disclaimer\n", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is designed for you to learn buying and selling cryptocurrency with real-time updated prices", submitTitle: "Continue", style: .default);
     }
     
     private func watchAdForInvestingTip() -> Void {
