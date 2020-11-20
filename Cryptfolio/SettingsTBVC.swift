@@ -116,7 +116,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         }
         
         // section 2 - Feedback and Support
-        self.feedbackItems.append(Section(title: "Disclaimer", image: UIImage(named: "Images/btc.png")!));
+        self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
         self.feedbackItems.append(Section(title: "Share Cryptfolio", image: UIImage(named: "Images/ltc.png")!));
         self.feedbackItems.append(Section(title: "Send bug report", image: UIImage(named: "Images/xmr.png")!));
         self.feedbackItems.append(Section(title: "About Cryptfolio", image: UIImage(named: "Images/eos.png")!));
@@ -377,7 +377,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func showDisclaimer() -> Void {
-        self.displayAlertNormal(title: "Disclaimer\n", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is designed for you to learn buying and selling cryptocurrency with real-time updated prices", submitTitle: "Continue", style: .default);
+        self.displayAlertNormal(title: "Note", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade crypto without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
     }
     
     private func watchAdForInvestingTip() -> Void {
