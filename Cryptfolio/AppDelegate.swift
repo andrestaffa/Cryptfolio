@@ -32,7 +32,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             } catch let signOutError as NSError {
                 print ("Error signing out: %@", signOutError)
             }
-            UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
         }
         
         return true

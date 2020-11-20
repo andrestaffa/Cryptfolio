@@ -116,6 +116,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         }
         
         // section 2 - Feedback and Support
+        self.feedbackItems.append(Section(title: "Disclaimer", image: UIImage(named: "Images/btc.png")!));
         self.feedbackItems.append(Section(title: "Share Cryptfolio", image: UIImage(named: "Images/ltc.png")!));
         self.feedbackItems.append(Section(title: "Send bug report", image: UIImage(named: "Images/xmr.png")!));
         self.feedbackItems.append(Section(title: "About Cryptfolio", image: UIImage(named: "Images/eos.png")!));
@@ -249,12 +250,15 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                 self.viewInvestingTips();
                 break;
             case (1, 0):
-                self.shareCryptfolio();
+                self.showDisclaimer();
                 break;
             case (1, 1):
-                self.sendBugReport();
+                self.shareCryptfolio();
                 break;
             case (1, 2):
+                self.sendBugReport();
+                break;
+            case (1, 3):
                 self.aboutCryptfolio();
                 break;
             case (2, 0):
@@ -290,12 +294,15 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             self.viewInvestingTips();
             break;
         case (1, 0):
-            self.shareCryptfolio();
+            self.showDisclaimer();
             break;
         case (1, 1):
-            self.sendBugReport();
+            self.shareCryptfolio();
             break;
         case (1, 2):
+            self.sendBugReport();
+            break;
+        case (1, 3):
             self.aboutCryptfolio();
             break;
         case (2, 0):
@@ -369,6 +376,10 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         }
     }
     
+    private func showDisclaimer() -> Void {
+        self.displayAlertNormal(title: "Disclaimer\n", message: "Everything in this app is practice.\n\n This app is designed for you to understand what trading is like without risk.", submitTitle: "Continue", style: .default);
+    }
+    
     private func watchAdForInvestingTip() -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         if (IronSource.hasRewardedVideo()) {
@@ -404,7 +415,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func sendBugReport() -> Void {
-        let safariVC = SFSafariViewController(url: URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSeJLJ9G6MthpLca6MZgCAICivIQYZOx7ly6clq6UKwx1luQeQ/viewform?vc=0&c=0&w=1")!)
+        let safariVC = SFSafariViewController(url: URL(string: "https://docs.google.com/forms/d/e/1FAIpQLSd8o0t1g8t8WBsCBYc4yKRtI35hx8aqn9OHBu2gm2YCtxrgLQ/viewform?usp=sf_link")!)
         self.present(safariVC, animated: true, completion: nil);
     }
     
@@ -434,6 +445,12 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func displayAlertNormal(title: String, message: String, style: UIAlertAction.Style) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert);
         alert.addAction(UIAlertAction(title: "OK", style: style, handler: nil));
+        self.present(alert, animated: true, completion: nil);
+    }
+    
+    private func displayAlertNormal(title: String, message: String, submitTitle:String, style: UIAlertAction.Style) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: UIAlertController.Style.alert);
+        alert.addAction(UIAlertAction(title: submitTitle, style: style, handler: nil));
         self.present(alert, animated: true, completion: nil);
     }
     

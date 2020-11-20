@@ -93,12 +93,21 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 self.loadData();
             }
         }
+        let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
+        if (loadedCoins != nil) {
+            if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime) && loadedCoins!.count == 1) {
+                self.displayAlert(title: "Disclaimer\n", message: "Everything in this app is practice.\n\n This app is designed for you to understand what trading is like without risk.", submitTitle: "Continue");
+                UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
+            }
+        }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.tabBarController?.tabBar.isHidden = false;
+        
+        self.glowAffect(view: self.leaderboard_btn, color: .orange);
         
         // setup collectionView
         self.getTickerData();
@@ -683,6 +692,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         present(alert, animated: true, completion: nil);
     }
     
+    private func displayAlert(title:String, message:String, submitTitle:String) {
+        let alert = UIAlertController(title: title,message: message, preferredStyle: .alert);
+        let defaultButton = UIAlertAction(title: submitTitle, style: .default, handler: nil);
+        alert.addAction(defaultButton);
+        present(alert, animated: true, completion: nil);
+    }
+    
     // MARK: - Buy/Sell methods
     
     private func quickBuy(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
@@ -1067,9 +1083,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private func glowAffect(view:UIView, color:UIColor) {
         view.layer.shadowColor  = color.cgColor;
-        view.layer.shadowRadius = 6.0;
-        view.layer.shadowOpacity = 1;
-        view.layer.shadowOffset = CGSize(width: 2.5, height: 2.5);
+        view.layer.shadowRadius = 4.5;
+        view.layer.shadowOpacity = 0.65;
+        view.layer.shadowOffset = CGSize(width: 0, height: 0);
         view.layer.masksToBounds = false;
     }
     
