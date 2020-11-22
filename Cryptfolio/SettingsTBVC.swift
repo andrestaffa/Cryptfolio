@@ -25,7 +25,6 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private var referenceItems = Array<Section>();
     private var feedbackItems = Array<Section>();
     private var accountItems = Array<Section>();
-    private var isMoneyAd:Bool = false;
     private var watchedAd:Bool = false;
     
     override func viewWillAppear(_ animated: Bool) {
@@ -53,44 +52,14 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     
     func didReceiveReward(forPlacement placementInfo: ISPlacementInfo!) {
         self.watchedAd = true;
-        if (self.isMoneyAd) {
-            UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 20.00, forKey: UserDefaultKeys.availableFundsKey);
-        } else {
-            TipManager.addRandomTip();
-        }
+        UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 20.00, forKey: UserDefaultKeys.availableFundsKey);
     }
     
     func rewardedVideoDidClose() {
         self.tableView.reloadData();
         if (self.watchedAd) {
             self.watchedAd = false;
-            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-                if (self.isMoneyAd) {
-                    self.isMoneyAd = false;
-                    displayAlertNormal(title: "Whoo!", message: "You just earned $20.00!", style: .default);
-                } else {
-                    displayAlertNormal(title: "Congratulations!", message: "You found all the Investing Tips!", style: .default);
-                    self.generalItems.removeAll();
-                    self.referenceItems.removeAll();
-                    self.feedbackItems.removeAll();
-                    self.accountItems.removeAll();
-                    self.getData();
-                    if (FirebaseAuth.Auth.auth().currentUser != nil) {
-                        self.accountItems.removeAll();
-                        self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
-                    }
-                    self.tableView.reloadData();
-                }
-            } else if (!self.isMoneyAd) {
-                displayAlertNormal(title: "Whoo!", message: "You just unlocked a new Investing Tip", style: .default);
-            } else {
-                self.isMoneyAd = false;
-                displayAlertNormal(title: "Whoo!", message: "You just earned $20.00!", style: .default);
-            }
-        } else {
-            if (self.isMoneyAd) {
-                self.isMoneyAd = false;
-            }
+            displayAlertNormal(title: "Whoo!", message: "You just earned $20.00!", style: .default);
         }
     }
     
@@ -106,14 +75,8 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func getData() -> Void {
         
         // section 1 - General
-        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-            self.generalItems.append(Section(title: "Watch Ad for bonus cash", image: UIImage(named: "Images/neo.png")!));
-            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
-        } else {
-            self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
-            self.generalItems.append(Section(title: "Watch a video for an investing tip", image: UIImage(named: "Images/bch.png")!));
-            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
-        }
+        self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
+        self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
         
         // section 2 - Feedback and Support
         self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
@@ -196,26 +159,12 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         
         switch indexPath.section {
         case 0:
-            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-                cell.isUserInteractionEnabled = true;
-                cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
-                cell.textLabel!.text = self.generalItems[indexPath.row].title;
-                if (indexPath.row == 0) {
-                    cell.textLabel?.textColor = .systemOrange;
-                    self.glowAffect(view: cell.textLabel!, color: .orange);
-                }
-                if (indexPath.row == 1) {
-                    cell.textLabel?.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
-                    self.glowAffect(view: cell.textLabel!, color: .clear);
-                }
-            } else {
-                cell.isUserInteractionEnabled = true;
-                cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
-                cell.textLabel!.text = self.generalItems[indexPath.row].title;
-                if (indexPath.row == 0 || indexPath.row == 1) {
-                    cell.textLabel?.textColor = .systemOrange;
-                    self.glowAffect(view: cell.textLabel!, color: .orange);
-                }
+            cell.isUserInteractionEnabled = true;
+            cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
+            cell.textLabel!.text = self.generalItems[indexPath.row].title;
+            if (indexPath.row == 0) {
+                cell.textLabel?.textColor = .systemOrange;
+                self.glowAffect(view: cell.textLabel!, color: .orange);
             }
             break;
         case 1:
@@ -241,56 +190,11 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true);
-        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-            switch (indexPath.section, indexPath.row) {
-            case (0, 0):
-                self.watchAdForMoney();
-                break;
-            case (0, 1):
-                self.viewInvestingTips();
-                break;
-            case (1, 0):
-                self.showDisclaimer();
-                break;
-            case (1, 1):
-                self.shareCryptfolio();
-                break;
-            case (1, 2):
-                self.sendBugReport();
-                break;
-            case (1, 3):
-                self.aboutCryptfolio();
-                break;
-            case (2, 0):
-                self.newsReferences();
-                break;
-            case (2, 1):
-                self.references();
-                break;
-            case (3, 0):
-                self.signOutPressed();
-                break;
-            default:
-                break;
-            }
-        } else {
-            self.switchConditions(indexPath: indexPath);
-        }
-    }
-    
-    private func switchConditions(indexPath:IndexPath) -> Void {
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
             self.watchAdForMoney();
             break;
         case (0, 1):
-            if (UserDefaults.standard.bool(forKey: UserDefaultKeys.foundAllTips)) {
-                self.viewInvestingTips();
-            } else {
-                self.watchAdForInvestingTip();
-            }
-            break;
-        case (0, 2):
             self.viewInvestingTips();
             break;
         case (1, 0):
@@ -333,30 +237,34 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func signOutPressed() {
+        let cell = tableView.cellForRow(at: IndexPath(row: 0, section: 3));
+        cell?.isUserInteractionEnabled = false;
         let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to sign out?", preferredStyle: .alert);
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in cell?.isUserInteractionEnabled = true; }));
         alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
             SVProgressHUD.show(withStatus: "Loading...")
             var highscore:Double = 0.0;
-            if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0) {
+            if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && !UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0)) {
                 highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
             } else {
                 highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
             }
             let firebaseAuth = FirebaseAuth.Auth.auth();
             DatabaseManager.findUserByEmailWithAllData(email: firebaseAuth.currentUser!.email!) { [weak self] (data, error) in
-                if let _ = error { self?.displayAlertNormal(title: "Error signing out", message: "There was an error signing out. Please try again", style: .default); SVProgressHUD.dismiss(); }
+                if let _ = error { self?.displayAlertNormal(title: "Error signing out", message: "There was an error signing out. Please try again", style: .default); SVProgressHUD.dismiss(); cell?.isUserInteractionEnabled = true; }
                 else {
                     let currentUsername = data!["username"] as! String;
                     DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":highscore]) { (error) in
-                        if let error = error { print(error.localizedDescription); SVProgressHUD.dismiss(); } else {
+                        if let error = error { print(error.localizedDescription); SVProgressHUD.dismiss(); cell?.isUserInteractionEnabled = true; } else {
                             do {
                                 try firebaseAuth.signOut();
                                 self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                 self?.tableView.reloadData();
                                 SVProgressHUD.dismiss();
+                                cell?.isUserInteractionEnabled = true;
                             } catch let signOutError as NSError {
                                 print ("Error signing out: %@", signOutError)
+                                cell?.isUserInteractionEnabled = true;
                                 SVProgressHUD.dismiss();
                             }
                         }
@@ -379,22 +287,10 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func showDisclaimer() -> Void {
         self.displayAlertNormal(title: "Note", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade crypto without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
     }
-    
-    private func watchAdForInvestingTip() -> Void {
-        SVProgressHUD.show(withStatus: "Loading...");
-        if (IronSource.hasRewardedVideo()) {
-            IronSource.showRewardedVideo(with: self);
-            SVProgressHUD.dismiss();
-        } else {
-            SVProgressHUD.dismiss();
-            self.displayAlertNormal(title: "Error", message: "Ad was not loaded yet. Please try again.", style: .default)
-        }
-    }
-    
+        
     private func watchAdForMoney() -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         if (IronSource.hasRewardedVideo()) {
-            self.isMoneyAd = true
             IronSource.showRewardedVideo(with: self);
             SVProgressHUD.dismiss();
         } else {

@@ -77,16 +77,19 @@ class LoginVC: UIViewController {
     
     @objc func loginBtnTapped() {
         self.vibrate(style: .medium)
+        self.disableButtons(isUserInteractionEnabled: false);
         self.view.endEditing(true);
         
         if (self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
             self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.password_txt.text!.count < 5) {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
+            self.disableButtons(isUserInteractionEnabled: true);
             return;
         }
         FirebaseAuth.Auth.auth().signIn(withEmail: self.email_txt.text!, password: self.password_txt.text!) { [weak self] (result, error) in
             if (error != nil) {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
+                self?.disableButtons(isUserInteractionEnabled: true);
             } else {
                 DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false, isLogin: true);
             }
@@ -152,6 +155,16 @@ class LoginVC: UIViewController {
         let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
         impactFeedbackGenerator.prepare();
         impactFeedbackGenerator.impactOccurred();
+    }
+    
+    private func disableButtons(isUserInteractionEnabled:Bool) -> Void {
+        self.email_txt.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.password_txt.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.login_btn.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.forgot_btn.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.createAccont_lbl.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.signUp_btn.isUserInteractionEnabled = isUserInteractionEnabled;
+        
     }
     
 }

@@ -77,11 +77,13 @@ class SignUpVC: UIViewController {
     
     @objc func signUpTapped() {
         self.vibrate(style: .medium);
+        self.disableButtons(isUserInteractionEnabled: false);
         self.view.endEditing(true);
         
         if (self.username_txt.text == nil || self.username_txt.text!.isEmpty || self.username_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.username_txt.text!.count > 15 || self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
             self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty) {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
+            self.disableButtons(isUserInteractionEnabled: true);
             return;
         }
         DatabaseManager.findUser(username: self.username_txt.text!) { [weak self] (foundUser) in
@@ -89,12 +91,14 @@ class SignUpVC: UIViewController {
                 FirebaseAuth.Auth.auth().createUser(withEmail: self!.email_txt.text!, password: self!.password_txt.text!) { [weak self] (result, error) in
                     if let error = error {
                         self?.displayAlert(title: "Sorry", message: error.localizedDescription);
+                        self?.disableButtons(isUserInteractionEnabled: true)
                     } else {
                         DatabaseManager.writeUserData(email: self!.email_txt.text!, username: self!.username_txt.text!, highscore: self!.highscore, change: self!.change, numberOfOwnedCoin: self!.numberOfOwnedCoins, highestHolding: self!.highestHolding,  merge: false, viewController: self!, isPortVC: false);
                     }
                 }
             } else {
                 self?.displayAlert(title: "Sorry", message: "Username already exists.");
+                self?.disableButtons(isUserInteractionEnabled: true);
             }
         }
         
@@ -155,6 +159,14 @@ class SignUpVC: UIViewController {
         let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
         impactFeedbackGenerator.prepare();
         impactFeedbackGenerator.impactOccurred();
+    }
+    
+    private func disableButtons(isUserInteractionEnabled:Bool) -> Void {
+        self.username_txt.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.password_txt.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.email_txt.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.signUp_btn.isUserInteractionEnabled = isUserInteractionEnabled;
+        self.signIn_btn.isUserInteractionEnabled = isUserInteractionEnabled;
     }
     
 

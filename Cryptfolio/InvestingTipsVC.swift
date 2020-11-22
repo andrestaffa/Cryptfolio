@@ -18,7 +18,7 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         if let loadedTips = TipManager.loadTipList() {
             self.investingTips = loadedTips;
         } else {
-            self.investingTips = TipManager.createTipList();
+            self.investingTips = TipManager.tipsHolder;
         }
     }
     
@@ -30,14 +30,7 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         
         self.collectionView.delegate = self;
         self.collectionView.dataSource = self;
-        
-        // FIX THESE USING ASPECT RATIOS
-//        let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout();
-//        layout.sectionInset = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 15);
-//        layout.minimumInteritemSpacing = 5;
-//        layout.itemSize = CGSize(width: (self.collectionView.bounds.width - 30) / 2, height: self.collectionView.bounds.height / 3);
-//        self.collectionView!.collectionViewLayout = layout;
-        
+                
         let layout:UICollectionViewFlowLayout = UICollectionViewFlowLayout();
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0);
         layout.minimumInteritemSpacing = 5;
@@ -60,14 +53,10 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
         cell.layer.masksToBounds = true;
         cell.tipTitle.font = cell.tipTitle.font.withSize(20.0);
         
-        if (cell.tipTitle.text == "?") {
-            cell.orangeDotImg.isHidden = true;
+        if (!self.investingTips[indexPath.item].isDiscovered) {
+            cell.orangeDotImg.isHidden = false;
         } else {
-            if (!self.investingTips[indexPath.item].isDiscovered) {
-                cell.orangeDotImg.isHidden = false;
-            } else {
-                cell.orangeDotImg.isHidden = true;
-            }
+            cell.orangeDotImg.isHidden = true;
         }
         
         return cell;
@@ -75,16 +64,12 @@ class InvestingTipsVC: UIViewController, UICollectionViewDelegate, UICollectionV
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         collectionView.deselectItem(at: indexPath, animated: true);
-        if (self.investingTips[indexPath.item].title == "?") {
-            alert(title: "Locked!", message: "Watch a reward Ad video to unlock investing tips");
-        } else {
-            self.investingTips[indexPath.item].isDiscovered = true;
-            TipManager.saveTipList();
-            self.collectionView.reloadData();
-            let tipVC = self.storyboard?.instantiateViewController(withIdentifier: "tipVC") as! TipVC;
-            tipVC.tip = self.investingTips[indexPath.item];
-            self.present(tipVC, animated: true, completion: nil);
-        }
+        self.investingTips[indexPath.item].isDiscovered = true;
+        TipManager.saveTipHolder();
+        self.collectionView.reloadData();
+        let tipVC = self.storyboard?.instantiateViewController(withIdentifier: "tipVC") as! TipVC;
+        tipVC.tip = self.investingTips[indexPath.item];
+        self.present(tipVC, animated: true, completion: nil);
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
