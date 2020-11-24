@@ -107,7 +107,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.tabBarController?.tabBar.isHidden = false;
         
-        self.glowAffect(view: self.leaderboard_btn, color: .orange);
+        //self.glowAffect(view: self.leaderboard_btn, color: .orange);
         
         // setup collectionView
         self.getTickerData();

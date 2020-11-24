@@ -31,6 +31,10 @@ public class TipManager {
     }
     
     public static func loadTipList() -> Array<Tip>? {
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.affectUsers)) {
+            UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
+            UserDefaults.standard.set(true, forKey: UserDefaultKeys.affectUsers);
+        }
         if let investingTips = DataStorageHandler.loadObject(type: [Tip].self, forKey: UserDefaultKeys.investingTipsKey) {
             tipsHolder = investingTips;
             return tipsHolder;

@@ -20,6 +20,7 @@ public class UserDefaultKeys {
     public static let mainPortChange = "mainPortChange";
     
     // Investing Tips
+    public static let affectUsers = "affectedUsers";
     public static let investingTipsKey = "investingTipsKey";
     public static let randomIndex = "randomIndex";
     

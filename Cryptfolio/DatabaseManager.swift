@@ -26,18 +26,20 @@ public struct User : Codable {
 public class DatabaseManager {
     
     private static let db = Firestore.firestore();
+    private static let userServer = "users-dev";  // Test Server: users-dev
+                                                  // Production Server: users
     
     public static func writeUserData(username:String, password:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
-        db.collection("users").document(username).setData(["username":username, "hashedPassword":password, "highscore":highscore, "change":change], merge: merge, completion: completion);
+        db.collection(userServer).document(username).setData(["username":username, "hashedPassword":password, "highscore":highscore, "change":change], merge: merge, completion: completion);
     }
 
     public static func writeUserData(username:String, merge:Bool, data:[String : Any], completion:@escaping(Error?) -> Void) -> Void {
-        db.collection("users").document(username).setData(data, merge: merge, completion: completion);
+        db.collection(userServer).document(username).setData(data, merge: merge, completion: completion);
     }
     
     public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
-        db.collection("users").document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "highestHolding":highestHolding], merge: merge) { (error) in
+        db.collection(userServer).document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "highestHolding":highestHolding], merge: merge) { (error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
@@ -54,7 +56,7 @@ public class DatabaseManager {
         
     public static func findUser(username:String, completion:@escaping(Bool) -> Void) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
-        db.collection("users").getDocuments { (snapshot, error) in
+        db.collection(userServer).getDocuments { (snapshot, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
@@ -81,7 +83,7 @@ public class DatabaseManager {
     }
     
     public static func findUserByEmail(email:String, completion:@escaping (Double?, Error?) -> Void) -> Void {
-        db.collection("users").getDocuments { (snapshot, error) in
+        db.collection(userServer).getDocuments { (snapshot, error) in
             if let error = error {
                 print(error.localizedDescription);
                 completion(nil, error)
@@ -102,7 +104,7 @@ public class DatabaseManager {
         }
     }
     public static func findUserByEmailWithAllData(email:String, completion:@escaping (Dictionary<String, Any>?, Error?) -> Void) -> Void {
-        db.collection("users").getDocuments { (snapshot, error) in
+        db.collection(userServer).getDocuments { (snapshot, error) in
             if let error = error {
                 print(error.localizedDescription);
                 completion(nil, error)
@@ -127,7 +129,7 @@ public class DatabaseManager {
         let data = isLogin ? ["change":change, "numberOfOwnedCoin":0, "highestHolding":"NA"] : ["highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfCoin, "highestHolding":highestHolding];
         SVProgressHUD.show(withStatus: "Loading...");
         DatabaseManager.hideTabBar(view: viewController);
-        db.collection("users").getDocuments { (snapshot, error) in
+        db.collection(userServer).getDocuments { (snapshot, error) in
             if let error = error {
                 SVProgressHUD.dismiss();
                 print(error.localizedDescription);
@@ -182,11 +184,11 @@ public class DatabaseManager {
     }
     
     public static func deleteUser(username:String, completion:@escaping(Error?) -> Void) -> Void {
-        db.collection("users").document(username).delete(completion: completion);
+        db.collection(userServer).document(username).delete(completion: completion);
     }
     
     public static func getAllUserData(completion:@escaping(User?, Error?) -> Void) -> Void {
-        db.collection("users").order(by: "highscore", descending: true).getDocuments { (snapshot, error) in
+        db.collection(userServer).order(by: "highscore", descending: true).getDocuments { (snapshot, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
