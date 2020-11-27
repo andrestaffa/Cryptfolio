@@ -47,6 +47,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private var viewDisappeared:Bool = false;
     
     private var isLoading:Bool = true;
+    private var usingPullRefresh:Bool = false;
     private var pressedAddCoin:Bool = false;
     private var priceDifference:Double = 0.0;
     private var portPercentChange:Double = 0.0;
@@ -123,6 +124,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         // setup tableView
         self.tableVIew.delegate = self;
         self.tableVIew.dataSource = self;
+        self.tableVIew.estimatedRowHeight = 46;
+        self.tableVIew.refreshControl = UIRefreshControl();
+        self.tableVIew.refreshControl!.attributedTitle = NSAttributedString(string: "Pull to refresh");
+        self.tableVIew.refreshControl!.addTarget(self, action: #selector(self.reloadData), for: .valueChanged);
         
         self.navigationItem.titleView = self.navTitleWithImageAndText(titleText: "ryptfolio", imageIcon: #imageLiteral(resourceName: "appLogo"));
         
@@ -168,6 +173,20 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.animateStartScreen();
         
         
+    }
+    
+    @objc private func reloadData() -> Void {
+        self.usingPullRefresh = true;
+        //self.updateCells();
+        //self.loadData();
+        //self.tableVIew.reloadData();
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.tableVIew.refreshControl!.endRefreshing();
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 46;
     }
     
     func navTitleWithImageAndText(titleText: String, imageIcon: UIImage) -> UIView {
@@ -890,7 +909,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         cell.delegate = self;
         if (self.isLoading) {
             if (self.traitCollection.userInterfaceStyle == .dark) { SVProgressHUD.setDefaultStyle(.dark); }
-            SVProgressHUD.show(withStatus: "Loading...");
+            if (!self.usingPullRefresh) { SVProgressHUD.show(withStatus: "Loading..."); }
             cell.add_btn.isHidden = true;
             cell.crypto_img.isHidden = true;
             cell.name_lbl.text = "";
@@ -970,7 +989,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         cell.add_btn.isHidden = false;
         self.styleButton(button: &cell.add_btn, borderColor: UIColor.orange.cgColor);
         cell.crypto_img.isHidden = false;
-        SVProgressHUD.dismiss();
+        if (!self.usingPullRefresh) { SVProgressHUD.dismiss(); }
         // basic stuff
         cell.name_lbl.text = coinSet[indexPath.row].ticker.name;
         cell.crypto_img.image = coinSet[indexPath.row].image.getImage()!;

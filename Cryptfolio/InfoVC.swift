@@ -72,7 +72,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated);
-        
         self.navigationController?.navigationBar.barTintColor = nil;
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.navigationController?.navigationBar.shadowImage = nil;
@@ -86,8 +85,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
             }
         }
-        
-    
     }
     
     override func viewDidLoad() {
@@ -479,11 +476,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chart_view.labelColor = UIColor.white;
         let series = ChartSeries(data);
         series.area = true;
-        if (!((data.first?.isLess(than: data.last!))!)) {
+        if (!((data.first?.isLess(than: data.last!))!) || self.price_lbl.text! == "-") {
             series.color = ChartColors.redColor();
         } else {
             series.color = ChartColors.greenColor();
         }
+        if (self.price_lbl.text!.first == "-") { series.color = ChartColors.greenColor(); }
         self.chart_view.showXLabelsAndGrid = false;
         if traitCollection.userInterfaceStyle == .light {
             self.chart_view.labelColor = UIColor.black;
