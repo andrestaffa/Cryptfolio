@@ -9,10 +9,15 @@
 import UIKit;
 import SwiftChart;
 
+protocol HomeCellDelgate: class {
+    func didTap(_ cell: CustomCell);
+}
+
 class CustomCell: UITableViewCell, ChartDelegate {
    
     @IBOutlet weak var add_lbl: UILabel!
-    
+    weak var delegate: HomeCellDelgate?;
+
     let chartView: Chart = {
         let chart = Chart();
         chart.topInset = 20.0;
@@ -121,7 +126,7 @@ class CustomCell: UITableViewCell, ChartDelegate {
         self.percentChangeTxt.font = UIFont.systemFont(ofSize: 15);
         self.percentChangeTxt.centerYAnchor.constraint(equalTo: self.container.centerYAnchor).isActive = true;
         self.percentChangeTxt.trailingAnchor.constraint(equalTo: self.container.trailingAnchor, constant: -5).isActive = true;
-        self.percentChangeTxt.widthAnchor.constraint(equalTo: self.container.widthAnchor).isActive = true;
+        self.percentChangeTxt.widthAnchor.constraint(equalTo: self.container.widthAnchor, multiplier: 0.9).isActive = true;
         self.percentChangeTxt.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
     }
     
@@ -136,6 +141,7 @@ class CustomCell: UITableViewCell, ChartDelegate {
     func didEndTouchingChart(_ chart: Chart) {}
     
     @objc func containerTapped() {
+        delegate?.didTap(self);
         let impactFeedbackgenerator = UIImpactFeedbackGenerator(style: .light);
         impactFeedbackgenerator.impactOccurred()
     }

@@ -91,7 +91,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 (_) in
                 self.refreshCount += 1;
                 print("REFRESH COIN: \(self.refreshCount)");
+                self.updateCells();
                 self.loadData();
+                self.tableVIew.reloadData();
             }
         }
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
@@ -126,7 +128,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.tableVIew.dataSource = self;
         self.tableVIew.estimatedRowHeight = 46;
         self.tableVIew.refreshControl = UIRefreshControl();
-        self.tableVIew.refreshControl!.attributedTitle = NSAttributedString(string: "Pull to refresh");
+        self.tableVIew.refreshControl!.attributedTitle = NSAttributedString(string: "");
         self.tableVIew.refreshControl!.addTarget(self, action: #selector(self.reloadData), for: .valueChanged);
         
         self.navigationItem.titleView = self.navTitleWithImageAndText(titleText: "ryptfolio", imageIcon: #imageLiteral(resourceName: "appLogo"));
@@ -353,6 +355,17 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         return masterStirng;
     }
     
+    private func attachImageToStringTitle(image:UIImage, color:UIColor, bounds:CGRect) -> NSAttributedString {
+        let attachment = NSTextAttachment()
+        let tempImage = image.withTintColor(color);
+        attachment.image = tempImage;
+        attachment.bounds = bounds;
+        let masterStirng = NSMutableAttributedString(string: "")
+        let imageAttachment = NSAttributedString(attachment: attachment)
+        masterStirng.append(imageAttachment)
+        return masterStirng;
+    }
+    
     private func getNewCurrentDate() -> String {
         let date = Date(timeIntervalSince1970: Double(Date().timeIntervalSince1970))
         let dateFormatter = DateFormatter();
@@ -423,6 +436,17 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
     }
     
+    private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double, image:UIImage, color:UIColor) -> Void {
+        let attributedText = NSMutableAttributedString(string: "$\(String(format: "%.2f", updatedMainPort))");
+        if (priceChange >= 0) {
+            attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: color, NSAttributedString.Key.baselineOffset : 1]));
+        } else {
+            attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: color, NSAttributedString.Key.baselineOffset : 1]));
+        }
+        attributedText.append(self.attachImageToStringTitle(image: image, color: color, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+        self.mainPortfolio_lbl.attributedText = attributedText;
+    }
+    
     public func loadData() -> Void {
         let currentAvailFunds = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
         self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
@@ -465,12 +489,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
                         if (mainPortChange != 0.0) {
                             if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
-                                self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
-                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
+                                let priceChange = (updatedMainPortfolio + currentAvailFunds) - mainPortChange;
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio, image: #imageLiteral(resourceName: "sortUpArrow"), color: .green);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
-                                self?.mainPortfolio_lbl.attributedText = self?.attachImageToString(text: "$\(String(format: "%.2f", updatedMainPortfolio))", image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 5, y: -1.0, width: 15, height: 15));
-                                //UIView.transition(with: self!.mainPortfolio_lbl, duration: 2, options: .transitionCrossDissolve, animations: {});
+                                let priceChange = (updatedMainPortfolio + currentAvailFunds) - mainPortChange;
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio, image: #imageLiteral(resourceName: "sortDownArrow"), color: .red);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
@@ -917,6 +941,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             cell.percentChange_lbl.text = ""
             cell.amountCost_lbl.text = "";
             cell.amountCoin_lbl.text = "";
+            cell.holdingPercentChange.text = "";
         } else {
             self.displayCellData(cell: cell, coinSet: self.coins, indexPath: indexPath);
         }
@@ -982,9 +1007,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         cell.name_lbl.adjustsFontSizeToFitWidth = true;
         cell.amountCoin_lbl.text = "";
         cell.amountCost_lbl.text = "";
+        cell.holdingPercentChange.text = "";
         if (indexPath.row >= 9) {
             cell.amountCost_lbl.text = ""
             cell.amountCoin_lbl.text = "";
+            cell.holdingPercentChange.text = "";
         }
         cell.add_btn.isHidden = false;
         self.styleButton(button: &cell.add_btn, borderColor: UIColor.orange.cgColor);
@@ -1026,11 +1053,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     if (holding.amountOfCoin.isLessThanOrEqualTo(0.00)) {
                         cell.amountCost_lbl.text = "";
                         cell.amountCoin_lbl.text = "";
+                        cell.holdingPercentChange.text = "";
                     } else {
                         holding.estCost = holding.amountOfCoin * coinSet[indexPath.row].ticker.price;
                         DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
                         cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
                         cell.amountCoin_lbl.text = self.formatPrice(price: holding.amountOfCoin);
+                        let percentage:Double = holding.estCost - (holding.amountOfCoin * holding.ticker.price);
+                        cell.holdingPercentChange.attributedText = percentage >= 0 ? self.attachImageToString(text: "+\(String(format: "%.2f", percentage))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7)) : self.attachImageToString(text: String(format: "%.2f", percentage), image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7));
+                        cell.holdingPercentChange.textColor = percentage >= 0 ? ChartColors.greenColor() : ChartColors.redColor();
                     }
                 }
             }

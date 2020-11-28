@@ -39,7 +39,9 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var marketCap_lbl: UILabel!
     @IBOutlet weak var maxSupply_lbl: UILabel!
     @IBOutlet weak var allTimeHigh_lbl: UILabel!
+    @IBOutlet weak var allTimeHighStatic_lbl: UILabel!
     @IBOutlet weak var daysRange_lbl: UILabel!
+    @IBOutlet weak var daysRangeStatic_lbl: UILabel!
     @IBOutlet weak var description_view: UITextView!
     @IBOutlet weak var chartPrice_lbl: UILabel!
     @IBOutlet weak var chart_view: Chart!
@@ -260,7 +262,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.volume24H_lbl.text = formatMoney(money: ticker.volume24H, isMoney: true);
         self.marketCap_lbl.text = formatMoney(money: ticker.marketCap, isMoney: true);
         self.allTimeHigh_lbl.text = "$\(String(format: "%.2f", ticker.allTimeHigh))";
-        self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
+        //self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
         self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
         self.description_view.text = self.setGoodDescription(ticker: ticker);
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
@@ -334,7 +336,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
-    private func formatDaysRange(ticker:Ticker) -> String {
+    private func formatDaysRange(ticker:Ticker, data:inout Array<Double>) -> String {
         var priceString = String(ticker.price);
         priceString.removeFirst();
         
@@ -343,12 +345,30 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         otherPrice.removeFirst();
         
         if (String(ticker.price).first == "0" || priceString.first == ".") {
-            return "\(String(format: "%.5f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.5f", ticker.history24h.max()!))"
+            return "\(String(format: "%.5f", data.min()!))" + " - " + "\(String(format: "%.5f", data.max()!))"
         } else if (otherPrice.first == ".") {
-            return "\(String(format: "%.2f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.2f", ticker.history24h.max()!))"
+            return "\(String(format: "%.2f", data.min()!))" + " - " + "\(String(format: "%.2f", data.max()!))"
         } else {
-            return "\(String(format: "%.0f", ticker.history24h.min()!))" + " - " + "\(String(format: "%.0f", ticker.history24h.max()!))"
+            return "\(String(format: "%.0f", data.min()!))" + " - " + "\(String(format: "%.0f", data.max()!))"
         }
+    }
+    
+    private func formatAllTimeHighRange(ticker:Ticker, data:inout Array<Double>) -> String {
+        var priceString = String(ticker.price);
+        priceString.removeFirst();
+        
+        var otherPrice = String(ticker.price);
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        
+        if (String(ticker.price).first == "0" || priceString.first == ".") {
+            return "$\(String(format: "%.5f", data.max()!))";
+        } else if (otherPrice.first == ".") {
+            return "$\(String(format: "%.2f", data.max()!))";
+        } else {
+            return "$\(String(format: "%.2f", data.max()!))";
+        }
+        
     }
     
     private func formatMoney(money:Double, isMoney:Bool) -> String {
@@ -460,8 +480,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 self?.activityIndicator.stopAnimating();
                 self?.dataPoints = history!.prices;
                 self?.timestamps = history!.timestamps;
-                self?.chartSetup(data: self!.dataPoints, isDay: false)
-                
+                self?.chartSetup(data: self!.dataPoints, isDay: false);
+                self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
+                self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
+                self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
             }
         }
     }
@@ -476,7 +500,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chart_view.labelColor = UIColor.white;
         let series = ChartSeries(data);
         series.area = true;
-        if (!((data.first?.isLess(than: data.last!))!) || self.price_lbl.text! == "-") {
+        if (!((data.first?.isLess(than: data.last!))!) || self.change_lbl.text!.first == "-") {
             series.color = ChartColors.redColor();
         } else {
             series.color = ChartColors.greenColor();

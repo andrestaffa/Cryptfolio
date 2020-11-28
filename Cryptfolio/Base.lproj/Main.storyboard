@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -525,11 +525,13 @@
                     <size key="freeformSize" width="375" height="1000"/>
                     <connections>
                         <outlet property="activityIndicator" destination="bvs-9s-xm9" id="X7p-gb-OCf"/>
+                        <outlet property="allTimeHighStatic_lbl" destination="UmT-le-OKa" id="Qqn-Ti-9L8"/>
                         <outlet property="allTimeHigh_lbl" destination="iOD-vO-A2Q" id="tpf-3T-Ry8"/>
                         <outlet property="change_lbl" destination="awc-oj-Ewa" id="G1r-vE-Y3h"/>
                         <outlet property="chartPrice_lbl" destination="QDH-iL-wGg" id="BUT-Fa-mJy"/>
                         <outlet property="chart_view" destination="aOe-tB-YcU" id="ocE-7x-GQt"/>
                         <outlet property="crypto_img" destination="mnz-BJ-czK" id="gWq-Kn-pVM"/>
+                        <outlet property="daysRangeStatic_lbl" destination="cBF-eL-klD" id="kgu-Lu-kdh"/>
                         <outlet property="daysRange_lbl" destination="G6H-O5-HZL" id="OJy-6d-RYg"/>
                         <outlet property="description_view" destination="zh0-bt-y64" id="T2h-zx-7Ta"/>
                         <outlet property="marketCap_lbl" destination="Vdw-cV-7dc" id="2YA-qx-Pek"/>

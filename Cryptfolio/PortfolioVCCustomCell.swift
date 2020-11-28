@@ -25,17 +25,27 @@ class PortfolioVCCustomCell: UITableViewCell {
     @IBOutlet weak var amountCoin_lbl: UILabel!
     @IBOutlet weak var add_btn: UIButton!
     
+    let holdingPercentChange: UILabel = {
+        let label = UILabel();
+        label.translatesAutoresizingMaskIntoConstraints = false;
+        label.textAlignment = .right;
+        label.font = UIFont.systemFont(ofSize: 9);
+        label.adjustsFontSizeToFitWidth = true;
+        return label;
+    }();
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        // Initialization code
+        self.addSubview(self.holdingPercentChange);
+        
+        self.holdingPercentChange.topAnchor.constraint(equalTo: self.amountCoin_lbl.bottomAnchor).isActive = true;
+        self.holdingPercentChange.trailingAnchor.constraint(equalTo: self.amountCoin_lbl.trailingAnchor).isActive = true;
+        self.holdingPercentChange.widthAnchor.constraint(equalTo: self.amountCost_lbl.widthAnchor).isActive = true;
+        self.holdingPercentChange.heightAnchor.constraint(equalTo: self.amountCoin_lbl.heightAnchor).isActive = true;
+        
     }
 
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-
-        // Configure the view for the selected state
-    }
     
     @IBAction func addHoldingButtonPressed(_ sender: Any) { delegate?.didTap(self); }
     

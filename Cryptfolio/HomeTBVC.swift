@@ -10,8 +10,8 @@ import UIKit;
 import SVProgressHUD;
 import SwiftChart;
 
-class HomeTBVC: UITableViewController {
-
+class HomeTBVC: UITableViewController, HomeCellDelgate {
+    
     // Private member vairables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
@@ -19,6 +19,7 @@ class HomeTBVC: UITableViewController {
     private var maxCoins = 20;
     private var counter = 0;
     private var prevLength = 0;
+    private var tappedContainer:Bool = false;
     
     // Public member variables
     public var isAdding = false;
@@ -56,7 +57,7 @@ class HomeTBVC: UITableViewController {
             //self.navigationItem.rightBarButtonItem = refreshButton;
             self.navigationController?.navigationBar.tintColor = UIColor.orange;
             self.tableView.refreshControl = UIRefreshControl();
-            self.tableView.refreshControl!.attributedTitle = NSAttributedString(string: "Pull to refresh");
+            self.tableView.refreshControl!.attributedTitle = NSAttributedString(string: "");
             self.tableView.refreshControl!.addTarget(self, action: #selector(self.refresh), for: .valueChanged);
             self.title = "Explore";
         }
@@ -144,6 +145,7 @@ class HomeTBVC: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! CustomCell;
+        cell.delegate = self;
         if (self.loading) {
             SVProgressHUD.show(withStatus: "Loading...")
             cell.chartView.isHidden = false;
@@ -231,6 +233,18 @@ class HomeTBVC: UITableViewController {
         }
     }
     
+    func didTap(_ cell: CustomCell) {
+        self.tappedContainer = !self.tappedContainer;
+        let indexPath = self.tableView.indexPath(for: cell);
+        if (self.isFiltering) {
+            let priceChange = (self.filterCoins[indexPath!.row].ticker.changePrecent24H / 100) * self.filterCoins[indexPath!.row].ticker.price;
+            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: priceChange) : self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath!.row].ticker.changePrecent24H), cell: cell);
+        } else {
+            let priceChange = (self.coins[indexPath!.row].ticker.changePrecent24H / 100) * self.coins[indexPath!.row].ticker.price;
+            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: priceChange) : self.setChange(change: String(format: "%.2f", self.coins[indexPath!.row].ticker.changePrecent24H), cell: cell);
+        }
+    }
+    
     private func setChange(change:String, cell: CustomCell) -> String {
         if (change.first != "-") {
             let newChange = "+\(change)%";
@@ -241,6 +255,25 @@ class HomeTBVC: UITableViewController {
             cell.container.backgroundColor = ChartColors.redColor();
             let newChange = "\(change)%";
             return newChange;
+        }
+    }
+    
+    private func formatPrice(price:Double) -> String {
+        var priceString = String(price);
+        priceString.removeFirst();
+        priceString.removeFirst();
+        
+        var otherPrice = String(price)
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        otherPrice.removeFirst();
+        
+        if (String(price).first == "0" || priceString.first == ".") {
+            return price >= 0 ? "+\(String(format: "%.5f", price))" : "\(String(format: "%.5f", price))";
+        } else if (otherPrice.first == ".") {
+            return price >= 0 ? "+\(String(format: "%.2f", price))" : "\(String(format: "%.2f", price))";
+        } else {
+            return price >= 0 ? "+\(String(format: "%.2f", price))" : "\(String(format: "%.2f", price))";
         }
     }
     
