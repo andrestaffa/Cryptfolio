@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17125"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -1053,7 +1053,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Cn9-ue-yyF">
-                                <rect key="frame" x="16" y="229" width="181" height="21"/>
+                                <rect key="frame" x="16" y="229" width="250" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="GwL-aI-6Or"/>
                                 </constraints>
@@ -1070,11 +1070,11 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+0.00%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lDs-Gx-WOm">
-                                <rect key="frame" x="227" y="237" width="132" height="16"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+10000.00%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lDs-Gx-WOm">
+                                <rect key="frame" x="274" y="237" width="85" height="16"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="16" id="cv9-bS-k2t"/>
-                                    <constraint firstAttribute="width" constant="132" id="gBR-kM-bsp"/>
+                                    <constraint firstAttribute="width" constant="85" id="gBR-kM-bsp"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="13"/>
                                 <nil key="highlightedColor"/>
@@ -1262,7 +1262,7 @@
                             <constraint firstItem="gCN-jI-xi0" firstAttribute="centerX" secondItem="tdP-DL-m7E" secondAttribute="centerX" id="XmA-zh-DYn"/>
                             <constraint firstItem="UbM-1Z-DPq" firstAttribute="top" secondItem="bKd-F8-5BW" secondAttribute="top" id="Y4B-Dx-Czy"/>
                             <constraint firstItem="Y2m-25-RGU" firstAttribute="top" secondItem="Cn9-ue-yyF" secondAttribute="bottom" constant="30" id="aLT-5e-QL7"/>
-                            <constraint firstItem="u9b-Cv-WlI" firstAttribute="trailing" secondItem="Cn9-ue-yyF" secondAttribute="trailing" constant="178" id="aXX-cn-VLu"/>
+                            <constraint firstItem="u9b-Cv-WlI" firstAttribute="trailing" secondItem="Cn9-ue-yyF" secondAttribute="trailing" constant="109" id="aXX-cn-VLu"/>
                             <constraint firstItem="yg4-cg-d7K" firstAttribute="top" secondItem="XQy-Ni-7xL" secondAttribute="bottom" id="b9X-UM-U0L"/>
                             <constraint firstItem="UTD-w4-oII" firstAttribute="leading" secondItem="wCn-Zc-pgb" secondAttribute="trailing" constant="153" id="c7Z-an-Kez"/>
                             <constraint firstItem="gCN-jI-xi0" firstAttribute="top" secondItem="tdP-DL-m7E" secondAttribute="top" constant="229" id="cLw-AF-zP8"/>

@@ -237,11 +237,9 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         self.tappedContainer = !self.tappedContainer;
         let indexPath = self.tableView.indexPath(for: cell);
         if (self.isFiltering) {
-            let priceChange = (self.filterCoins[indexPath!.row].ticker.changePrecent24H / 100) * self.filterCoins[indexPath!.row].ticker.price;
-            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: priceChange) : self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath!.row].ticker.changePrecent24H), cell: cell);
+            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: self.filterCoins[indexPath!.row].ticker.price, coinSet: self.filterCoins, indexPathRow: indexPath!.row) : self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath!.row].ticker.changePrecent24H), cell: cell);
         } else {
-            let priceChange = (self.coins[indexPath!.row].ticker.changePrecent24H / 100) * self.coins[indexPath!.row].ticker.price;
-            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: priceChange) : self.setChange(change: String(format: "%.2f", self.coins[indexPath!.row].ticker.changePrecent24H), cell: cell);
+            cell.percentChangeTxt.text = self.tappedContainer ? self.formatPrice(price: self.coins[indexPath!.row].ticker.price, coinSet: self.coins, indexPathRow: indexPath!.row) : self.setChange(change: String(format: "%.2f", self.coins[indexPath!.row].ticker.changePrecent24H), cell: cell);
         }
     }
     
@@ -258,22 +256,22 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         }
     }
     
-    private func formatPrice(price:Double) -> String {
+    private func formatPrice(price:Double, coinSet:Array<Coin>, indexPathRow:Int) -> String {
         var priceString = String(price);
-        priceString.removeFirst();
         priceString.removeFirst();
         
         var otherPrice = String(price)
         otherPrice.removeFirst();
         otherPrice.removeFirst();
-        otherPrice.removeFirst();
+
+        let priceChange = (coinSet[indexPathRow].ticker.changePrecent24H / 100) * price
         
         if (String(price).first == "0" || priceString.first == ".") {
-            return price >= 0 ? "+\(String(format: "%.5f", price))" : "\(String(format: "%.5f", price))";
+            return priceChange >= 0 ? "+\(String(format: "%.5f", priceChange))" : "\(String(format: "%.5f", priceChange))";
         } else if (otherPrice.first == ".") {
-            return price >= 0 ? "+\(String(format: "%.2f", price))" : "\(String(format: "%.2f", price))";
+            return priceChange >= 0 ? "+\(String(format: "%.2f", priceChange))" : "\(String(format: "%.2f", priceChange))";
         } else {
-            return price >= 0 ? "+\(String(format: "%.2f", price))" : "\(String(format: "%.2f", price))";
+            return priceChange >= 0 ? "+\(String(format: "%.2f", priceChange))" : "\(String(format: "%.2f", priceChange))";
         }
     }
     

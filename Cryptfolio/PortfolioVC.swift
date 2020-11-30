@@ -71,6 +71,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.tabBarController?.tabBar.isHidden = false;
         
         self.leaderboard_btn.isUserInteractionEnabled = true;
+        self.addCoin_btn.isUserInteractionEnabled = true;
         
         self.viewDisappeared = false;
         if (!self.viewDisappeared && self.collectionView != nil && !self.tickers.isEmpty) { self.autoScroll(); }
@@ -963,6 +964,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @IBAction func pressAddCoinBtn(_ sender: Any) {
         self.vibrate(style: .light);
+        self.addCoin_btn.isUserInteractionEnabled = false;
         let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
         homeTBVC.isAdding = true;
         homeTBVC.portfolioVC = self;
@@ -1062,6 +1064,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         let percentage:Double = holding.estCost - (holding.amountOfCoin * holding.ticker.price);
                         cell.holdingPercentChange.attributedText = percentage >= 0 ? self.attachImageToString(text: "+\(String(format: "%.2f", percentage))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7)) : self.attachImageToString(text: String(format: "%.2f", percentage), image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7));
                         cell.holdingPercentChange.textColor = percentage >= 0 ? ChartColors.greenColor() : ChartColors.redColor();
+                        if (cell.amountCost_lbl.text == "$0.00") {
+                            self.quickSell(coinSet: coinSet, indexPathRow: indexPath.row);
+                            self.displayAlert(title: "Dev Message", message: "Quick Sell worked when it showed zero.");
+                        }
                     }
                 }
             }

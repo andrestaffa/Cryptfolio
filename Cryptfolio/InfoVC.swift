@@ -481,11 +481,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 self?.dataPoints = history!.prices;
                 self?.timestamps = history!.timestamps;
                 self?.chartSetup(data: self!.dataPoints, isDay: false);
-                self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
-                self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
-                self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                    self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
+                    self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                    self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                    self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
+                    self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
+                }
             }
         }
     }
