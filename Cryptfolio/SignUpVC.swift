@@ -14,6 +14,7 @@ class SignUpVC: UIViewController {
     @IBOutlet weak var username_txt: UITextField!
     @IBOutlet weak var email_txt: UITextField!
     @IBOutlet weak var password_txt: UITextField!
+    @IBOutlet weak var confirmPassword_txt: UITextField!
     @IBOutlet weak var signUp_btn: UIButton!
     @IBOutlet weak var alreadyHave_btn: UILabel!
     @IBOutlet weak var signIn_btn: UIButton!
@@ -41,15 +42,17 @@ class SignUpVC: UIViewController {
         self.signIn_btn.setTitleColor(.orange, for: .highlighted);
         self.email_txt.keyboardType = .emailAddress;
         self.password_txt.isSecureTextEntry = true;
+        self.confirmPassword_txt.isSecureTextEntry = true;
         self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0);
         self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0);
         self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
+        self.styleTextField(textField: &self.confirmPassword_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
         
         self.username_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneUsernameButtonTapped)), onCancel: (target: self, action: #selector(self.cancelUsernameButtonTapped)), doneName: "Done");
         self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
         self.password_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.donePasswordButtonTapped)), onCancel: (target: self, action: #selector(self.cancelPasswordButtonTapped)), doneName: "Done");
+        self.confirmPassword_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneConfirmPasswordTapped)), onCancel: (target: self, action: #selector(self.cancelConfirmPasswordTapped)), doneName: "Done");
         
-                
         self.signUp_btn.addTarget(self, action: #selector(signUpTapped), for: .touchUpInside);
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tappedScreen));
@@ -70,6 +73,10 @@ class SignUpVC: UIViewController {
     @objc func donePasswordButtonTapped() { self.password_txt.resignFirstResponder(); }
     @objc func cancelPasswordButtonTapped() { self.password_txt.text = ""; self.password_txt.resignFirstResponder(); }
     
+    // MARK: Confirm Password button methods
+    @objc func doneConfirmPasswordTapped() { self.confirmPassword_txt.resignFirstResponder(); }
+    @objc func cancelConfirmPasswordTapped() { self.confirmPassword_txt.text = ""; self.confirmPassword_txt.resignFirstResponder(); }
+    
     
     @objc func tappedScreen() {
         self.view.endEditing(true);
@@ -79,10 +86,14 @@ class SignUpVC: UIViewController {
         self.vibrate(style: .medium);
         self.disableButtons(isUserInteractionEnabled: false);
         self.view.endEditing(true);
-        
         if (self.username_txt.text == nil || self.username_txt.text!.isEmpty || self.username_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.username_txt.text!.count > 15 || self.email_txt.text == nil || self.email_txt.text!.isEmpty || self.email_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || !self.isValidEmail(self.email_txt.text!) ||
-            self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty) {
+                self.password_txt.text == nil || self.password_txt.text!.isEmpty || self.password_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty || self.confirmPassword_txt.text == nil || self.confirmPassword_txt.text!.isEmpty || self.confirmPassword_txt.text!.trimmingCharacters(in: .whitespaces).isEmpty) {
             self.displayAlert(title: "Sorry", message: "All fields must have the correct formatting.");
+            self.disableButtons(isUserInteractionEnabled: true);
+            return;
+        }
+        if (self.password_txt.text! != self.confirmPassword_txt.text!) {
+            self.displayAlert(title: "Error", message: "Passwords do not match!")
             self.disableButtons(isUserInteractionEnabled: true);
             return;
         }
@@ -101,7 +112,6 @@ class SignUpVC: UIViewController {
                 self?.disableButtons(isUserInteractionEnabled: true);
             }
         }
-        
     }
     
     @objc func signInTapped() {

@@ -30,6 +30,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     override func viewWillAppear(_ animated: Bool) {
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
             self.accountItems.removeAll();
+            self.accountItems.append(Section(title: "Change Username", image: UIImage(named: "Images/btc.png")!));
             self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
             self.tableView.reloadData();
         }
@@ -156,7 +157,6 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath);
-        
         switch indexPath.section {
         case 0:
             cell.isUserInteractionEnabled = true;
@@ -175,8 +175,12 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         case 3:
             if (FirebaseAuth.Auth.auth().currentUser != nil) {
                 cell.isHidden = false;
-                cell.textLabel?.text = self.accountItems[indexPath.row].title;
-                cell.textLabel?.textColor = .red;
+                cell.textLabel?.textColor = .white;
+                self.glowAffect(view: cell.textLabel!, color: .clear);
+                cell.textLabel?.text = self.accountItems[indexPath.row].title
+                if (indexPath.row == 1 && indexPath.section == 3) {
+                    cell.textLabel?.textColor = .red;
+                }
             } else {
                 cell.isHidden = true;
             }
@@ -216,6 +220,8 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             self.references();
             break;
         case (3, 0):
+            self.changeUsername();
+        case (3, 1):
             self.signOutPressed();
             break;
         default:
@@ -234,6 +240,40 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func setTextOfHeader(label:UILabel!, text: String) {
         label.text = text;
         label.sizeToFit();
+    }
+    
+    private func changeUsername() -> Void {
+        let alertController = UIAlertController(title: "Change Username", message: "Please enter a new username", preferredStyle: .alert);
+        alertController.addTextField();
+        alertController.textFields![0].placeholder = "New Username";
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        alertController.addAction(UIAlertAction(title: "Change", style: .default, handler: { (action) in
+            DatabaseManager.findUser(username: alertController.textFields![0].text!) { (foundUser) in
+                if (!foundUser) {
+                    DatabaseManager.findUserByEmailWithAllData(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (data, error) in
+                        if let error = error { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); } else {
+                            let prevData = data!;
+                            let oldUsername = data!["username"] as! String;
+                            DatabaseManager.deleteUser(username: oldUsername) { (error) in
+                                if let error = error { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); } else {
+                                    let newData = ["email":prevData["email"], "username":alertController.textFields![0].text!, "highscore":prevData["highscore"], "change":prevData["change"], "numberOfOwnedCoin":prevData["numberOfOwnedCoin"], "highestHolding":prevData["highestHolding"]];
+                                    DatabaseManager.writeUserData(username: alertController.textFields![0].text!, merge: false, data: newData as [String : Any]) { (error) in
+                                        if let error = error { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); } else {
+                                            self.displayAlertNormal(title: "Success", message: "Successfully changed username!", style: .default);
+                                            return;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    self.displayAlertNormal(title: "Error", message: "Username already exists!", style: .default);
+                    return;
+                }
+            }
+        }));
+        self.present(alertController, animated: true, completion: nil);
     }
     
     private func signOutPressed() {

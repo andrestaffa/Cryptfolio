@@ -180,9 +180,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @objc private func reloadData() -> Void {
         self.usingPullRefresh = true;
-        //self.updateCells();
-        //self.loadData();
-        //self.tableVIew.reloadData();
+        self.updateCells();
+        self.loadData();
+        self.tableVIew.reloadData();
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
             self.tableVIew.refreshControl!.endRefreshing();
         }

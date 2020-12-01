@@ -26,7 +26,7 @@ public struct User : Codable {
 public class DatabaseManager {
     
     private static let db = Firestore.firestore();
-    private static let userServer = "users";  // Test Server: users-dev
+    private static let userServer = "users-dev";  // Test Server: users-dev
                                                   // Production Server: users
     
     public static func writeUserData(username:String, password:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
@@ -35,6 +35,10 @@ public class DatabaseManager {
 
     public static func writeUserData(username:String, merge:Bool, data:[String : Any], completion:@escaping(Error?) -> Void) -> Void {
         db.collection(userServer).document(username).setData(data, merge: merge, completion: completion);
+    }
+    
+    public static func changeUsername(oldUsername:String, newUsername:String, completion:@escaping(Error?) -> Void) -> Void {
+        db.collection(userServer).document(oldUsername).setData(["username":newUsername], merge: true, completion: completion);
     }
     
     public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {

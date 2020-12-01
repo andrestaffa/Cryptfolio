@@ -2211,7 +2211,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </subviews>
                             </stackView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0t3-di-Nhw">
-                                <rect key="frame" x="48" y="355" width="279" height="50"/>
+                                <rect key="frame" x="48" y="413" width="279" height="50"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="50" id="kwG-Jg-eQ2"/>
                                 </constraints>
@@ -2237,17 +2237,22 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 </subviews>
                             </stackView>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Username" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="mNb-9G-Srv">
-                                <rect key="frame" x="48" y="160.5" width="279" height="34"/>
+                                <rect key="frame" x="48" y="176.5" width="279" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Your Email Address" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="jfr-JG-Ly3">
-                                <rect key="frame" x="48" y="218.5" width="279" height="34"/>
+                                <rect key="frame" x="48" y="234.5" width="279" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Hlg-It-kWR">
-                                <rect key="frame" x="48" y="280.5" width="279" height="34"/>
+                                <rect key="frame" x="48" y="292.5" width="279" height="34"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </textField>
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Confirm Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Uk6-X1-Ten">
+                                <rect key="frame" x="48" y="350.5" width="279" height="34"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
@@ -2256,25 +2261,29 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="jfr-JG-Ly3" firstAttribute="trailing" secondItem="Hlg-It-kWR" secondAttribute="trailing" id="7Qr-Tb-gwQ"/>
+                            <constraint firstItem="Uk6-X1-Ten" firstAttribute="leading" secondItem="Hlg-It-kWR" secondAttribute="leading" id="Ak5-tO-Xdg"/>
                             <constraint firstItem="0t3-di-Nhw" firstAttribute="trailing" secondItem="jfr-JG-Ly3" secondAttribute="trailing" id="D2e-xD-vjN"/>
                             <constraint firstItem="sbp-Nt-FSR" firstAttribute="top" secondItem="lNT-Ao-XQW" secondAttribute="top" constant="20" id="D3D-v1-jiS"/>
-                            <constraint firstItem="jfr-JG-Ly3" firstAttribute="centerY" secondItem="vd6-Dg-C66" secondAttribute="centerY" constant="-98" id="FQR-qC-d9E"/>
+                            <constraint firstItem="jfr-JG-Ly3" firstAttribute="centerY" secondItem="vd6-Dg-C66" secondAttribute="centerY" constant="-82" id="FQR-qC-d9E"/>
                             <constraint firstItem="0t3-di-Nhw" firstAttribute="leading" secondItem="lNT-Ao-XQW" secondAttribute="leading" constant="48" id="GKF-t5-Wce"/>
                             <constraint firstItem="Rz6-89-uj0" firstAttribute="centerX" secondItem="vd6-Dg-C66" secondAttribute="centerX" id="HdK-iR-QGA"/>
-                            <constraint firstItem="Hlg-It-kWR" firstAttribute="top" secondItem="jfr-JG-Ly3" secondAttribute="bottom" constant="28" id="Mpm-9h-DBY"/>
+                            <constraint firstItem="Hlg-It-kWR" firstAttribute="top" secondItem="jfr-JG-Ly3" secondAttribute="bottom" constant="24" id="Mpm-9h-DBY"/>
+                            <constraint firstItem="Uk6-X1-Ten" firstAttribute="trailing" secondItem="Hlg-It-kWR" secondAttribute="trailing" id="N8K-eY-eum"/>
                             <constraint firstItem="jfr-JG-Ly3" firstAttribute="trailing" secondItem="mNb-9G-Srv" secondAttribute="trailing" id="Npg-2b-Qmr"/>
                             <constraint firstItem="sbp-Nt-FSR" firstAttribute="centerX" secondItem="vd6-Dg-C66" secondAttribute="centerX" id="OnH-OV-6jn"/>
+                            <constraint firstItem="Uk6-X1-Ten" firstAttribute="top" secondItem="Hlg-It-kWR" secondAttribute="bottom" constant="24" id="ZaS-Fh-dP3"/>
                             <constraint firstItem="jfr-JG-Ly3" firstAttribute="leading" secondItem="mNb-9G-Srv" secondAttribute="leading" id="awR-wf-BFK"/>
                             <constraint firstItem="lNT-Ao-XQW" firstAttribute="bottom" secondItem="Rz6-89-uj0" secondAttribute="bottom" constant="102" id="bPo-MM-NM2"/>
                             <constraint firstItem="jfr-JG-Ly3" firstAttribute="leading" secondItem="Hlg-It-kWR" secondAttribute="leading" id="i84-5J-p4n"/>
                             <constraint firstItem="0t3-di-Nhw" firstAttribute="leading" secondItem="jfr-JG-Ly3" secondAttribute="leading" id="lgy-xC-l1b"/>
                             <constraint firstItem="jfr-JG-Ly3" firstAttribute="top" secondItem="mNb-9G-Srv" secondAttribute="bottom" constant="24" id="pjV-oA-QOE"/>
-                            <constraint firstItem="0t3-di-Nhw" firstAttribute="top" secondItem="Hlg-It-kWR" secondAttribute="bottom" constant="40.5" id="vgi-om-gJt"/>
+                            <constraint firstItem="0t3-di-Nhw" firstAttribute="top" secondItem="Hlg-It-kWR" secondAttribute="bottom" constant="86.5" id="vgi-om-gJt"/>
                             <constraint firstItem="0t3-di-Nhw" firstAttribute="centerX" secondItem="Rz6-89-uj0" secondAttribute="centerX" id="zkL-Lt-whI"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="iQt-AV-huv"/>
                     <connections>
+                        <outlet property="confirmPassword_txt" destination="Uk6-X1-Ten" id="S8k-hu-Ybe"/>
                         <outlet property="email_txt" destination="jfr-JG-Ly3" id="UIM-SR-Ma8"/>
                         <outlet property="password_txt" destination="Hlg-It-kWR" id="vGL-dN-aUe"/>
                         <outlet property="signIn_btn" destination="Asz-Fe-YK1" id="lBi-VA-Bug"/>
