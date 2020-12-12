@@ -54,6 +54,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     func didReceiveReward(forPlacement placementInfo: ISPlacementInfo!) {
         self.watchedAd = true;
         UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) + 20.00, forKey: UserDefaultKeys.availableFundsKey);
+        UserDefaults.standard.setValue(UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney) + 20.00, forKey: UserDefaultKeys.cumulativeAdMoney);
     }
     
     func rewardedVideoDidClose() {
@@ -250,6 +251,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         alertController.addAction(UIAlertAction(title: "Change", style: .default, handler: { (action) in
             DatabaseManager.findUser(username: alertController.textFields![0].text!) { (foundUser) in
                 if (!foundUser) {
+                    if (alertController.textFields![0].text == nil || alertController.textFields![0].text!.isEmpty || alertController.textFields![0].text!.trimmingCharacters(in: .whitespaces).isEmpty || alertController.textFields![0].text!.count > 15) { self.displayAlertNormal(title: "Error", message: "Username field must have the correct formatting.", style: .default); return; }
                     DatabaseManager.findUserByEmailWithAllData(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (data, error) in
                         if let error = error { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); } else {
                             let prevData = data!;

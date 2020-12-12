@@ -437,14 +437,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
     }
     
-    private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double, image:UIImage, color:UIColor) -> Void {
+    private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
         let attributedText = NSMutableAttributedString(string: "$\(String(format: "%.2f", updatedMainPort))");
-        if (priceChange >= 0) {
-            attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: color, NSAttributedString.Key.baselineOffset : 1]));
-        } else {
-            attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: color, NSAttributedString.Key.baselineOffset : 1]));
+        if (priceChange > 0) {
+            attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.baselineOffset : 1]));
+            attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortUpArrow"), color: .green, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+        } else if (priceChange < 0) {
+            attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.baselineOffset : 1]));
+            attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortDownArrow"), color: .red, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
         }
-        attributedText.append(self.attachImageToStringTitle(image: image, color: color, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
         self.mainPortfolio_lbl.attributedText = attributedText;
     }
     
@@ -490,13 +491,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
                         if (mainPortChange != 0.0) {
                             if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
-                                let priceChange = (updatedMainPortfolio + currentAvailFunds) - mainPortChange;
-                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio, image: #imageLiteral(resourceName: "sortUpArrow"), color: .green);
+                                let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
-                                let priceChange = (updatedMainPortfolio + currentAvailFunds) - mainPortChange;
-                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio, image: #imageLiteral(resourceName: "sortDownArrow"), color: .red);
+                                let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
                             }

@@ -15,6 +15,7 @@ import SVProgressHUD;
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
+    var notificationCenter: UNUserNotificationCenter = UNUserNotificationCenter.current();
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -34,7 +35,32 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        self.notificationCenter = UNUserNotificationCenter.current();
+        let options: UNAuthorizationOptions = [.alert, .sound, .badge, .carPlay, .announcement];
+        notificationCenter.requestAuthorization(options: options) { (didAllow, error) in
+            if let error = error { print(error.localizedDescription) } else {
+                if (!didAllow) { print("User did not allow notifications"); } else {
+                    print("User HAS allowed notifications");
+                }
+            }
+        }
+        
         return true
+    }
+    
+    func scheduleNotification() -> Void {
+        let content = UNMutableNotificationContent();
+        content.title = "Don't miss out!";
+        content.body = "Check on your portfolio! Who knows... you might be rich!";
+        content.sound = UNNotificationSound.default;
+        content.badge = 1;
+        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 86400, repeats: false);
+        let request = UNNotificationRequest(identifier: UserDefaultKeys.dailyReminder, content: content, trigger: trigger);
+        self.notificationCenter.add(request) { (error) in
+            if let error = error { print(error.localizedDescription) } else {
+                print("Successfuly showed the notifications")
+            }
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -45,6 +71,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        self.scheduleNotification();
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
@@ -53,6 +80,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        UIApplication.shared.applicationIconBadgeNumber = 0;
     }
 
     func applicationWillTerminate(_ application: UIApplication) {

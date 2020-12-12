@@ -29,6 +29,41 @@ public class DatabaseManager {
     private static let userServer = "users-dev";  // Test Server: users-dev
                                                   // Production Server: users
     
+    
+    // MARK: Test Methods for encoding and decoding
+    
+    public static func writeObjects<T : Codable>(username:String, type: T, typeName:String, completion:@escaping(Error?) -> Void) -> Void {
+        if let data = DataStorageHandler.encodeTypeIntoJSON(type: type) {
+            db.collection("users-dev").document(username).setData([typeName: data], merge: true, completion: completion);
+        } else {
+            print("The type inputted is nil! Not uploading to database");
+        }
+    }
+    
+    public static func getObjects<T : Codable>(username:String, type: T.Type, typeName:String, completion:@escaping(Any?, Error?) -> Void) -> Void {
+        db.collection("users-dev").getDocuments { (snapshot, error) in
+            if let error = error { print(error.localizedDescription) } else {
+                if let snapshot = snapshot {
+                    for i in 0...snapshot.documents.count - 1 {
+                        let docData = snapshot.documents[i].data();
+                        if (docData["username"] as! String == username) {
+                            let objects = docData[typeName] as! Array<Dictionary<String, Any>>;
+                            if let object = DataStorageHandler.decodeTypeFromJSON(type: T.self, jsonData: objects) {
+                                completion(object, nil);
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    completion(nil, error);
+                }
+            }
+        }
+    }
+    
+    
+    // MARK: Main Methods
+    
     public static func writeUserData(username:String, password:String, highscore:Double, change:String, merge:Bool, completion:@escaping(Error?) -> Void) -> Void {
         db.collection(userServer).document(username).setData(["username":username, "hashedPassword":password, "highscore":highscore, "change":change], merge: merge, completion: completion);
     }

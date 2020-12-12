@@ -36,6 +36,7 @@ class TradeVC: UIViewController {
     // Private member variables
     private var holdings = Array<Holding>();
     private var availPressed:Bool = false;
+    private var ownedCoinPressed:Bool = false;
     private var isUSDAmount:Bool = true;
     private var calculatedAmountOfCoin:Double = 0.0;
     
@@ -207,6 +208,7 @@ class TradeVC: UIViewController {
     
     @objc private func amountTapped() -> Void {
         self.vibrate(style: .medium);
+        self.ownedCoinPressed = false;
         let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
         if (currentFunds != nil) {
             if (currentFunds!.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "Insuffient funds"); return;}
@@ -219,11 +221,13 @@ class TradeVC: UIViewController {
     
     @objc private func ownedTapped() -> Void {
         self.vibrate(style: .medium);
+        self.availPressed = false;
         if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
             for holding in loadedHoldings {
                 if (holding.ticker.name == self.ticker!.name) {
                     if (holding.amountOfCoin.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "You do not own any \(holding.ticker.symbol.uppercased()) to sell"); return; }
                     self.amount_txt.text = self.isUSDAmount ? "\(holding.amountOfCoin * self.ticker!.price)" : "\(holding.amountOfCoin)";
+                    self.ownedCoinPressed = true;
                     updateInfo(isTypeing: false);
                     return;
                 }
@@ -331,11 +335,12 @@ class TradeVC: UIViewController {
         if (self.isUSDAmount) {
             var temp:String = self.availableFunds_lbl.text!;
             temp.removeFirst();
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!)) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.availPressed) {
                 let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
                 if (currentFunds != nil) {
                     if (currentFunds!.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "Insuffient funds"); return;}
                     tempCalc = currentFunds! / self.ticker!.price;
+                    print("BUYING WITH ALL FUNDS");
                 } else { displayAlert(title: "Sorry", message: "Insuffient funds"); return; }
             }
         }
@@ -376,12 +381,13 @@ class TradeVC: UIViewController {
         if (self.isUSDAmount) {
             var temp:String = self.ownedCoin_lbl.text!;
             temp.removeFirst();
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!)) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.ownedCoinPressed) {
                 print("yes")
                 if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                     for holding in loadedHoldings {
                         if (holding.ticker.name == self.ticker!.name) {
                             tempCalc = (holding.amountOfCoin);
+                            print("SELLING ALL COINS IN USD AMOUNT");
                             print("CALC: \(tempCalc)");
                         }
                     }
@@ -389,13 +395,14 @@ class TradeVC: UIViewController {
             }
         } else {
             let temp:String = self.ownedAmountCoin_txt.text!;
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!)) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.ownedCoinPressed) {
                 if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                     for holding in loadedHoldings {
                         if (holding.ticker.name == self.ticker!.name) {
                             print("here");
                             tempCalc = (holding.amountOfCoin);
                             print("CALC: \(tempCalc)");
+                            print("SELLING ALL COINS IN COIN AMOUNT");
                         }
                     }
                 }
