@@ -406,35 +406,95 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         if (!self.isLoading) {
             self.isLoading = true;
         }
-        // get current coins in watchList;
-        if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
-            self.coins = loadedCoins;
-        }
-        if let loadedCoin = DataStorageHandler.loadObject(type: Coin.self, forKey: UserDefaultKeys.coinKey) {
-            if (!self.coins.contains(where: { (coin) -> Bool in
-                return coin.ticker.name == loadedCoin.ticker.name;
-            })) {
-                self.coins.append(loadedCoin);
+        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.loginPressed)) {
+            print("PRESSED LOGIN AND NOW DATA IS BEING RETRIEVED FROM THE DATABASE");
+            UserDefaults.standard.set(false, forKey: UserDefaultKeys.loginPressed);
+            DatabaseManager.getUsername(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (username) in
+                if (username != "NA") {
+                    DatabaseManager.getObjects(username: username, type: [Holding].self, typeName: "holdings") { [weak self] (object, error) in
+                        if let error = error { print(error.localizedDescription); } else {
+                            let holdings = object as? [Holding];
+                            print("The username: \(username)");
+                            if (holdings != nil && !holdings!.isEmpty) {
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.holdingsKey);
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinKey);
+                                DataStorageHandler.saveObject(type: holdings, forKey: UserDefaultKeys.holdingsKey);
+                                var coins = Array<Coin>();
+                                let coin = Coin(ticker: holdings![0].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings![0].ticker.symbol.lowercased())" + ".png")!));
+                                DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
+                                coins.append(coin);
+                                DataStorageHandler.saveObject(type: coins, forKey: UserDefaultKeys.coinArrayKey);
+                                var sum:Double = holdings![0].estCost;
+                                if (holdings!.count > 1) {
+                                    for i in 1...holdings!.count - 1 {
+                                        let coin = Coin(ticker: holdings![i].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings![i].ticker.symbol.lowercased())" + ".png")!));
+                                        DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
+                                        var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
+                                        loadedCoins.append(coin);
+                                        DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
+                                        sum += holdings![i].estCost;
+                                    }
+                                }
+                                UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) - sum, forKey: UserDefaultKeys.availableFundsKey);
+                                UserDefaults.standard.set(sum, forKey: UserDefaultKeys.mainPortfolioKey);
+                                self?.availableFunds_lbl.text = "$\(String(format: "%.2f", UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey)))";
+                                self!.coins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
+                                self?.loadData();
+                                self?.tableVIew.reloadData();
+                                // update the current coinList;
+                                for coin in self!.coins {
+                                    CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
+                                        if let error = error {
+                                            print(error.localizedDescription);
+                                            print("no internet")
+                                            return;
+                                        } else {
+                                            coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                                            coin.ticker = ticker!;
+                                            self?.isLoading = false;
+                                            self?.tableVIew.reloadData();
+                                            self?.writeCoinArray();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
-        }
-        writeCoinArray();
-        self.tableVIew.reloadData();
-        // update the current coinList;
-        for coin in self.coins {
-            CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
-                if let error = error {
-                    print(error.localizedDescription);
-                    print("no internet")
-                    return;
-                } else {
-                    coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
-                    coin.ticker = ticker!;
-                    self?.isLoading = false;
-                    self?.tableVIew.reloadData();
-                    self?.writeCoinArray();
+        } else {
+            // get current coins in watchList;
+            if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+                self.coins = loadedCoins;
+            }
+            if let loadedCoin = DataStorageHandler.loadObject(type: Coin.self, forKey: UserDefaultKeys.coinKey) {
+                if (!self.coins.contains(where: { (coin) -> Bool in
+                    return coin.ticker.name == loadedCoin.ticker.name;
+                })) {
+                    self.coins.append(loadedCoin);
+                }
+            }
+            writeCoinArray();
+            self.tableVIew.reloadData();
+            // update the current coinList;
+            for coin in self.coins {
+                CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
+                    if let error = error {
+                        print(error.localizedDescription);
+                        print("no internet")
+                        return;
+                    } else {
+                        coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                        coin.ticker = ticker!;
+                        self?.isLoading = false;
+                        self?.tableVIew.reloadData();
+                        self?.writeCoinArray();
+                    }
                 }
             }
         }
+        
     }
     
     private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
@@ -516,6 +576,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
                     self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
                 }
+                self?.tableVIew.reloadData();
             }
         }
         

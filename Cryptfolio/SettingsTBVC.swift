@@ -296,18 +296,36 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                 if let _ = error { self?.displayAlertNormal(title: "Error signing out", message: "There was an error signing out. Please try again", style: .default); SVProgressHUD.dismiss(); cell?.isUserInteractionEnabled = true; }
                 else {
                     let currentUsername = data!["username"] as! String;
-                    DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":highscore]) { (error) in
+                    DatabaseManager.writeUserData(username: currentUsername, merge: true, data: ["highscore":highscore]) { [weak self] (error) in
                         if let error = error { print(error.localizedDescription); SVProgressHUD.dismiss(); cell?.isUserInteractionEnabled = true; } else {
-                            do {
-                                try firebaseAuth.signOut();
-                                self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
-                                self?.tableView.reloadData();
-                                SVProgressHUD.dismiss();
-                                cell?.isUserInteractionEnabled = true;
-                            } catch let signOutError as NSError {
-                                print ("Error signing out: %@", signOutError)
-                                cell?.isUserInteractionEnabled = true;
-                                SVProgressHUD.dismiss();
+                            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                                DatabaseManager.writeObjects(username: currentUsername, type: loadedHoldings, typeName: "holdings") { [weak self] (error) in
+                                    if let error = error { print(error.localizedDescription); } else {
+                                        do {
+                                            try firebaseAuth.signOut();
+                                            self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
+                                            self?.tableView.reloadData();
+                                            SVProgressHUD.dismiss();
+                                            cell?.isUserInteractionEnabled = true;
+                                        } catch let signOutError as NSError {
+                                            print ("Error signing out: %@", signOutError)
+                                            cell?.isUserInteractionEnabled = true;
+                                            SVProgressHUD.dismiss();
+                                        }
+                                    }
+                                }
+                            } else {
+                                do {
+                                    try firebaseAuth.signOut();
+                                    self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
+                                    self?.tableView.reloadData();
+                                    SVProgressHUD.dismiss();
+                                    cell?.isUserInteractionEnabled = true;
+                                } catch let signOutError as NSError {
+                                    print ("Error signing out: %@", signOutError)
+                                    cell?.isUserInteractionEnabled = true;
+                                    SVProgressHUD.dismiss();
+                                }
                             }
                         }
                     }

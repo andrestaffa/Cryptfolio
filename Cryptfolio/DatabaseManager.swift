@@ -47,8 +47,9 @@ public class DatabaseManager {
                     for i in 0...snapshot.documents.count - 1 {
                         let docData = snapshot.documents[i].data();
                         if (docData["username"] as! String == username) {
-                            let objects = docData[typeName] as! Array<Dictionary<String, Any>>;
-                            if let object = DataStorageHandler.decodeTypeFromJSON(type: T.self, jsonData: objects) {
+                            let objects = docData[typeName] as? Array<Dictionary<String, Any>>;
+                            if (objects == nil) { return; }
+                            if let object = DataStorageHandler.decodeTypeFromJSON(type: T.self, jsonData: objects!) {
                                 completion(object, nil);
                                 break;
                             }
@@ -82,13 +83,27 @@ public class DatabaseManager {
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                SVProgressHUD.dismiss();
-                if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
-                    return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
-                }) {
-                    leaderboardVC.hidesBottomBarWhenPushed = true;
-                    viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
-                } else { print("LeaderboardVC has not been instantiated"); }
+                if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                    DatabaseManager.writeObjects(username: username, type: loadedHoldings, typeName: "holdings") { (error) in
+                        if let error = error { print(error.localizedDescription); } else {
+                            SVProgressHUD.dismiss();
+                            if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
+                            }) {
+                                leaderboardVC.hidesBottomBarWhenPushed = true;
+                                viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                            } else { print("LeaderboardVC has not been instantiated"); }
+                        }
+                    }
+                } else {
+                    SVProgressHUD.dismiss();
+                    if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                        return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
+                    }) {
+                        leaderboardVC.hidesBottomBarWhenPushed = true;
+                        viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                    } else { print("LeaderboardVC has not been instantiated"); }
+                }
             }
         }
     }
@@ -116,6 +131,35 @@ public class DatabaseManager {
                     }
                     SVProgressHUD.dismiss();
                     completion(false);
+                }
+            }
+        }
+    }
+    
+    public static func getUsername(email:String, completion:@escaping(String) -> Void) -> Void {
+        SVProgressHUD.show(withStatus: "Loading...");
+        db.collection(userServer).getDocuments { (snapshot, error) in
+            if let error = error {
+                print(error.localizedDescription);
+            } else {
+                if let snapshot = snapshot {
+                    if ( snapshot.isEmpty || snapshot.documents.isEmpty) {
+                        SVProgressHUD.dismiss();
+                        completion("NA");
+                        return;
+                    }
+                    for i in 0...snapshot.documents.count - 1 {
+                        let docData = snapshot.documents[i].data();
+                        let foundUser = docData["username"] as! String;
+                        let foundEmail = docData["email"] as! String;
+                        if (foundEmail.lowercased() == email.lowercased()) {
+                            SVProgressHUD.dismiss();
+                            completion(foundUser);
+                            return;
+                        }
+                    }
+                    SVProgressHUD.dismiss();
+                    completion("NA");
                 }
             }
         }
@@ -192,6 +236,7 @@ public class DatabaseManager {
                                         if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
                                             return LeaderboardVC(coder: coder, currentUsername: usernameLogin, currentHighscore: highscoreLogin, currentChange: changeLogin, isPortVC: isPortVC);
                                         }) {
+                                            UserDefaults.standard.set(true, forKey: UserDefaultKeys.loginPressed);
                                             leaderboardVC.hidesBottomBarWhenPushed = true;
                                             viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                                         } else { print("LeaderboardVC has not been instantiated"); }
@@ -203,13 +248,27 @@ public class DatabaseManager {
                                         SVProgressHUD.dismiss();
                                         print(error.localizedDescription);
                                     } else {
-                                        SVProgressHUD.dismiss();
-                                        if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
-                                            return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
-                                        }) {
-                                            leaderboardVC.hidesBottomBarWhenPushed = true;
-                                            viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
-                                        } else { print("LeaderboardVC has not been instantiated"); }
+                                        if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                                            DatabaseManager.writeObjects(username: foundUser!, type: loadedHoldings, typeName: "holdings") { (error) in
+                                                if let error = error { print(error.localizedDescription); } else {
+                                                    SVProgressHUD.dismiss();
+                                                    if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                                        return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
+                                                    }) {
+                                                        leaderboardVC.hidesBottomBarWhenPushed = true;
+                                                        viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                                                    } else { print("LeaderboardVC has not been instantiated"); }
+                                                }
+                                            }
+                                        } else {
+                                            SVProgressHUD.dismiss();
+                                            if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
+                                                return LeaderboardVC(coder: coder, currentUsername: foundUser!, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
+                                            }) {
+                                                leaderboardVC.hidesBottomBarWhenPushed = true;
+                                                viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
+                                            } else { print("LeaderboardVC has not been instantiated"); }
+                                        }
                                     }
                                 }
                             }
