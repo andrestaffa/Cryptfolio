@@ -22,6 +22,7 @@
 		2035B58524784F6100626463 /* NewsTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B58424784F6100626463 /* NewsTBVC.swift */; };
 		2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */; };
 		2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */; };
+		20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20437EB3258C0355005479C7 /* NotificationManager.swift */; };
 		204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */; };
 		2053C4CF245F851B00A04769 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2053C4CE245F851B00A04769 /* Coin.swift */; };
 		2062A22124ED920800185BF8 /* TipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2062A22024ED920800185BF8 /* TipManager.swift */; };
@@ -70,6 +71,7 @@
 		2035B58424784F6100626463 /* NewsTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVC.swift; sourceTree = "<group>"; };
 		2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVCCustomCell.swift; sourceTree = "<group>"; };
 		2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVCCustomCell.swift; sourceTree = "<group>"; };
+		20437EB3258C0355005479C7 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
 		204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVC.swift; sourceTree = "<group>"; };
 		2053C4CE245F851B00A04769 /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
 		2062A22024ED920800185BF8 /* TipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipManager.swift; sourceTree = "<group>"; };
@@ -172,6 +174,7 @@
 				20F218F72506DB69002A01AC /* LoginVC.swift */,
 				20F218F92506F82A002A01AC /* SignUpVC.swift */,
 				20F218FB25070DAF002A01AC /* Forgot.swift */,
+				20437EB3258C0355005479C7 /* NotificationManager.swift */,
 			);
 			path = Cryptfolio;
 			sourceTree = "<group>";
@@ -332,6 +335,7 @@
 				20DAB4D1247EF3DB00DD57CC /* SettingsTBVC.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */,
+				20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
 				20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */,
 				2016FEB524F2E6E200E38535 /* HoldingVC.swift in Sources */,

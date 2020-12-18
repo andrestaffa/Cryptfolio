@@ -69,6 +69,9 @@ public class OrderHandler {
                 }
                 // save the holdings array
                 DataStorageHandler.saveObject(type: holdings, forKey: UserDefaultKeys.holdingsKey);
+                DatabaseManager.writeHighscoreAndHoldings { (error) in
+                    if let error = error { print(error.localizedDescription); } else { print("Success in sell method!"); }
+                }
                 return true;
             }
         } else {
@@ -144,11 +147,17 @@ public class OrderHandler {
                     // this should NOT happen, when ever you sell something, the main portfolio should always have value;
                     UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.mainPortfolioKey);
                 }
+                DatabaseManager.writeHighscoreAndHoldings { (error) in
+                    if let error = error { print(error.localizedDescription); } else { print("Success in sell method!"); }
+                }
                 return true;
             }
         } else {
             // user does have any money, but they own some of the coin, so updated their funds when the sell it
             UserDefaults.standard.set(amountCost, forKey: UserDefaultKeys.availableFundsKey);
+            DatabaseManager.writeHighscoreAndHoldings { (error) in
+                if let error = error { print(error.localizedDescription); } else { print("Success in sell method!"); }
+            }
             return true;
         }
     }

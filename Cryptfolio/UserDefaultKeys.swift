@@ -35,8 +35,12 @@ public class UserDefaultKeys {
     // first time lanching app
     public static let isNotFirstTime = "isNotFirstTime";
     public static let didAnimateWithOneCoin = "didAnimateWithOneCoin";
+    public static let prevSignedInUser = "prevSignedInUser";
     
     // User Notifications keys
     public static let dailyReminder = "dailyReminder";
+    
+    // Username
+    public static let currentUsername = "username";
     
 }

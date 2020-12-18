@@ -80,6 +80,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
         
+        // get username from signed in user
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.prevSignedInUser)) {
+            UserDefaults.standard.set(true, forKey: UserDefaultKeys.prevSignedInUser);
+            if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                DatabaseManager.getUsername(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (username) in
+                    UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
+                }
+            }
+        }
+        
         self.nameCol_img.image = #imageLiteral(resourceName: "normal")
         self.priceCol_img.image = #imageLiteral(resourceName: "normal");
         self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
@@ -555,18 +565,30 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                    self?.saveUserData();
+                                }
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
                                 let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                    self?.saveUserData();
+                                }
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                    self?.saveUserData();
+                                }
                             }
                         } else {
                             print("WAS 0, adding to userDefaults");
                             UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
-                            self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))"
+                            self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                self?.saveUserData();
+                            }
                         }
                     }
                     
@@ -582,12 +604,32 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
     }
     
+    public func saveUserData() -> Void {
+        var change:String = "";
+        if (String(self.portPercentChange).first != "-") {
+            change = "+\(String(format: "%.2f", self.portPercentChange * 100))%";
+        } else {
+            change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
+        }
+        DatabaseManager.writeHighscoreAndHoldings(change: change) { (error) in
+            if let error = error { print("CANNOT UPLOAD HIGHSCORE AND HOLDINGS: \(error.localizedDescription)") } else {
+                print("Success!");
+            }
+        }
+    }
+    
+    
     @objc private func availFundsTapped() -> Void {
         print("Avail Tapped");
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
+        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
+            print("CURRENT USERNAME: \(currentUsername)");
+        } else {
+            print("NO USER LOGGED IN!");
+        }
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
@@ -1028,6 +1070,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @IBAction func pressAddCoinBtn(_ sender: Any) {
         self.vibrate(style: .light);
+        NotificationManager.askPermission();
         self.addCoin_btn.isUserInteractionEnabled = false;
         let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
         homeTBVC.isAdding = true;

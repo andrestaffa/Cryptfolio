@@ -77,6 +77,66 @@ public class DatabaseManager {
         db.collection(userServer).document(oldUsername).setData(["username":newUsername], merge: true, completion: completion);
     }
     
+    public static func writeHighscoreAndHoldings(change:String, completion:@escaping(Error?) -> Void) -> Void {
+        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
+            var highscore:Double = 0.0;
+            if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && !UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0)) {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+            } else {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+            }
+            
+            var highestHolding:String = "NA";
+            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                if (!loadedHoldings.isEmpty) {
+                    let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
+                        return holding.estCost < nextHolding.estCost;
+                    }
+                    if (hold!.amountOfCoin > 0) {
+                        highestHolding = hold!.ticker.symbol.uppercased();
+                    }
+                }
+                if let data = DataStorageHandler.encodeTypeIntoJSON(type: loadedHoldings) {
+                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "highestHolding":highestHolding, "change":change, "holdings": data], merge: true, completion: completion);
+                } else {
+                    print("The type inputted is nil! Not uploading to database");
+                }
+            } else { print("There are no holdings to upload."); }
+        } else {
+            print("No user was logged in. Not saving data...");
+        }
+    }
+    
+    public static func writeHighscoreAndHoldings(completion:@escaping(Error?) -> Void) -> Void {
+        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
+            var highscore:Double = 0.0;
+            if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && !UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0)) {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+            } else {
+                highscore = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+            }
+            
+            var highestHolding:String = "NA";
+            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                if (!loadedHoldings.isEmpty) {
+                    let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
+                        return holding.estCost < nextHolding.estCost;
+                    }
+                    if (hold!.amountOfCoin > 0) {
+                        highestHolding = hold!.ticker.symbol.uppercased();
+                    }
+                }
+                if let data = DataStorageHandler.encodeTypeIntoJSON(type: loadedHoldings) {
+                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "highestHolding":highestHolding, "holdings": data], merge: true, completion: completion);
+                } else {
+                    print("The type inputted is nil! Not uploading to database");
+                }
+            } else { print("There are no holdings to upload."); }
+        } else {
+            print("No user was logged in. Not saving data...");
+        }
+    }
+    
     public static func writeUserData(email:String, username:String, highscore:Double, change:String, numberOfOwnedCoin:Int, highestHolding:String, merge:Bool, viewController:UIViewController, isPortVC:Bool) -> Void {
         SVProgressHUD.show(withStatus: "Loading...");
         db.collection(userServer).document(username).setData(["email":email, "username":username, "highscore":highscore, "change":change, "numberOfOwnedCoin":numberOfOwnedCoin, "highestHolding":highestHolding], merge: merge) { (error) in
@@ -90,6 +150,7 @@ public class DatabaseManager {
                             if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
                                 return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
                             }) {
+                                UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
                                 leaderboardVC.hidesBottomBarWhenPushed = true;
                                 viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                             } else { print("LeaderboardVC has not been instantiated"); }
@@ -100,6 +161,7 @@ public class DatabaseManager {
                     if let leaderboardVC = viewController.storyboard?.instantiateViewController(identifier: "leaderboardVC", creator: { (coder) -> LeaderboardVC? in
                         return LeaderboardVC(coder: coder, currentUsername: username, currentHighscore: highscore, currentChange: change, isPortVC: isPortVC);
                     }) {
+                        UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
                         leaderboardVC.hidesBottomBarWhenPushed = true;
                         viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                     } else { print("LeaderboardVC has not been instantiated"); }
@@ -237,6 +299,7 @@ public class DatabaseManager {
                                             return LeaderboardVC(coder: coder, currentUsername: usernameLogin, currentHighscore: highscoreLogin, currentChange: changeLogin, isPortVC: isPortVC);
                                         }) {
                                             UserDefaults.standard.set(true, forKey: UserDefaultKeys.loginPressed);
+                                            UserDefaults.standard.set(usernameLogin, forKey: UserDefaultKeys.currentUsername);
                                             leaderboardVC.hidesBottomBarWhenPushed = true;
                                             viewController.navigationController?.pushViewController(leaderboardVC, animated: true);
                                         } else { print("LeaderboardVC has not been instantiated"); }

@@ -305,6 +305,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                                             try firebaseAuth.signOut();
                                             self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                             self?.tableView.reloadData();
+                                            UserDefaults.standard.removeObject(forKey: UserDefaultKeys.currentUsername);
                                             SVProgressHUD.dismiss();
                                             cell?.isUserInteractionEnabled = true;
                                         } catch let signOutError as NSError {

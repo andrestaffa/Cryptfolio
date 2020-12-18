@@ -35,34 +35,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
-        self.notificationCenter = UNUserNotificationCenter.current();
-        let options: UNAuthorizationOptions = [.alert, .sound, .badge, .carPlay, .announcement];
-        notificationCenter.requestAuthorization(options: options) { (didAllow, error) in
-            if let error = error { print(error.localizedDescription) } else {
-                if (!didAllow) { print("User did not allow notifications"); } else {
-                    print("User HAS allowed notifications");
-                }
-            }
-        }
-        
         return true
     }
     
-    func scheduleNotification() -> Void {
-        let content = UNMutableNotificationContent();
-        content.title = "Don't miss out!";
-        content.body = "Check on your portfolio! Who knows... you might be rich!";
-        content.sound = UNNotificationSound.default;
-        content.badge = 1;
-        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: 86400, repeats: false);
-        let request = UNNotificationRequest(identifier: UserDefaultKeys.dailyReminder, content: content, trigger: trigger);
-        self.notificationCenter.add(request) { (error) in
-            if let error = error { print(error.localizedDescription) } else {
-                print("Successfuly showed the notifications")
-            }
-        }
-    }
-
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
@@ -71,7 +46,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationDidEnterBackground(_ application: UIApplication) {
         // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
         // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
-        self.scheduleNotification();
+        NotificationManager.scheduleNotification();
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
