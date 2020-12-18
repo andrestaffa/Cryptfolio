@@ -48,7 +48,7 @@ public class DatabaseManager {
                         let docData = snapshot.documents[i].data();
                         if (docData["username"] as! String == username) {
                             let objects = docData[typeName] as? Array<Dictionary<String, Any>>;
-                            if (objects == nil) { return; }
+                            if (objects == nil) { completion(nil, nil); return; }
                             if let object = DataStorageHandler.decodeTypeFromJSON(type: T.self, jsonData: objects!) {
                                 completion(object, nil);
                                 break;
@@ -87,6 +87,7 @@ public class DatabaseManager {
             }
             
             var highestHolding:String = "NA";
+            var numberOfCoins:Int = 0;
             if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                 if (!loadedHoldings.isEmpty) {
                     let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
@@ -95,9 +96,13 @@ public class DatabaseManager {
                     if (hold!.amountOfCoin > 0) {
                         highestHolding = hold!.ticker.symbol.uppercased();
                     }
+                    let filteredHoldingList = loadedHoldings.filter({ (holding) -> Bool in
+                        return holding.amountOfCoin > 0;
+                    })
+                    numberOfCoins = filteredHoldingList.count;
                 }
                 if let data = DataStorageHandler.encodeTypeIntoJSON(type: loadedHoldings) {
-                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "highestHolding":highestHolding, "change":change, "holdings": data], merge: true, completion: completion);
+                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "numberOfOwnedCoin":numberOfCoins, "highestHolding":highestHolding, "change":change, "holdings": data], merge: true, completion: completion);
                 } else {
                     print("The type inputted is nil! Not uploading to database");
                 }
@@ -117,6 +122,7 @@ public class DatabaseManager {
             }
             
             var highestHolding:String = "NA";
+            var numberOfCoins:Int = 0;
             if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                 if (!loadedHoldings.isEmpty) {
                     let hold = loadedHoldings.max { (holding, nextHolding) -> Bool in
@@ -125,9 +131,13 @@ public class DatabaseManager {
                     if (hold!.amountOfCoin > 0) {
                         highestHolding = hold!.ticker.symbol.uppercased();
                     }
+                    let filteredHoldingList = loadedHoldings.filter({ (holding) -> Bool in
+                        return holding.amountOfCoin > 0;
+                    })
+                    numberOfCoins = filteredHoldingList.count;
                 }
                 if let data = DataStorageHandler.encodeTypeIntoJSON(type: loadedHoldings) {
-                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "highestHolding":highestHolding, "holdings": data], merge: true, completion: completion);
+                    db.collection(userServer).document(currentUsername).setData(["highscore": highscore, "numberOfOwnedCoin":numberOfCoins, "highestHolding":highestHolding, "holdings": data], merge: true, completion: completion);
                 } else {
                     print("The type inputted is nil! Not uploading to database");
                 }

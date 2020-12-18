@@ -261,7 +261,17 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                                     let newData = ["email":prevData["email"], "username":alertController.textFields![0].text!, "highscore":prevData["highscore"], "change":prevData["change"], "numberOfOwnedCoin":prevData["numberOfOwnedCoin"], "highestHolding":prevData["highestHolding"]];
                                     DatabaseManager.writeUserData(username: alertController.textFields![0].text!, merge: false, data: newData as [String : Any]) { (error) in
                                         if let error = error { self.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); } else {
-                                            self.displayAlertNormal(title: "Success", message: "Successfully changed username!", style: .default);
+                                            if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                                                DatabaseManager.writeObjects(username: alertController.textFields![0].text!, type: loadedHoldings, typeName: "holdings") { (error) in
+                                                    if let error = error { print(error.localizedDescription); } else {
+                                                        self.displayAlertNormal(title: "Success", message: "Successfully changed username!", style: .default);
+                                                        UserDefaults.standard.set(alertController.textFields![0].text!, forKey: UserDefaultKeys.currentUsername);
+                                                    }
+                                                }
+                                            } else {
+                                                self.displayAlertNormal(title: "Success", message: "Successfully changed username!", style: .default);
+                                                UserDefaults.standard.set(alertController.textFields![0].text!, forKey: UserDefaultKeys.currentUsername);
+                                            }
                                             return;
                                         }
                                     }
@@ -305,7 +315,10 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                                             try firebaseAuth.signOut();
                                             self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                             self?.tableView.reloadData();
-                                            UserDefaults.standard.removeObject(forKey: UserDefaultKeys.currentUsername);
+                                            let domain = Bundle.main.bundleIdentifier!
+                                            UserDefaults.standard.removePersistentDomain(forName: domain)
+                                            UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
+                                            UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
                                             SVProgressHUD.dismiss();
                                             cell?.isUserInteractionEnabled = true;
                                         } catch let signOutError as NSError {
@@ -320,6 +333,10 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                                     try firebaseAuth.signOut();
                                     self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                     self?.tableView.reloadData();
+                                    let domain = Bundle.main.bundleIdentifier!
+                                    UserDefaults.standard.removePersistentDomain(forName: domain)
+                                    UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
+                                    UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
                                     SVProgressHUD.dismiss();
                                     cell?.isUserInteractionEnabled = true;
                                 } catch let signOutError as NSError {

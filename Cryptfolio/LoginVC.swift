@@ -91,7 +91,6 @@ class LoginVC: UIViewController {
                 self?.displayAlert(title: "Sorry", message: "Incorrect username or password.");
                 self?.disableButtons(isUserInteractionEnabled: true);
             } else {
-                
                 DatabaseManager.findUser(email: self!.email_txt.text!, highscore: self!.highscore, change: self!.change, numberOfCoin: self!.numberOfOwnedCoin, highestHolding: self!.highestHolding, viewController: self!, isPortVC: false, isLogin: true);
             }
         }

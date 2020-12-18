@@ -25,6 +25,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
         //IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
+        
+        // get username from signed in user
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.prevSignedInUser)) {
+            UserDefaults.standard.set(true, forKey: UserDefaultKeys.prevSignedInUser);
+            if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                DatabaseManager.getUsername(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (username) in
+                    UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
+                }
+            }
+        }
+        
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
             let firebaseAuth = FirebaseAuth.Auth.auth();

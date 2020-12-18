@@ -27,9 +27,9 @@ class NewsTBVC: UITableViewController {
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.navigationController?.navigationBar.tintColor = UIColor.orange;
         
-        let refreshButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(refresh));
-        refreshButton.tintColor = .orange;
-        self.navigationItem.rightBarButtonItem = refreshButton;
+        self.tableView.refreshControl = UIRefreshControl();
+        self.tableView.refreshControl!.attributedTitle = NSAttributedString(string: "");
+        self.tableView.refreshControl!.addTarget(self, action: #selector(self.refresh), for: .valueChanged);
         
         self.getData();
         self.title = "News";
@@ -54,6 +54,9 @@ class NewsTBVC: UITableViewController {
                 }
             }
             self?.isLoading = false;
+            if let refresh = self?.tableView.refreshControl {
+                refresh.endRefreshing();
+            }
             self?.tableView.reloadData();
         }
         

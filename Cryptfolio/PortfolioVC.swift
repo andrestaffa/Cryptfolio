@@ -80,16 +80,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
         
-        // get username from signed in user
-        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.prevSignedInUser)) {
-            UserDefaults.standard.set(true, forKey: UserDefaultKeys.prevSignedInUser);
-            if (FirebaseAuth.Auth.auth().currentUser != nil) {
-                DatabaseManager.getUsername(email: FirebaseAuth.Auth.auth().currentUser!.email!) { (username) in
-                    UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
-                }
-            }
-        }
-        
         self.nameCol_img.image = #imageLiteral(resourceName: "normal")
         self.priceCol_img.image = #imageLiteral(resourceName: "normal");
         self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
@@ -423,27 +413,30 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 if (username != "NA") {
                     DatabaseManager.getObjects(username: username, type: [Holding].self, typeName: "holdings") { [weak self] (object, error) in
                         if let error = error { print(error.localizedDescription); } else {
-                            let holdings = object as? [Holding];
+                            guard let holdings = object as? [Holding] else {
+                                self?.getCoinDataFromDisk();
+                                return;
+                            }
                             print("The username: \(username)");
-                            if (holdings != nil && !holdings!.isEmpty) {
+                            if (!holdings.isEmpty) {
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.holdingsKey);
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinKey);
                                 DataStorageHandler.saveObject(type: holdings, forKey: UserDefaultKeys.holdingsKey);
                                 var coins = Array<Coin>();
-                                let coin = Coin(ticker: holdings![0].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings![0].ticker.symbol.lowercased())" + ".png")!));
+                                let coin = Coin(ticker: holdings[0].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings[0].ticker.symbol.lowercased())" + ".png")!));
                                 DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
                                 coins.append(coin);
                                 DataStorageHandler.saveObject(type: coins, forKey: UserDefaultKeys.coinArrayKey);
-                                var sum:Double = holdings![0].estCost;
-                                if (holdings!.count > 1) {
-                                    for i in 1...holdings!.count - 1 {
-                                        let coin = Coin(ticker: holdings![i].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings![i].ticker.symbol.lowercased())" + ".png")!));
+                                var sum:Double = holdings[0].estCost;
+                                if (holdings.count > 1) {
+                                    for i in 1...holdings.count - 1 {
+                                        let coin = Coin(ticker: holdings[i].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings[i].ticker.symbol.lowercased())" + ".png")!));
                                         DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
                                         var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
                                         loadedCoins.append(coin);
                                         DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
-                                        sum += holdings![i].estCost;
+                                        sum += holdings[i].estCost;
                                     }
                                 }
                                 UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) - sum, forKey: UserDefaultKeys.availableFundsKey);
@@ -474,37 +467,42 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 }
             }
         } else {
-            // get current coins in watchList;
-            if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
-                self.coins = loadedCoins;
+            self.getCoinDataFromDisk();
+        }
+    }
+    
+    private func getCoinDataFromDisk() -> Void {
+        // get current coins in watchList;
+        if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+            self.coins = loadedCoins;
+        } else {
+            self.coins = Array<Coin>();
+        }
+        if let loadedCoin = DataStorageHandler.loadObject(type: Coin.self, forKey: UserDefaultKeys.coinKey) {
+            if (!self.coins.contains(where: { (coin) -> Bool in
+                return coin.ticker.name == loadedCoin.ticker.name;
+            })) {
+                self.coins.append(loadedCoin);
             }
-            if let loadedCoin = DataStorageHandler.loadObject(type: Coin.self, forKey: UserDefaultKeys.coinKey) {
-                if (!self.coins.contains(where: { (coin) -> Bool in
-                    return coin.ticker.name == loadedCoin.ticker.name;
-                })) {
-                    self.coins.append(loadedCoin);
-                }
-            }
-            writeCoinArray();
-            self.tableVIew.reloadData();
-            // update the current coinList;
-            for coin in self.coins {
-                CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
-                    if let error = error {
-                        print(error.localizedDescription);
-                        print("no internet")
-                        return;
-                    } else {
-                        coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
-                        coin.ticker = ticker!;
-                        self?.isLoading = false;
-                        self?.tableVIew.reloadData();
-                        self?.writeCoinArray();
-                    }
+        }
+        writeCoinArray();
+        self.tableVIew.reloadData();
+        // update the current coinList;
+        for coin in self.coins {
+            CryptoData.getCoinData(id: coin.ticker.id) { [weak self] (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                    print("no internet")
+                    return;
+                } else {
+                    coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                    coin.ticker = ticker!;
+                    self?.isLoading = false;
+                    self?.tableVIew.reloadData();
+                    self?.writeCoinArray();
                 }
             }
         }
-        
     }
     
     private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
@@ -565,7 +563,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     self?.saveUserData();
                                 }
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
@@ -573,12 +571,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     self?.saveUserData();
                                 }
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                     self?.saveUserData();
                                 }
                             }
@@ -586,7 +584,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                             print("WAS 0, adding to userDefaults");
                             UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                                 self?.saveUserData();
                             }
                         }
@@ -626,9 +624,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
         if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
-            print("CURRENT USERNAME: \(currentUsername)");
+            self.displayAlert(title: "Current Username:\n", message: "\(currentUsername)")
         } else {
-            print("NO USER LOGGED IN!");
+            self.displayAlert(title: "Current Username:\n", message: "NO USER LOGGED IN");
         }
     }
     

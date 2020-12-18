@@ -41,6 +41,6 @@ public class UserDefaultKeys {
     public static let dailyReminder = "dailyReminder";
     
     // Username
-    public static let currentUsername = "username";
+    public static let currentUsername = "currentUsername";
     
 }
