@@ -26,7 +26,7 @@ public struct User : Codable {
 public class DatabaseManager {
     
     private static let db = Firestore.firestore();
-    private static let userServer = "users-dev";  // Test Server: users-dev
+    private static let userServer = "users";  // Test Server: users-dev
                                                   // Production Server: users
     
     
@@ -34,14 +34,14 @@ public class DatabaseManager {
     
     public static func writeObjects<T : Codable>(username:String, type: T, typeName:String, completion:@escaping(Error?) -> Void) -> Void {
         if let data = DataStorageHandler.encodeTypeIntoJSON(type: type) {
-            db.collection("users-dev").document(username).setData([typeName: data], merge: true, completion: completion);
+            db.collection(userServer).document(username).setData([typeName: data], merge: true, completion: completion);
         } else {
             print("The type inputted is nil! Not uploading to database");
         }
     }
     
     public static func getObjects<T : Codable>(username:String, type: T.Type, typeName:String, completion:@escaping(Any?, Error?) -> Void) -> Void {
-        db.collection("users-dev").getDocuments { (snapshot, error) in
+        db.collection(userServer).getDocuments { (snapshot, error) in
             if let error = error { print(error.localizedDescription) } else {
                 if let snapshot = snapshot {
                     for i in 0...snapshot.documents.count - 1 {

@@ -97,6 +97,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 self.tableVIew.reloadData();
             }
         }
+        
+        if (UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
+            NotificationManager.askPermission();
+        }
+        
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
         if (loadedCoins != nil) {
             if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime) && loadedCoins!.count == 1) {
@@ -508,11 +513,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
         let attributedText = NSMutableAttributedString(string: "$\(String(format: "%.2f", updatedMainPort))");
         if (priceChange > 0) {
-            attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.baselineOffset : 1]));
-            attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortUpArrow"), color: .green, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+            if (String(format: "%.2f", priceChange) != "0.00") {
+                attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.baselineOffset : 1]));
+                attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortUpArrow"), color: .green, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+            }
         } else if (priceChange < 0) {
-            attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.baselineOffset : 1]));
-            attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortDownArrow"), color: .red, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+            if (String(format: "%.2f", priceChange) != "-0.00") {
+                attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.baselineOffset : 1]));
+                attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortDownArrow"), color: .red, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
+            }
         }
         self.mainPortfolio_lbl.attributedText = attributedText;
     }
@@ -563,30 +572,22 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self?.saveUserData();
-                                }
+                                self?.retreiveUsernameAndUploadHoldings();
                             } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
                                 let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
                                 self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                                 UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self?.saveUserData();
-                                }
+                                self?.retreiveUsernameAndUploadHoldings();
                             } else {
                                 self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                    self?.saveUserData();
-                                }
+                                self?.retreiveUsernameAndUploadHoldings();
                             }
                         } else {
                             print("WAS 0, adding to userDefaults");
                             UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                                self?.saveUserData();
-                            }
+                            self?.retreiveUsernameAndUploadHoldings();
                         }
                     }
                     
@@ -610,10 +611,22 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             change = "\(String(format: "%.2f", self.portPercentChange * 100))%";
         }
         DatabaseManager.writeHighscoreAndHoldings(change: change) { (error) in
-            if let error = error { print("CANNOT UPLOAD HIGHSCORE AND HOLDINGS: \(error.localizedDescription)") } else {
+            if let error = error { print("CANNOT UPLOAD HIGHSCORE AND HOLDINGS: \(error.localizedDescription)"); } else {
                 print("Success!");
             }
         }
+    }
+    
+    private func retreiveUsernameAndUploadHoldings() -> Void {
+        if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.prevSignedInUser)) {
+            UserDefaults.standard.set(true, forKey: UserDefaultKeys.prevSignedInUser);
+            if (FirebaseAuth.Auth.auth().currentUser != nil) {
+                DatabaseManager.getUsername(email: FirebaseAuth.Auth.auth().currentUser!.email!) { [weak self] (username) in
+                    UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
+                    self?.saveUserData();
+                }
+            } else { DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { self.saveUserData(); } }
+        } else { DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { self.saveUserData(); } }
     }
     
     
@@ -623,11 +636,11 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
-        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
-            self.displayAlert(title: "Current Username:\n", message: "\(currentUsername)")
-        } else {
-            self.displayAlert(title: "Current Username:\n", message: "NO USER LOGGED IN");
-        }
+//        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
+//            self.displayAlert(title: "Current Username:\n", message: "\(currentUsername)")
+//        } else {
+//            self.displayAlert(title: "Current Username:\n", message: "NO USER LOGGED IN");
+//        }
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
