@@ -419,6 +419,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     DatabaseManager.getObjects(username: username, type: [Holding].self, typeName: "holdings") { [weak self] (object, error) in
                         if let error = error { print(error.localizedDescription); } else {
                             guard let holdings = object as? [Holding] else {
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortChange);
                                 self?.getCoinDataFromDisk();
                                 return;
                             }
@@ -427,6 +428,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinArrayKey);
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.holdingsKey);
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.coinKey);
+                                UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortChange);
                                 DataStorageHandler.saveObject(type: holdings, forKey: UserDefaultKeys.holdingsKey);
                                 var coins = Array<Coin>();
                                 let coin = Coin(ticker: holdings[0].ticker, image: Image(withImage: UIImage(named: "Images/" + "\(holdings[0].ticker.symbol.lowercased())" + ".png")!));
