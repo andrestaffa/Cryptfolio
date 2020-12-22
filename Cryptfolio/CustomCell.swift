@@ -15,7 +15,6 @@ protocol HomeCellDelgate: class {
 
 class CustomCell: UITableViewCell, ChartDelegate {
    
-    @IBOutlet weak var add_lbl: UILabel!
     weak var delegate: HomeCellDelgate?;
 
     let chartView: Chart = {
@@ -67,6 +66,12 @@ class CustomCell: UITableViewCell, ChartDelegate {
         return label;
     }();
     
+    let addSymbolImg: UIImageView = {
+        let image = UIImageView();
+        image.translatesAutoresizingMaskIntoConstraints = false;
+        return image;
+    }();
+    
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -77,6 +82,7 @@ class CustomCell: UITableViewCell, ChartDelegate {
         self.addSubview(self.name_lbl);
         self.addSubview(self.priceTxt);
         self.addSubview(self.container);
+        self.addSubview(self.addSymbolImg);
         self.container.addSubview(self.percentChangeTxt);
         
         let con:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? -10.0 : -5.0;
@@ -128,10 +134,17 @@ class CustomCell: UITableViewCell, ChartDelegate {
         self.percentChangeTxt.trailingAnchor.constraint(equalTo: self.container.trailingAnchor, constant: -5).isActive = true;
         self.percentChangeTxt.widthAnchor.constraint(equalTo: self.container.widthAnchor, multiplier: 0.9).isActive = true;
         self.percentChangeTxt.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
+        
+        self.addSymbolImg.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+        self.addSymbolImg.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15).isActive = true;
+        self.addSymbolImg.widthAnchor.constraint(equalToConstant: 17.5).isActive = true;
+        self.addSymbolImg.heightAnchor.constraint(equalToConstant: 17.5).isActive = true;
+        
     }
     
     override func prepareForReuse() {
         super.prepareForReuse();
+        self.addSymbolImg.isHidden = true;
         self.chartView.removeAllSeries();
     }
     

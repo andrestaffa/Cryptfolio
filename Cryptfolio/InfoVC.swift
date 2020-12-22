@@ -282,7 +282,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     private func setGoodDescription(ticker:Ticker) -> String {
-        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased()) {
+        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased() || ticker.name.lowercased() == "Litecoin".lowercased()) {
             let charset = CharacterSet(charactersIn: ".")
             let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
             var resultString = Array<String>();
@@ -482,9 +482,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 self?.timestamps = history!.timestamps;
                 self?.chartSetup(data: self!.dataPoints, isDay: false);
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
-                    self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                    self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                    if let max = self!.dataPoints.max() {
+                        self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", max))";
+                        self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                        self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
+                        self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                    }
                     self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
                     self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
                 }

@@ -148,17 +148,26 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         cell.delegate = self;
         if (self.loading) {
             SVProgressHUD.show(withStatus: "Loading...")
-            cell.chartView.isHidden = false;
+            cell.chartView.isHidden = true;
             cell.symbolLbl.isHidden = true;
             cell.name_lbl.isHidden = true;
             cell.crypto_img.isHidden = true;
-            cell.add_lbl.isHidden = true;
+            cell.symbolLbl.isHidden = true;
             cell.priceTxt.isHidden = true;
             cell.container.isHidden = true;
             cell.percentChangeTxt.isHidden = true;
         } else {
             SVProgressHUD.dismiss();
             if (self.isFiltering) {
+                cell.chartView.isHidden = false;
+                cell.symbolLbl.isHidden = false;
+                cell.name_lbl.isHidden = false;
+                cell.crypto_img.isHidden = false;
+                cell.priceTxt.isHidden = false;
+                cell.container.isHidden = false;
+                cell.percentChangeTxt.isHidden = false;
+                cell.addSymbolImg.isHidden = true;
+                if (self.isAdding) { self.displayAddingVC(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row); }
                 cell.symbolLbl.text = self.filterCoins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
@@ -179,13 +188,8 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 cell.priceTxt.isHidden = false;
                 cell.container.isHidden = false;
                 cell.percentChangeTxt.isHidden = false;
-                if (self.isAdding) {
-                    cell.chartView.isHidden = true;
-                    cell.priceTxt.isHidden = true;
-                    cell.container.isHidden = true;
-                    cell.percentChangeTxt.isHidden = true;
-                }
-                cell.add_lbl.isHidden = !self.isAdding;
+                cell.addSymbolImg.isHidden = true;
+                if (self.isAdding) { self.displayAddingVC(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row); }
                 cell.symbolLbl.text = self.coins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
@@ -210,6 +214,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         let infoVC = self.storyboard?.instantiateViewController(withIdentifier: "infoVC") as! InfoVC;
         if (self.isFiltering) {
             if (self.isAdding) {
+                if (self.userHasCoin(coinSet: self.filterCoins, indexPathRow: indexPath.row)) { self.alert(title: "Coin Already Added!", message: "You already have \(self.filterCoins[indexPath.row].ticker.name) in your dashboard"); return;  }
                 if let portfolioVC = self.portfolioVC {
                     portfolioVC.viewDidLoad();
                 }
@@ -221,6 +226,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
             if (self.isAdding) {
+                if (self.userHasCoin(coinSet: self.coins, indexPathRow: indexPath.row)) { self.alert(title: "Coin Already Added!", message: "You already have \(self.coins[indexPath.row].ticker.name) in your dashboard"); return; }
                 if let portfolioVC = self.portfolioVC {
                     portfolioVC.viewDidLoad();
                 }
@@ -272,6 +278,44 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             return priceChange >= 0 ? "+\(String(format: "%.2f", priceChange))" : "\(String(format: "%.2f", priceChange))";
         } else {
             return priceChange >= 0 ? "+\(String(format: "%.2f", priceChange))" : "\(String(format: "%.2f", priceChange))";
+        }
+    }
+    
+    private func displayAddingVC(cell:CustomCell, coinSet:Array<Coin>, indexPathRow:Int) -> Void {
+        cell.addSymbolImg.isHidden = false;
+        cell.chartView.isHidden = true;
+        cell.priceTxt.isHidden = true;
+        cell.container.isHidden = true;
+        cell.percentChangeTxt.isHidden = true;
+        if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+            if (loadedCoins.contains(where: { (coin) -> Bool in
+                return coin.ticker.symbol.lowercased() == coinSet[indexPathRow].ticker.symbol.lowercased();
+            })) {
+                cell.addSymbolImg.tintColor = .green;
+                cell.addSymbolImg.image = #imageLiteral(resourceName: "checkmark");
+            } else {
+                // set cell add image to plus sign
+                cell.addSymbolImg.tintColor = .orange;
+                cell.addSymbolImg.image = #imageLiteral(resourceName: "plus");
+            }
+        } else {
+            // set cell add image to plus sign
+            cell.addSymbolImg.tintColor = .orange;
+            cell.addSymbolImg.image = #imageLiteral(resourceName: "plus");
+        }
+    }
+    
+    private func userHasCoin(coinSet:Array<Coin>, indexPathRow:Int) -> Bool {
+        if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+            if (loadedCoins.contains(where: { (coin) -> Bool in
+                return coin.ticker.symbol.lowercased() == coinSet[indexPathRow].ticker.symbol.lowercased();
+            })) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
         }
     }
     

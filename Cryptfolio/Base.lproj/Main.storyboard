@@ -66,26 +66,7 @@
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mOD-cL-WPK" id="Cm8-8E-nOX">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="55"/>
                                     <autoresizingMask key="autoresizingMask"/>
-                                    <subviews>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Jv1-fp-AqL">
-                                            <rect key="frame" x="330" y="7" width="29" height="30"/>
-                                            <constraints>
-                                                <constraint firstAttribute="width" constant="29" id="Ik8-i3-I5F"/>
-                                                <constraint firstAttribute="height" constant="30" id="JNI-Nz-dgn"/>
-                                            </constraints>
-                                            <fontDescription key="fontDescription" type="system" pointSize="26"/>
-                                            <color key="textColor" systemColor="systemOrangeColor"/>
-                                            <nil key="highlightedColor"/>
-                                        </label>
-                                    </subviews>
-                                    <constraints>
-                                        <constraint firstAttribute="trailing" secondItem="Jv1-fp-AqL" secondAttribute="trailing" constant="16" id="4Vb-rO-Ykn"/>
-                                        <constraint firstItem="Jv1-fp-AqL" firstAttribute="top" secondItem="Cm8-8E-nOX" secondAttribute="top" constant="7" id="pAX-rN-FNb"/>
-                                    </constraints>
                                 </tableViewCellContentView>
-                                <connections>
-                                    <outlet property="add_lbl" destination="Jv1-fp-AqL" id="Ril-2f-ll4"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
