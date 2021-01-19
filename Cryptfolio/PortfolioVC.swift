@@ -408,9 +408,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     public func updateCells() -> Void {
-        if (!self.isLoading) {
-            self.isLoading = true;
-        }
+//        if (!self.isLoading) {
+//            self.isLoading = true;
+//        }
         if (UserDefaults.standard.bool(forKey: UserDefaultKeys.loginPressed)) {
             print("PRESSED LOGIN AND NOW DATA IS BEING RETRIEVED FROM THE DATABASE");
             UserDefaults.standard.set(false, forKey: UserDefaultKeys.loginPressed);
