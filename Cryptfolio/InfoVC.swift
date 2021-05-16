@@ -78,13 +78,15 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.navigationController?.navigationBar.prefersLargeTitles = true;
         self.navigationController?.navigationBar.shadowImage = nil;
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
-        
-        CryptoData.getCoinData(id: coin!.ticker.id) { [weak self] (ticker, error) in
-            if let error = error {
-                print(error.localizedDescription);
-            } else {
-                self?.coin!.ticker = ticker!;
-                self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
+        CryptoData.getCryptoID(coinSymbol: coin!.ticker.symbol.lowercased()) { (uuid, error) in
+            if let error = error { print(error.localizedDescription); return; }
+            CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    self?.coin!.ticker = ticker!;
+                    self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
+                }
             }
         }
     }
@@ -265,7 +267,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         //self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
         self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
         self.description_view.text = self.setGoodDescription(ticker: ticker);
-        self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.website.replacingOccurrences(of: "https://", with: "")));
+        self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.name));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/internet.png")!, title: "CryptoCompare", linkName: "cryptocompare.com/coins/" + "\(ticker.symbol.lowercased())" + "/forum"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/twitter.png")!, title: "Twitter", linkName: "twitter.com/hashtag/" + "\(ticker.name.lowercased())"));
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/InfoImages/chart.png")!, title: "Technical Charts", linkName: "cryptowat.ch/assets/" + "\(ticker.symbol.lowercased())"));
@@ -472,24 +474,27 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
         self.activityIndicator.startAnimating();
-        CryptoData.getCoinHistory(id: self.coin!.ticker.id, timeFrame: timeFrame) { [weak self] (history, error) in
-            if let error = error {
-                print(error.localizedDescription);
-            } else {
-                self?.chart_view.isHidden = false;
-                self?.activityIndicator.stopAnimating();
-                self?.dataPoints = history!.prices;
-                self?.timestamps = history!.timestamps;
-                self?.chartSetup(data: self!.dataPoints, isDay: false);
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    if let max = self!.dataPoints.max() {
-                        self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", max))";
-                        self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                        self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
-                        self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+        CryptoData.getCryptoID(coinSymbol: self.coin!.ticker.symbol.lowercased()) { (uuid, error) in
+            if let error = error { print(error.localizedDescription); return; }
+            CryptoData.getCoinHistory(id: uuid!, timeFrame: timeFrame) { [weak self] (history, error) in
+                if let error = error {
+                    print(error.localizedDescription);
+                } else {
+                    self?.chart_view.isHidden = false;
+                    self?.activityIndicator.stopAnimating();
+                    self?.dataPoints = history!.prices;
+                    self?.timestamps = history!.timestamps;
+                    self?.chartSetup(data: self!.dataPoints, isDay: false);
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        if let max = self!.dataPoints.max() {
+                            self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", max))";
+                            self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                            self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
+                            self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                        }
+                        self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
+                        self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
                     }
-                    self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
-                    self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
                 }
             }
         }

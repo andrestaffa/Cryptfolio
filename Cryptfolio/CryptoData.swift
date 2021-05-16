@@ -42,6 +42,10 @@ public struct PortfolioData : Codable {
     let currentDate:String;
 }
 
+public struct CoinMap : Codable {
+    var coinMap:Dictionary<String, String>;
+}
+
 public class CryptoData {
     
 //    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) {
@@ -78,8 +82,8 @@ public class CryptoData {
 //         }
 //     }
     
-    public static func getCoinHistory(id: Int, timeFrame:String, completion:@escaping (History?, Error?) -> Void) -> Void {
-        let url = URL(string: "https://api.coinranking.com/v1/public/coin/" + "\(id)" + "/history/" + "\(timeFrame)");
+    public static func getCoinHistory(id: String, timeFrame:String, completion:@escaping (History?, Error?) -> Void) -> Void {
+        let url = URL(string: "https://api.coinranking.com/v2/coin/\(id)/history?timePeriod=\(timeFrame)");
         if (url == nil) {
             print("error loading history, url was nil");
             return;
@@ -131,8 +135,8 @@ public class CryptoData {
         }
     }
     
-    public static func getCoinData(id: Int, completion:@escaping (Ticker?, Error?) -> Void) -> Void {
-        let url = URL(string: "https://api.coinranking.com/v1/public/coin/" + "\(id)");
+    public static func getCoinData(id: String, completion:@escaping (Ticker?, Error?) -> Void) -> Void {
+        let url = URL(string: "https://api.coinranking.com/v2/coin/\(id)");
         if (url == nil) {
             return;
         }
@@ -142,22 +146,30 @@ public class CryptoData {
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
                 let coin:Dictionary = data["coin"] as! Dictionary<String, Any>;
                 // get properties
-                let id = coin["id"] as! Int;
+                let id = 9999;
                 let name = coin["name"] as? String;
                 let symbol = coin["symbol"] as? String;
                 let rank = coin["rank"] as? Int;
                 let priceString = coin["price"] as? String;
+                let changeString =  coin["change"] as? String;
+                let volumeString = coin["24hVolume"] as? String;
+                let marketCapString = coin["marketCap"] as? String;
                 let price  = Double(priceString ?? "0.0");
-                let change =  coin["change"] as? Double;
-                let volume = coin["volume"] as? Double;
-                let marketCap = coin["marketCap"] as? Double;
-                let circulation = coin["circulatingSupply"] as? Double;
+                let change = Double(changeString ?? "0.0");
+                let volume = Double(volumeString ?? "0.0");
+                let marketCap = Double(marketCapString ?? "0.0");
+                let supply = coin["supply"] as? Dictionary<String, Any>;
+                var circulation:Double = 0.0;
+                if let supply = supply {
+                    let circulationString = supply["circulating"] as? String;
+                    circulation = Double(circulationString ?? "0.0")!;
+                }
                 let description = coin["description"] as? String;
                 let website = coin["websiteUrl"] as? String;
                 let allTimeHigh = coin["allTimeHigh"] as! Dictionary<String, Any>;
                 let allTimeHighPriceString = allTimeHigh["price"] as? String
                 let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
-                let history24hString = coin["history"] as? [String?];
+                let history24hString = coin["sparkline"] as? [String?];
                 var historyDouble = [Double]();
                 if (history24hString != nil) {
                     for priceString in history24hString! {
@@ -168,7 +180,7 @@ public class CryptoData {
                 } else {
                     historyDouble = [Double]();
                 }
-                let ticker = Ticker(id: id, name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: circulation ?? 0.0, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
+                let ticker = Ticker(id: id, name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: circulation, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
                 completion(ticker, nil);
             } else if let error = response.error {
                 completion(nil, error);
@@ -177,7 +189,7 @@ public class CryptoData {
     }
     
     public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) -> Void {
-        let url = URL(string: "https://api.coinranking.com/v1/public/coins?limit=100");
+        let url = URL(string: "https://api.coinranking.com/v2/coins?limit=100");
         if (url == nil) {
             return;
         }
@@ -187,22 +199,19 @@ public class CryptoData {
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
                 let coins = data["coins"] as! [[String: Any]];
                 for i in 0...coins.count - 1 {
-                    let id = coins[i]["id"] as! Int;
+                    let id = 9999;
                     let name = coins[i]["name"] as? String;
                     let symbol = coins[i]["symbol"] as? String;
                     let rank = coins[i]["rank"] as? Int;
                     let priceString = coins[i]["price"] as? String;
+                    let changeString =  coins[i]["change"] as? String;
+                    let volumeString = coins[i]["24hVolume"] as? String;
+                    let marketCapString = coins[i]["marketCap"] as? String;
                     let price  = Double(priceString ?? "0.0");
-                    let change =  coins[i]["change"] as? Double;
-                    let volume = coins[i]["volume"] as? Double;
-                    let marketCap = coins[i]["marketCap"] as? Double;
-                    let circulation = coins[i]["circulatingSupply"] as? Double;
-                    let description = coins[i]["description"] as? String;
-                    let website = coins[i]["websiteUrl"] as? String;
-                    let allTimeHigh = coins[i]["allTimeHigh"] as! Dictionary<String, Any>;
-                    let allTimeHighPriceString = allTimeHigh["price"] as? String
-                    let allTimeHighPriceDouble = Double(allTimeHighPriceString ?? "0.0");
-                    let history24hString = coins[i]["history"] as? [String?];
+                    let change = Double(changeString ?? "0.0");
+                    let volume = Double(volumeString ?? "0.0");
+                    let marketCap = Double(marketCapString ?? "0.0");
+                    let history24hString = coins[i]["sparkline"] as? [String?];
                     var historyDouble = [Double]();
                     if (history24hString != nil) {
                         for priceString in history24hString! {
@@ -213,8 +222,47 @@ public class CryptoData {
                     } else {
                         historyDouble = [Double]();
                     }
-                    let ticker = Ticker(id: id, name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: circulation ?? 0.0, description: description ?? "No Description Available", website: website ?? "No Website Available", allTimeHigh: allTimeHighPriceDouble!, history24h: historyDouble)
+                    let ticker = Ticker(id: id, name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: 0.0, description: "No Description Available", website: "No Website Available", allTimeHigh: 0.0, history24h: historyDouble)
                     completion(ticker, nil);
+                }
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
+    
+    public static func getCryptoID(coinSymbol:String, completion:@escaping (String?, Error?) -> Void) -> Void {
+        if let coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
+            if let uuid = coinMap.coinMap[coinSymbol] {
+                completion(uuid, nil);
+                return;
+            }
+        }
+        let url = URL(string: "https://api.coinranking.com/v2/coins?limit=100");
+        if (url == nil) {
+            print("URL IS NIL");
+            return;
+        }
+        AF.request(url!).responseJSON { response in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
+                let coins = data["coins"] as! [[String: Any]];
+                for i in 0...coins.count - 1 {
+                    let symbol = coins[i]["symbol"] as! String;
+                    if (symbol.lowercased() == coinSymbol.lowercased()) {
+                        let uuid = coins[i]["uuid"] as! String;
+                        if var coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
+                            coinMap.coinMap[coinSymbol] = uuid;
+                            DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                        } else {
+                            var coinMap:CoinMap = CoinMap(coinMap: Dictionary<String, String>());
+                            coinMap.coinMap[coinSymbol] = uuid;
+                            DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                        }
+                        completion(uuid, nil);
+                        break;
+                    }
                 }
             } else if let error = response.error {
                 completion(nil, error);

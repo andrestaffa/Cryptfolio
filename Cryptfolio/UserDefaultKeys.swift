@@ -20,6 +20,7 @@ public class UserDefaultKeys {
     public static let mainPortChange = "mainPortChange";
     public static let cumulativeAdMoney = "cumulativeAdMoney";
     public static let loginPressed = "loginPressed";
+    public static let coinMap = "coinMap";
     
     // Investing Tips
     public static let affectUsers = "affectedUsers";
