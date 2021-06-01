@@ -7,7 +7,7 @@ target 'Cryptfolio' do
   pod 'SVProgressHUD'
   pod 'SwiftChart'
   pod 'Alamofire', '~> 5.0'
-  pod 'IronSourceSDK','7.0.3.0'
+  pod 'IronSourceSDK','7.1.6.0'
   pod 'CryptoSwift'
   pod 'Firebase/Analytics'
   pod 'Firebase/Auth'

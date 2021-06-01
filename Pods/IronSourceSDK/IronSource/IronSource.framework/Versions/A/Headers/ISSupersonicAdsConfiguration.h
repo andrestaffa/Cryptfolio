@@ -4,7 +4,7 @@
 
 @interface ISSupersonicAdsConfiguration : NSObject
 
-@property (nonatomic, assign)   NSNumber        *useClientSideCallbacks;
+@property (nonatomic, strong)   NSNumber        *useClientSideCallbacks;
 @property (nonatomic, strong)   NSString        *language;
 @property (nonatomic, strong)   NSString        *minimumOfferCommission;
 @property (nonatomic, strong)   NSDictionary    *controllerConfig;

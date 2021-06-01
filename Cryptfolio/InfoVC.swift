@@ -54,6 +54,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var view4: UIView!
     @IBOutlet weak var view5: UIView!
     @IBOutlet weak var view6: UIView!
+    @IBOutlet weak var infoTableViewYConstraint: NSLayoutConstraint!
     
     private var circleView:UIView = UIView();
     private var prevIndex:Int = 0;
@@ -86,6 +87,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 } else {
                     self?.coin!.ticker = ticker!;
                     self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
+                    if (self!.description_view.text == "No Description Available.") {
+                        self?.infoTableViewYConstraint.constant = 180.0;
+                        self?.description_view.isHidden = true;
+                    } else {
+                        self?.infoTableViewYConstraint.constant = 225.0;
+                        self?.description_view.isHidden = false;
+                    }
                 }
             }
         }
@@ -204,7 +212,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 let safariVC = SFSafariViewController(url: url)
                 self.present(safariVC, animated: true, completion: nil);
             } else {
-                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+                self.displayAlert(title: "Sorry", message: "Website unavailable.");
             }
             break;
         case 1:
@@ -212,7 +220,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 let safariVC = SFSafariViewController(url: url)
                 self.present(safariVC, animated: true, completion: nil);
             } else {
-                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+                self.displayAlert(title: "Sorry", message: "Website unavailable.");
             }
             break;
         case 2:
@@ -220,7 +228,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 let safariVC = SFSafariViewController(url: url)
                 self.present(safariVC, animated: true, completion: nil);
             } else {
-                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+                self.displayAlert(title: "Sorry", message: "Website unavailable.");
             }
             break;
         case 3:
@@ -228,7 +236,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 let safariVC = SFSafariViewController(url: url)
                 self.present(safariVC, animated: true, completion: nil);
             } else {
-                self.displayAlert(title: "Sorry", message: "The URL is either broken or does not exist");
+                self.displayAlert(title: "Sorry", message: "Website unavailable.");
             }
             break;
         default:
@@ -284,7 +292,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     private func setGoodDescription(ticker:Ticker) -> String {
-        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased() || ticker.name.lowercased() == "Litecoin".lowercased()) {
+        if (ticker.name.lowercased() == "Bitcoin".lowercased() || ticker.name.lowercased() == "Tether USD".lowercased() || ticker.name.lowercased() == "Bitcoin SV".lowercased() || ticker.name.lowercased() == "Ontology".lowercased() || ticker.name.lowercased() == "NEO".lowercased() || ticker.name.lowercased() == "Litecoin".lowercased() || ticker.symbol.lowercased() == "matic") {
             let charset = CharacterSet(charactersIn: ".")
             let arr = ticker.description.replacingOccurrences(of: "<[^>]+>", with: "", options: .regularExpression, range: nil).components(separatedBy: charset)
             var resultString = Array<String>();
@@ -510,10 +518,18 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chart_view.labelColor = UIColor.white;
         let series = ChartSeries(data);
         series.area = true;
-        if (!((data.first?.isLess(than: data.last!))!) || self.change_lbl.text!.first == "-") {
-            series.color = ChartColors.redColor();
+        if (isDay) {
+            if (!((data.first?.isLess(than: data.last!))!) || self.change_lbl.text!.first == "-") {
+                series.color = ChartColors.redColor();
+            } else {
+                series.color = ChartColors.greenColor();
+            }
         } else {
-            series.color = ChartColors.greenColor();
+            if (!((data.first?.isLess(than: data.last!))!)) {
+                series.color = ChartColors.redColor();
+            } else {
+                series.color = ChartColors.greenColor();
+            }
         }
         if (self.price_lbl.text!.first == "-") { series.color = ChartColors.greenColor(); }
         self.chart_view.showXLabelsAndGrid = false;

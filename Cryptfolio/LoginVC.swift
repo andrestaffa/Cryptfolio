@@ -9,7 +9,7 @@
 import UIKit;
 import FirebaseAuth;
 
-class LoginVC: UIViewController {
+class LoginVC: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var email_txt: UITextField!
     @IBOutlet weak var password_txt: UITextField!
@@ -45,8 +45,8 @@ class LoginVC: UIViewController {
         self.signUp_btn.setTitleColor(.orange, for: .highlighted);
         self.email_txt.keyboardType = .emailAddress;
         self.password_txt.isSecureTextEntry = true;
-        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0);
-        self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
+        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0, color: .lightGray);
+        self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
         
         // add cancel and doner buttons on keyboard
         self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
@@ -60,6 +60,9 @@ class LoginVC: UIViewController {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tappedScreen));
         self.view.addGestureRecognizer(tap);
+        
+        self.email_txt.delegate = self;
+        self.password_txt.delegate = self;
         
     }
     
@@ -120,7 +123,7 @@ class LoginVC: UIViewController {
         button.layer.borderColor = borderColor;
     }
     
-    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat) {
+    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat, color:UIColor) {
         var tempImage:UIImage = image;
         textField.leftViewMode = .always;
         textField.backgroundColor = .clear;
@@ -128,7 +131,7 @@ class LoginVC: UIViewController {
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
         bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
-        bottomLine.backgroundColor = UIColor.white.cgColor;
+        bottomLine.backgroundColor = color.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);
         let imageView = UIImageView();
@@ -165,6 +168,35 @@ class LoginVC: UIViewController {
         self.createAccont_lbl.isUserInteractionEnabled = isUserInteractionEnabled;
         self.signUp_btn.isUserInteractionEnabled = isUserInteractionEnabled;
         
+    }
+    
+    @objc private func hideKeyboard() -> Void { self.view.endEditing(true); }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool { textField.resignFirstResponder(); return true; }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0, color: .orange);
+            break;
+        case self.password_txt:
+            self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .orange);
+            break;
+        default:
+            break;
+        }
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15, height: 15.0, color: .lightGray);
+            break;
+        case self.password_txt:
+            self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
+            break;
+        default:
+            break;
+        }
     }
     
 }

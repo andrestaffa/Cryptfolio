@@ -188,7 +188,7 @@ public class CryptoData {
         }
     }
     
-    public static func getCryptoData(completion:@escaping (Ticker?, Error?) -> Void) -> Void {
+    public static func getCryptoData(completion:@escaping (Array<Ticker>?, Error?) -> Void) -> Void {
         let url = URL(string: "https://api.coinranking.com/v2/coins?limit=100");
         if (url == nil) {
             return;
@@ -198,6 +198,7 @@ public class CryptoData {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
                 let coins = data["coins"] as! [[String: Any]];
+                var tickerList:Array<Ticker> = Array<Ticker>();
                 for i in 0...coins.count - 1 {
                     let id = 9999;
                     let name = coins[i]["name"] as? String;
@@ -223,8 +224,9 @@ public class CryptoData {
                         historyDouble = [Double]();
                     }
                     let ticker = Ticker(id: id, name: name ?? "No Name", symbol: symbol ?? "No symbol", rank: rank ?? 0, price: price!, changePrecent24H: change ?? 0.0, volume24H: volume ?? 0.0, marketCap: marketCap ?? 0.0, circulation: 0.0, description: "No Description Available", website: "No Website Available", allTimeHigh: 0.0, history24h: historyDouble)
-                    completion(ticker, nil);
+                    tickerList.append(ticker);
                 }
+                completion(tickerList, nil);
             } else if let error = response.error {
                 completion(nil, error);
             }
@@ -234,6 +236,7 @@ public class CryptoData {
     public static func getCryptoID(coinSymbol:String, completion:@escaping (String?, Error?) -> Void) -> Void {
         if let coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
             if let uuid = coinMap.coinMap[coinSymbol] {
+                print("CACHED!!");
                 completion(uuid, nil);
                 return;
             }
@@ -290,6 +293,18 @@ public class CryptoData {
         }
         arrayOfStrings = [String()];
         return arrayOfStrings;
+    }
+    
+    public static func styleTextField(textField: UITextField, width:CGFloat, color:UIColor) {
+        let bottomLine = CALayer();
+        bottomLine.frame = CGRect(x: 0.0, y: 30.0, width: width, height: 1.0);
+        bottomLine.backgroundColor = color.cgColor;
+        textField.borderStyle = .none;
+        textField.layer.addSublayer(bottomLine);
+    }
+    
+    public static func styleTextFieldsOnEditing(textField:UITextField, width:CGFloat, weight:UIFont.Weight, color:UIColor, labelColor:UIColor) -> Void {
+        self.styleTextField(textField: textField, width: width, color: color);
     }
     
 }

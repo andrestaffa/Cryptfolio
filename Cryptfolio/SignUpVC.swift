@@ -9,7 +9,7 @@
 import UIKit;
 import FirebaseAuth;
 
-class SignUpVC: UIViewController {
+class SignUpVC: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var username_txt: UITextField!
     @IBOutlet weak var email_txt: UITextField!
@@ -43,10 +43,10 @@ class SignUpVC: UIViewController {
         self.email_txt.keyboardType = .emailAddress;
         self.password_txt.isSecureTextEntry = true;
         self.confirmPassword_txt.isSecureTextEntry = true;
-        self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0);
-        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0);
-        self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
-        self.styleTextField(textField: &self.confirmPassword_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0);
+        self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0, color: .lightGray);
+        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .lightGray);
+        self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
+        self.styleTextField(textField: &self.confirmPassword_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
         
         self.username_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneUsernameButtonTapped)), onCancel: (target: self, action: #selector(self.cancelUsernameButtonTapped)), doneName: "Done");
         self.email_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(self.doneEmailButtonTapped)), onCancel: (target: self, action: #selector(self.cancelEmailButtonTapped)), doneName: "Done");
@@ -58,6 +58,11 @@ class SignUpVC: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(tappedScreen));
         self.view.addGestureRecognizer(tap);
         self.signIn_btn.addTarget(self, action: #selector(signInTapped), for: .touchUpInside);
+        
+        self.username_txt.delegate = self;
+        self.email_txt.delegate = self;
+        self.password_txt.delegate = self;
+        self.confirmPassword_txt.delegate = self;
 
     }
     
@@ -134,7 +139,7 @@ class SignUpVC: UIViewController {
         button.layer.borderColor = borderColor;
     }
     
-    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat) {
+    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat, color:UIColor) {
         var tempImage:UIImage = image;
         textField.leftViewMode = .always;
         textField.backgroundColor = .clear;
@@ -142,7 +147,7 @@ class SignUpVC: UIViewController {
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
         bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
-        bottomLine.backgroundColor = UIColor.white.cgColor;
+        bottomLine.backgroundColor = color.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);
         let imageView = UIImageView();
@@ -177,6 +182,47 @@ class SignUpVC: UIViewController {
         self.email_txt.isUserInteractionEnabled = isUserInteractionEnabled;
         self.signUp_btn.isUserInteractionEnabled = isUserInteractionEnabled;
         self.signIn_btn.isUserInteractionEnabled = isUserInteractionEnabled;
+    }
+    
+    @objc private func hideKeyboard() -> Void { self.view.endEditing(true); }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool { textField.resignFirstResponder(); return true; }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.username_txt:
+            self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0, color: .orange);
+            break;
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .orange);
+            break;
+        case self.password_txt:
+            self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .orange);
+            break;
+        case self.confirmPassword_txt:
+            self.styleTextField(textField: &self.confirmPassword_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .orange);
+            break;
+        default:
+            break;
+        }
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.username_txt:
+            self.styleTextField(textField: &self.username_txt, image: #imageLiteral(resourceName: "username"), width: 16.0, height: 16.0, color: .lightGray);
+            break;
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .lightGray);
+            break;
+        case self.password_txt:
+            self.styleTextField(textField: &self.password_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
+            break;
+        case self.confirmPassword_txt:
+            self.styleTextField(textField: &self.confirmPassword_txt, image: #imageLiteral(resourceName: "password"), width: 16.0, height: 16.0, color: .lightGray);
+            break;
+        default:
+            break;
+        }
     }
     
 

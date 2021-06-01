@@ -93,15 +93,14 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         if (!self.loading) {
             self.loading = true;
         }
-        CryptoData.getCryptoData { [weak self] (ticker, error) in
+        CryptoData.getCryptoData { [weak self] (tickerList, error) in
             if let error = error {
                 print(error.localizedDescription)
             } else {
-                let imageUI = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")
-                if (imageUI != nil) {
-                    if (ticker!.name != "Matic Network") {
-                        let image = Image(withImage: imageUI!);
-                        self?.coins.append(Coin(ticker: ticker!, image: image));
+                for ticker in tickerList! {
+                    if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
+                        let image = Image(withImage: imageUI);
+                        self?.coins.append(Coin(ticker: ticker, image: image));
                         if (self!.counter < 2) {
                             self?.prevLength = (self!.coins.count);
                         }

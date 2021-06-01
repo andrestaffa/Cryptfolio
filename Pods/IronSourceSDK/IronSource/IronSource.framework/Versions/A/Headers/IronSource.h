@@ -26,6 +26,8 @@
 #import "ISDemandOnlyInterstitialDelegate.h"
 #import "ISBannerSize.h"
 #import "ISImpressionDataDelegate.h"
+#import "ISConsentViewDelegate.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 #define IS_REWARDED_VIDEO @"rewardedvideo"
@@ -33,8 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 #define IS_OFFERWALL @"offerwall"
 #define IS_BANNER @"banner"
 
-static NSString * const MEDIATION_SDK_VERSION     = @"7.0.3";
-static NSString * GitHash = @"a9007ede8";
+static NSString * const MEDIATION_SDK_VERSION     = @"7.1.6";
+static NSString * GitHash = @"f336b2841";
+
+/*
+    This constant is for sending an external impression data from mopub
+*/
+static NSString * const DataSource_MOPUB     = @"MoPub";
+
 
 @interface IronSource : NSObject
 
@@ -480,10 +488,72 @@ static NSString * GitHash = @"a9007ede8";
  @param delegate The 'ISImpressionDataDelegate' for IronSource to send callbacks to.
  */
 
-+ (void)setImpressionDataDelegate:(id<ISImpressionDataDelegate>)delegate;
++ (void)setImpressionDataDelegate:(id<ISImpressionDataDelegate>)delegate __attribute__((deprecated("This method has been deprecated and won’t be included in ironSource SDK versions 7.2.0 and above. Please use addImpressionDataDelegate instead.")));
+
+/**
+ @abstract Adds the delegate for impression data callbacks.
+
+ @param delegate The 'ISImpressionDataDelegate' for IronSource to send callbacks to.
+ */
+
+
++ (void)addImpressionDataDelegate:(id<ISImpressionDataDelegate>)delegate;
+
+/**
+ @abstract Ad revenue data
+ 
+ @param dataSource the external source id from which the impression data is sent.
+ @param impressionData the impression data
+
+ */
++ (void)setAdRevenueDataWithDataSource:(NSString *)dataSource
+                        impressionData:(NSData *)impressionData;
+
+
+
+/**
+ @abstract Removes  the delegate from impression data callbacks.
+
+ @param delegate The 'ISImpressionDataDelegate' for IronSource to send callbacks to.
+ */
+
++ (void)removeImpressionDataDelegate:(id<ISImpressionDataDelegate>)delegate;
+
+
+#pragma mark - Consent View
+
+/**
+ @abstract Sets the delegate for consent view callbacks.
+ 
+ @param delegate The 'ISConsentViewDelegate' for IronSource to send callbacks to.
+ */
++ (void)setConsentViewWithDelegate:(id<ISConsentViewDelegate>)delegate;
+
+/**
+ @abstract Load consent view.
+ 
+ @param consentViewType The type of the view (pre/post).
+ */
++ (void)loadConsentViewWithType:(NSString *)consentViewType;
+
+/**
+ @abstract Show consent view after load.
+ 
+ @param consentViewType The type of the view (pre/post).
+ */
++ (void)showConsentViewWithViewController:(UIViewController *)viewController andType:(NSString *)consentViewType;
+
+
+#pragma mark - Conversion Value (CV)
+
+/**
+ @abstract get current conversion value
+*/
++ (NSNumber *)getConversionValue;
 
 @end
 
 NS_ASSUME_NONNULL_END
+
 
 #endif

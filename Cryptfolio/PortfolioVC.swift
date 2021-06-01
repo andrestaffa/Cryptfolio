@@ -393,13 +393,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
        
     private func getTickerData() -> Void {
-        CryptoData.getCryptoData { [weak self] (ticker, error) in
+        CryptoData.getCryptoData { [weak self] (tickerList, error) in
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                if (ticker!.name != "Matic Network") {
-                    if let imageUI = UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png") {
-                        self?.tickers.append(Coin(ticker: ticker!, image: Image(withImage: imageUI)));
+                for ticker in tickerList! {
+                    if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
+                        self?.tickers.append(Coin(ticker: ticker, image: Image(withImage: imageUI)));
                         self?.collectionView.reloadData();
                     }
                 }

@@ -102,6 +102,14 @@ Check out [CONTRIBUTING.md](CONTRIBUTING.md) for more information on how to help
 
 ## Installation
 
+### Hardened Runtime (macOS) and Xcode
+
+Binary CryptoSwift.xcframework (Used by Swift Package Manager package integration) won't load properly in your app if the app uses **Sign to Run Locally**  Signing Certificate with Hardened Runtime enabled. It is possible to setup Xcode like this. To solve the problem you have two options:
+- Use proper Signing Certificate, eg. *Development* <- this is the proper action
+- Use `Disable Library Validation` aka `com.apple.security.cs.disable-library-validation` entitlement
+
+#### Xcode Project
+
 To install CryptoSwift, add it as a submodule to your project (on the top level project directory):
 
     git submodule add https://github.com/krzyzanowskim/CryptoSwift.git
@@ -113,7 +121,7 @@ It is recommended to enable [Whole-Module Optimization](https://swift.org/blog/w
 You can use [Swift Package Manager](https://swift.org/package-manager/) and specify dependency in `Package.swift` by adding this:
 
 ```swift
-.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.3.5"))
+.package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMinor(from: "1.4.0"))
 ```
 
 See: [Package.swift - manual](http://blog.krzyzanowskim.com/2016/08/09/package-swift-manual/)
@@ -125,7 +133,7 @@ Notice: Swift Package Manager uses debug configuration for debug Xcode build, th
 You can use [CocoaPods](https://cocoapods.org/pods/CryptoSwift).
 
 ```ruby
-pod 'CryptoSwift', '~> 1.3.5'
+pod 'CryptoSwift', '~> 1.4.0'
 ```
 
 Bear in mind that CocoaPods will build CryptoSwift without [Whole-Module Optimization](https://swift.org/blog/whole-module-optimizations/) that may impact performance. You can change it manually after installation, or use [cocoapods-wholemodule](https://github.com/jedlewison/cocoapods-wholemodule) plugin.
@@ -144,7 +152,7 @@ Run `carthage` to build the framework and drag the built CryptoSwift.framework i
 #### XCFramework
 
 XCFrameworks require Xcode 11 or later and they can be integrated similarly to how we’re used to integrating the `.framework` format.
-Please us a script [scripts/build-framework.sh](scripts/build-framework.sh) to generate binary `CryptoSwift.xcframework` archive that you can use as a dependency in Xcode.
+Please use script [scripts/build-framework.sh](scripts/build-framework.sh) to generate binary `CryptoSwift.xcframework` archive that you can use as a dependency in Xcode.
 
 CryptoSwift.xcframework is a Release (Optimized) binary that offer best available Swift code performance.
 
@@ -241,13 +249,13 @@ bytes.toBase64()
 Hashing a data or array of bytes (aka `Array<UInt8>`)
 ```swift
 /* Hash struct usage */
-let bytes:Array<UInt8> = [0x01, 0x02, 0x03]
+let bytes: Array<UInt8> = [0x01, 0x02, 0x03]
 let digest = input.md5()
 let digest = Digest.md5(bytes)
 ```
 
 ```swift
-let data = Data( [0x01, 0x02, 0x03])
+let data = Data([0x01, 0x02, 0x03])
 
 let hash = data.md5()
 let hash = data.sha1()
@@ -285,7 +293,7 @@ data.crc32()
 
 ```swift
 // Calculate Message Authentication Code (MAC) for message
-let key:Array<UInt8> = [1,2,3,4,5,6,7,8,9,10,...]
+let key: Array<UInt8> = [1,2,3,4,5,6,7,8,9,10,...]
 
 try Poly1305(key: key).authenticate(bytes)
 try HMAC(key: key, variant: .sha256).authenticate(bytes)
@@ -450,7 +458,7 @@ let encrypted: Array<UInt8> = try! AES(key: Array("secret0key000000".utf8), bloc
 Using convenience extensions
 
 ```swift
-let plain = Data( [0x01, 0x02, 0x03])
+let plain = Data([0x01, 0x02, 0x03])
 let encrypted = try! plain.encrypt(ChaCha20(key: key, iv: iv))
 let decrypted = try! encrypted.decrypt(ChaCha20(key: key, iv: iv))
 ```

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TradeVC: UIViewController {
+class TradeVC: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var orderSummary_lbl: UILabel!
     @IBOutlet weak var marketPrice_lbl: UILabel!
@@ -92,6 +92,8 @@ class TradeVC: UIViewController {
             self.ownedAmountCoin_txt.text = "";
         }
         
+        CryptoData.styleTextField(textField: self.amount_txt, width: self.amount_txt.frame.width * 0.9, color: .lightGray);
+        self.amount_txt.delegate = self;
     }
     
     override func viewDidLoad() {
@@ -102,7 +104,7 @@ class TradeVC: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard));
         self.view.addGestureRecognizer(tap);
         
-        self.amount_txt.backgroundColor = .black;
+        //self.amount_txt.backgroundColor = .black;
         self.amount_txt.addDoneCancelToolbar(onDone: (target: self, action: #selector(doneButtonTappedForMyNumericTextField)), onCancel: (target: self, action: #selector(self.cancelButtonTappedForMyNumericTextField)), doneName: "Done");
         self.amount_txt.addTarget(self, action: #selector(self.amountTextDidChange), for: .editingChanged);
         
@@ -130,6 +132,10 @@ class TradeVC: UIViewController {
         self.marketPrice_lbl.adjustsFontSizeToFitWidth = true;
         self.cost_lbl.adjustsFontSizeToFitWidth = true;
         
+        self.addLeftImage(textfield: self.amount_txt, image: UIImage(named: "dollar24")!);
+        CryptoData.styleTextField(textField: self.amount_txt, width: self.view.frame.width * 0.9, color: .lightGray);
+        self.amount_txt.font = UIFont.systemFont(ofSize: 16.0);
+        
     }
     
     @objc func amountTextDidChange() {
@@ -143,6 +149,7 @@ class TradeVC: UIViewController {
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
         alertController.addAction(UIAlertAction(title: "Switch", style: UIAlertAction.Style.default, handler: { [weak self] (action) in
             self?.isUSDAmount = !self!.isUSDAmount;
+            self?.addLeftImage(textfield: self!.amount_txt, image: (self!.isUSDAmount ? UIImage(named: "dollar24")! : UIImage(named: "Images/\(self!.ticker!.symbol.lowercased()).png"))!)
             self?.setUpVC();
             self?.amount_txt.text = "";
         }))
@@ -152,14 +159,16 @@ class TradeVC: UIViewController {
     @IBAction func fiveTapped(_ sender: Any) {
         self.vibrate(style: .medium);
         if (self.cost_lbl.text == "$ - " || self.cost_lbl.text == " - ") {
-            let newAmountOfCoin = self.isUSDAmount ? 500.0 : 500.00 / self.ticker!.price;
-            self.amount_txt.text = String(newAmountOfCoin);
+            let newAmountOfCoin = self.isUSDAmount ? 500.00 : 500.00 / self.ticker!.price;
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", newAmountOfCoin) : String(newAmountOfCoin);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         } else {
-            var temp:String = self.isUSDAmount ? self.amount_txt.text! : self.cost_lbl.text!;
+            var temp:String = self.isUSDAmount ? self.amount_txt.text!.replacingOccurrences(of: ",", with: "") : self.cost_lbl.text!;
             if (!self.isUSDAmount) { temp.removeFirst(); }
             let combinedDouble = self.isUSDAmount ? (Double(temp)! + 500.0) : (Double(temp)! + 500.0) / ticker!.price;
-            self.amount_txt.text = String(combinedDouble)
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", combinedDouble) : String(combinedDouble);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         }
     }
@@ -167,13 +176,15 @@ class TradeVC: UIViewController {
         self.vibrate(style: .medium);
         if (self.cost_lbl.text == "$ - " || self.cost_lbl.text == " - ") {
             let newAmountOfCoin = self.isUSDAmount ? 1000.0 : 1000.00 / self.ticker!.price;
-            self.amount_txt.text = String(newAmountOfCoin);
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", newAmountOfCoin) : String(newAmountOfCoin);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         } else {
-            var temp:String = self.isUSDAmount ? self.amount_txt.text! : self.cost_lbl.text!;
+            var temp:String = self.isUSDAmount ? self.amount_txt.text!.replacingOccurrences(of: ",", with: "") : self.cost_lbl.text!;
             if (!self.isUSDAmount) { temp.removeFirst(); }
             let combinedDouble = self.isUSDAmount ? (Double(temp)! + 1000.0) : (Double(temp)! + 1000.00) / ticker!.price;
-            self.amount_txt.text = String(combinedDouble)
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", combinedDouble) : String(combinedDouble);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         }
     }
@@ -181,13 +192,15 @@ class TradeVC: UIViewController {
         self.vibrate(style: .medium);
         if (self.cost_lbl.text == "$ - " || self.cost_lbl.text == " - ") {
             let newAmountOfCoin = self.isUSDAmount ? 5000.0 : 5000.00 / self.ticker!.price;
-            self.amount_txt.text = String(newAmountOfCoin);
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", newAmountOfCoin) : String(newAmountOfCoin);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         } else {
-            var temp:String = self.isUSDAmount ? self.amount_txt.text! : self.cost_lbl.text!;
+            var temp:String = self.isUSDAmount ? self.amount_txt.text!.replacingOccurrences(of: ",", with: "") : self.cost_lbl.text!;
             if (!self.isUSDAmount) { temp.removeFirst(); }
             let combinedDouble = self.isUSDAmount ? (Double(temp)! + 5000.0) : (Double(temp)! + 5000.00) / ticker!.price;
-            self.amount_txt.text = String(combinedDouble)
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", combinedDouble) : String(combinedDouble);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         }
     }
@@ -195,13 +208,15 @@ class TradeVC: UIViewController {
         self.vibrate(style: .medium);
         if (self.cost_lbl.text == "$ - " || self.cost_lbl.text == " - ") {
             let newAmountOfCoin = self.isUSDAmount ? 10000.0 : 10000.00 / self.ticker!.price;
-            self.amount_txt.text = String(newAmountOfCoin);
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", newAmountOfCoin) : String(newAmountOfCoin);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         } else {
-            var temp:String = self.isUSDAmount ? self.amount_txt.text! : self.cost_lbl.text!;
+            var temp:String = self.isUSDAmount ? self.amount_txt.text!.replacingOccurrences(of: ",", with: "") : self.cost_lbl.text!;
             if (!self.isUSDAmount) { temp.removeFirst(); }
             let combinedDouble = self.isUSDAmount ? (Double(temp)! + 10000.0) : (Double(temp)! + 10000.00) / ticker!.price;
-            self.amount_txt.text = String(combinedDouble)
+            self.amount_txt.text = self.isUSDAmount ? String(format: "%.2f", combinedDouble) : String(combinedDouble);
+            self.setAmountFormattedText(textField: self.amount_txt);
             updateInfo(isTypeing: false);
         }
     }
@@ -213,7 +228,8 @@ class TradeVC: UIViewController {
         if (currentFunds != nil) {
             if (currentFunds!.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "Insuffient funds"); return;}
             let result = self.isUSDAmount ? currentFunds! : currentFunds! / self.ticker!.price;
-            self.amount_txt.text = "\(result)"
+            self.amount_txt.text = self.isUSDAmount ? "\(String(format: "%.2f", result))" : "\(result)";
+            self.setAmountFormattedText(textField: self.amount_txt);
             self.availPressed = true;
             updateInfo(isTypeing: false);
         }
@@ -226,7 +242,8 @@ class TradeVC: UIViewController {
             for holding in loadedHoldings {
                 if (holding.ticker.name == self.ticker!.name) {
                     if (holding.amountOfCoin.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "You do not own any \(holding.ticker.symbol.uppercased()) to sell"); return; }
-                    self.amount_txt.text = self.isUSDAmount ? "\(holding.amountOfCoin * self.ticker!.price)" : "\(holding.amountOfCoin)";
+                    self.amount_txt.text = self.isUSDAmount ? "\(String(format: "%.2f", holding.amountOfCoin * self.ticker!.price))" : "\(holding.amountOfCoin)";
+                    self.setAmountFormattedText(textField: self.amount_txt);
                     self.ownedCoinPressed = true;
                     updateInfo(isTypeing: false);
                     return;
@@ -243,7 +260,7 @@ class TradeVC: UIViewController {
     
     private func setUpVC() {
         self.marketPrice_lbl.text = "$\(String(format: "%.2f", self.ticker!.price))";
-        self.amount_txt.placeholder = self.isUSDAmount ? "Enter amount of USD to buy/sell" : "Enter amount of \(self.ticker!.symbol.uppercased()) to buy/sell";
+        self.amount_txt.placeholder = self.isUSDAmount ? "USD" : "\(self.ticker!.symbol.uppercased())";
         self.estCost.text = self.isUSDAmount ? "AMT OF COIN" : "EST COST";
         self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - "
         let combinedString = NSMutableAttributedString();
@@ -286,7 +303,7 @@ class TradeVC: UIViewController {
         if (self.amount_txt.text!.first == "-") {
             self.amount_txt.text!.removeFirst();
         }
-        let amountDouble = Double(self.amount_txt.text!);
+        let amountDouble = Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""));
         if (amountDouble == nil) {
             self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
             if (!isTypeing) {
@@ -324,7 +341,7 @@ class TradeVC: UIViewController {
         self.vibrate(style: .light);
         
         // get the amount of coin being bought
-        let doubleAmount = self.isUSDAmount ? Double(self.cost_lbl.text!) : Double(self.amount_txt.text!);
+        let doubleAmount = self.isUSDAmount ? Double(self.cost_lbl.text!) : Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""));
         if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0) || self.cost_lbl.text! == "$ - " || self.cost_lbl.text! == " - ") {
             incorrectInputLayout()
             return;
@@ -335,7 +352,7 @@ class TradeVC: UIViewController {
         if (self.isUSDAmount) {
             var temp:String = self.availableFunds_lbl.text!;
             temp.removeFirst();
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.availPressed) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""))!) || self.availPressed) {
                 let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
                 if (currentFunds != nil) {
                     if (currentFunds!.isLessThanOrEqualTo(0.0)) { displayAlert(title: "Sorry", message: "Insuffient funds"); return;}
@@ -374,7 +391,7 @@ class TradeVC: UIViewController {
     @IBAction func sellPressed(_ sender: Any) {
         self.vibrate(style: .light);
         // get the amount of coin being bought
-        let doubleAmount = Double(self.amount_txt.text!);
+        let doubleAmount = Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""));
 
         if (doubleAmount == nil || self.amount_txt.text!.isEmpty || doubleAmount!.isZero || doubleAmount!.isLess(than: 0.0) || self.cost_lbl.text! == "$ - " || self.cost_lbl.text == " - ") {
             incorrectInputLayout()
@@ -384,7 +401,7 @@ class TradeVC: UIViewController {
         if (self.isUSDAmount) {
             var temp:String = self.ownedCoin_lbl.text!;
             temp.removeFirst();
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.ownedCoinPressed) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""))!) || self.ownedCoinPressed) {
                 print("yes")
                 if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                     for holding in loadedHoldings {
@@ -398,7 +415,7 @@ class TradeVC: UIViewController {
             }
         } else {
             let temp:String = self.ownedAmountCoin_txt.text!;
-            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!)!) || self.ownedCoinPressed) {
+            if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""))!) || self.ownedCoinPressed) {
                 if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
                     for holding in loadedHoldings {
                         if (holding.ticker.name == self.ticker!.name) {
@@ -465,7 +482,7 @@ class TradeVC: UIViewController {
     }
     
     private func dismissKeyboardReset() {
-        let amountDouble = Double(self.amount_txt.text!);
+        let amountDouble = Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""));
         if (self.amount_txt.text!.isEmpty) {
             self.view.endEditing(true);
             self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
@@ -523,6 +540,55 @@ class TradeVC: UIViewController {
         self.amount_txt.resignFirstResponder()
     }
     
+    private func addLeftImage(textfield:UITextField, image:UIImage) -> Void {
+        let view = UIView(frame: CGRect(x: 0.0, y: 0.0, width: 35.0, height: 25.0));
+        let leftImageView = UIImageView(frame: CGRect(x: 0.0, y: 0.0, width: self.isUSDAmount ? image.size.width : 25.0, height: self.isUSDAmount ? image.size.width : 25.0));
+        view.addSubview(leftImageView);
+        leftImageView.image = image;
+        leftImageView.tintColor = .white;
+        textfield.leftView = view;
+        textfield.leftViewMode = .always;
+    }
+    
+    @objc private func hideKeyboard() -> Void { self.view.endEditing(true); }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool { textField.resignFirstResponder(); return true; }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.amount_txt:
+            CryptoData.styleTextFieldsOnEditing(textField: self.amount_txt, width: self.view.frame.width * 0.9, weight: .medium, color: .orange, labelColor: .orange);
+            break;
+        default:
+            break;
+        }
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.amount_txt:
+            CryptoData.styleTextFieldsOnEditing(textField: self.amount_txt, width: self.view.frame.width * 0.9, weight: .light, color: .lightGray, labelColor: .black);
+            break;
+        default:
+            break;
+        }
+    }
+    
+    func textFieldDidChangeSelection(_ textField: UITextField) {
+        self.setAmountFormattedText(textField: textField);
+    }
+    
+    private func setAmountFormattedText(textField:UITextField) -> Void {
+        if (!self.isUSDAmount) { return; }
+        if var amountString = textField.text?.currencyInputFormatting() {
+            if (!amountString.isEmpty) {
+                amountString.remove(at: amountString.startIndex);
+                textField.text = amountString;
+            } else {
+                textField.text = "";
+            }
+        }
+    }
+    
 }
 
 extension UITextField {
@@ -545,4 +611,35 @@ extension UITextField {
     // Default actions:
     @objc func doneButtonTapped() { self.resignFirstResponder(); }
     @objc func cancelButtonTapped() { self.resignFirstResponder(); }
+}
+
+extension String {
+
+    // formatting text for currency textField
+    func currencyInputFormatting() -> String {
+
+        var number: NSNumber!
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currencyAccounting
+        formatter.currencySymbol = "$"
+        formatter.maximumFractionDigits = 2
+        formatter.minimumFractionDigits = 2
+
+        var amountWithPrefix = self
+
+        // remove from String: "$", ".", ","
+        let regex = try! NSRegularExpression(pattern: "[^0-9]", options: .caseInsensitive)
+        amountWithPrefix = regex.stringByReplacingMatches(in: amountWithPrefix, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, self.count), withTemplate: "")
+
+        let double = (amountWithPrefix as NSString).doubleValue
+        number = NSNumber(value: (double / 100))
+
+        // if first number is 0 or all numbers were deleted
+        guard number != 0 as NSNumber else {
+            return ""
+        }
+
+        return formatter.string(from: number)!
+ 
+    }
 }

@@ -9,7 +9,7 @@
 import UIKit;
 import FirebaseAuth;
 
-class ForgotVC: UIViewController {
+class ForgotVC: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var email_txt: UITextField!
     @IBOutlet weak var resetPassword_btn: UIButton!
@@ -23,7 +23,7 @@ class ForgotVC: UIViewController {
         self.signIn_btn.setTitleColor(.orange, for: .normal);
         self.signIn_btn.setTitleColor(.orange, for: .highlighted);
         self.email_txt.keyboardType = .emailAddress;
-        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0);
+        self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .lightGray);
                 
         self.resetPassword_btn.addTarget(self, action: #selector(resetBtnTapped), for: .touchUpInside);
         self.signIn_btn.addTarget(self, action: #selector(signInTapped), for: .touchUpInside);
@@ -32,6 +32,8 @@ class ForgotVC: UIViewController {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tappedScreen));
         self.view.addGestureRecognizer(tap);
+        
+        self.email_txt.delegate = self;
 
     }
     
@@ -78,7 +80,7 @@ class ForgotVC: UIViewController {
         button.layer.borderColor = borderColor;
     }
     
-    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat) {
+    private func styleTextField(textField:inout UITextField, image:UIImage, width:CGFloat, height:CGFloat, color:UIColor) {
         var tempImage:UIImage = image;
         textField.leftViewMode = .always;
         textField.backgroundColor = .clear;
@@ -86,7 +88,7 @@ class ForgotVC: UIViewController {
         textField.leftView = UIView(frame: CGRect(x: 0.0, y: 0.0, width: distanceFromImage, height: 0));
         let bottomLine = CALayer();
         bottomLine.frame = CGRect(x: distanceFromImage, y: 20.0, width: self.view.frame.width - 130.0, height: 1.0);
-        bottomLine.backgroundColor = UIColor.white.cgColor;
+        bottomLine.backgroundColor = color.cgColor;
         textField.borderStyle = .none;
         textField.layer.addSublayer(bottomLine);
         let imageView = UIImageView();
@@ -113,6 +115,29 @@ class ForgotVC: UIViewController {
         let impactFeedbackGenerator = UIImpactFeedbackGenerator(style: style);
         impactFeedbackGenerator.prepare();
         impactFeedbackGenerator.impactOccurred();
+    }
+    
+    @objc private func hideKeyboard() -> Void { self.view.endEditing(true); }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool { textField.resignFirstResponder(); return true; }
+
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .orange);
+            break;
+        default:
+            break;
+        }
+    }
+
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        switch (textField) {
+        case self.email_txt:
+            self.styleTextField(textField: &self.email_txt, image: #imageLiteral(resourceName: "email"), width: 15.0, height: 15.0, color: .lightGray);
+            break;
+        default:
+            break;
+        }
     }
     
 }
