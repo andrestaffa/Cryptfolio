@@ -170,7 +170,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 cell.symbolLbl.text = self.filterCoins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
-                cell.priceTxt.text = "$\(String(format: "%.2f", self.filterCoins[indexPath.row].ticker.price))";
+                cell.priceTxt.text = CryptoData.convertToDollar(price: self.filterCoins[indexPath.row].ticker.price, hasSymbol: false);
                 cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath.row].ticker.changePrecent24H), cell: cell);
                 let series = ChartSeries(self.filterCoins[indexPath.row].ticker.history24h);
                 if (!((self.filterCoins[indexPath.row].ticker.history24h.first?.isLess(than: self.filterCoins[indexPath.row].ticker.history24h.last!))!)) {
@@ -192,7 +192,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 cell.symbolLbl.text = self.coins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
-                cell.priceTxt.text = "$\(String(format: "%.4f", self.coins[indexPath.row].ticker.price))";
+                cell.priceTxt.text = CryptoData.convertToDollar(price: self.coins[indexPath.row].ticker.price, hasSymbol: false);
                 cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H), cell: cell);
                 let series = ChartSeries(self.coins[indexPath.row].ticker.history24h);
                 series.area = true;

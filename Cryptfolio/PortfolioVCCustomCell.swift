@@ -9,7 +9,7 @@
 import UIKit
 import SwiftChart;
 
-protocol CellDelegate: class {
+protocol CellDelegate: AnyObject {
     func didTap(_ cell: PortfolioVCCustomCell)
 }
 
@@ -38,6 +38,12 @@ class PortfolioVCCustomCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         self.addSubview(self.holdingPercentChange);
+        
+        self.price_lbl.font = UIFont(name: "PingFangHK-Medium", size: 12.0);
+        self.price_lbl.textColor = .white;
+        
+        self.amountCost_lbl.font = UIFont(name: "PingFangHK-Medium", size: 12.0);
+        self.amountCost_lbl.textColor = .white;
         
         self.holdingPercentChange.topAnchor.constraint(equalTo: self.amountCoin_lbl.bottomAnchor).isActive = true;
         self.holdingPercentChange.trailingAnchor.constraint(equalTo: self.amountCoin_lbl.trailingAnchor).isActive = true;

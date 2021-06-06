@@ -77,8 +77,12 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func getData() -> Void {
         
         // section 1 - General
-        self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
-        self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        if (NotificationManager.isAppTrackingAuthorized()) {
+            self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
+            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        } else {
+            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+        }
         
         // section 2 - Feedback and Support
         self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
@@ -163,9 +167,11 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             cell.isUserInteractionEnabled = true;
             cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
             cell.textLabel!.text = self.generalItems[indexPath.row].title;
-            if (indexPath.row == 0) {
-                cell.textLabel?.textColor = .systemOrange;
-                self.glowAffect(view: cell.textLabel!, color: .orange);
+            if (NotificationManager.isAppTrackingAuthorized()) {
+                if (indexPath.row == 0) {
+                    cell.textLabel?.textColor = .systemOrange;
+                    self.glowAffect(view: cell.textLabel!, color: .orange);
+                }
             }
             break;
         case 1:
@@ -197,7 +203,11 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         tableView.deselectRow(at: indexPath, animated: true);
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            self.watchAdForMoney();
+            if (NotificationManager.isAppTrackingAuthorized()) {
+                self.watchAdForMoney();
+            } else {
+                self.viewInvestingTips();
+            }
             break;
         case (0, 1):
             self.viewInvestingTips();
@@ -363,7 +373,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func showDisclaimer() -> Void {
-        self.displayAlertNormal(title: "Note", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade crypto without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
+        self.displayAlertNormal(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
     }
         
     private func watchAdForMoney() -> Void {

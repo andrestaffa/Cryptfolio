@@ -6,7 +6,7 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import UIKit
+import UIKit;
 
 class TradeVC: UIViewController, UITextFieldDelegate {
 
@@ -49,12 +49,12 @@ class TradeVC: UIViewController, UITextFieldDelegate {
             if (availableFunds!.isLessThanOrEqualTo(0.0)) {
                 self.availableFunds_lbl.text = "$0.00";
             } else {
-                var tempString = String(availableFunds!);
+                var tempString = CryptoData.convertToMoney(price: String(availableFunds!));
                 if (tempString.first == "-" ) {
                     tempString.removeFirst();
                     availableFunds = Double(tempString);
                 }
-                self.availableFunds_lbl.text = "$\(String(format: "%.2f", availableFunds!))";
+                self.availableFunds_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", availableFunds!));
                 self.availableFunds_lbl.textColor = .systemOrange;
             }
         } else {
@@ -72,7 +72,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
                         self.ownedAmountCoin_txt.text = "";
                         break;
                     }
-                    self.ownedCoin_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
+                    self.ownedCoin_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", holding.estCost));
                     self.ownedAmountCoin_txt.text = self.formatPrice(price: holding.amountOfCoin);
                     self.ownedCoin_lbl.transform = .identity;
                     self.ownedCoin_lbl.textColor = .systemOrange;
@@ -135,6 +135,9 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         self.addLeftImage(textfield: self.amount_txt, image: UIImage(named: "dollar24")!);
         CryptoData.styleTextField(textField: self.amount_txt, width: self.view.frame.width * 0.9, color: .lightGray);
         self.amount_txt.font = UIFont.systemFont(ofSize: 16.0);
+        self.ownedCoinStatic_lbl.adjustsFontSizeToFitWidth = true;
+        self.overview_txtView.textAlignment = .center;
+        self.overview_txtView.adjustsFontForContentSizeCategory = true;
         
     }
     
@@ -259,13 +262,13 @@ class TradeVC: UIViewController, UITextFieldDelegate {
     }
     
     private func setUpVC() {
-        self.marketPrice_lbl.text = "$\(String(format: "%.2f", self.ticker!.price))";
+        self.marketPrice_lbl.text = CryptoData.convertToDollar(price: self.ticker!.price, hasSymbol: false);
         self.amount_txt.placeholder = self.isUSDAmount ? "USD" : "\(self.ticker!.symbol.uppercased())";
         self.estCost.text = self.isUSDAmount ? "AMT OF COIN" : "EST COST";
         self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - "
         let combinedString = NSMutableAttributedString();
         combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
-        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+//        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
         self.overview_txtView.attributedText = combinedString;
         self.styleButton(button: &self.fiveBtn, borderColor: UIColor.orange.cgColor);
         self.styleButton(button: &self.thousBtn, borderColor: UIColor.orange.cgColor);
@@ -311,7 +314,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
             } else {
                 let combinedString = NSMutableAttributedString();
                 combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
-                combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+//                combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
                 self.overview_txtView.attributedText = combinedString;
             }
             return;
@@ -328,7 +331,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         self.cost_lbl.text = self.isUSDAmount ? " - " : "$ - ";
         let combinedString = NSMutableAttributedString();
         combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
-        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+//        combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
         self.overview_txtView.attributedText = combinedString;
         displayAlert(title: "Oops...", message: "Must be a valid number i.e. 1.23, 2.0");
     }
@@ -352,6 +355,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         if (self.isUSDAmount) {
             var temp:String = self.availableFunds_lbl.text!;
             temp.removeFirst();
+            temp = temp.replacingOccurrences(of: ",", with: "")
             if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""))!) || self.availPressed) {
                 let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
                 if (currentFunds != nil) {
@@ -401,6 +405,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         if (self.isUSDAmount) {
             var temp:String = self.ownedCoin_lbl.text!;
             temp.removeFirst();
+            temp = temp.replacingOccurrences(of: ",", with: "");
             if (Double(temp)!.isEqual(to: Double(self.amount_txt.text!.replacingOccurrences(of: ",", with: ""))!) || self.ownedCoinPressed) {
                 print("yes")
                 if let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
@@ -489,7 +494,7 @@ class TradeVC: UIViewController, UITextFieldDelegate {
             self.overview_txtView.text = "";
             let combinedString = NSMutableAttributedString();
             combinedString.append(NSMutableAttributedString(string: "Welcome to Cryptfolio's practice trade console. Here you can practice buying and selling cryptocurrency with the funds you have in your account.", attributes: [NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
-            combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
+//            combinedString.append(NSMutableAttributedString(string: "\n\nTip: tap on highlighted text to input all holdings or available funds", attributes: [NSAttributedString.Key.font : UIFont.italicSystemFont(ofSize: 12.0), NSAttributedString.Key.foregroundColor : UIColor(red: 210/255, green: 210/255, blue: 210/255, alpha: 1)]));
             self.overview_txtView.attributedText = combinedString;
             return;
         }
@@ -574,6 +579,8 @@ class TradeVC: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldDidChangeSelection(_ textField: UITextField) {
+        self.availPressed = false;
+        self.ownedCoinPressed = false;
         self.setAmountFormattedText(textField: textField);
     }
     

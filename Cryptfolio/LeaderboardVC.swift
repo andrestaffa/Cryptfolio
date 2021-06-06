@@ -117,7 +117,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.hideStats(hidden: true);
         self.username_lbl.text = self.currentUsername;
         self.username_lbl.textColor = .orange;
-        self.portfolio_lbl.text = "$\(String(format: "%.2f", self.currentHighscore))";
+        self.portfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", self.currentHighscore));
         setChange(change: &self.change_lbl, changeString: self.currentChange);
         
         self.portfolio_lbl.adjustsFontSizeToFitWidth = true;
@@ -193,7 +193,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 self.setChange(change: &cell.change_lbl, changeString: self.filterUsers[indexPath.row].change);
                 cell.rank_lbl.text = "\(self.filterUsers[indexPath.row].rank)";
                 cell.username_lbl.text = self.filterUsers[indexPath.row].username;
-                cell.highscore_lbl.text = "$\(String(format: "%.2f", self.filterUsers[indexPath.row].highscore))";
+                cell.highscore_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", self.filterUsers[indexPath.row].highscore));
                 if (self.filterUsers[indexPath.row].username.lowercased() == currentUsername.lowercased()) {
                     cell.username_lbl.textColor = .orange;
                 }
@@ -202,7 +202,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 self.setChange(change: &cell.change_lbl, changeString: self.users[indexPath.row].change)
                 cell.rank_lbl.text = "\(self.users[indexPath.row].rank)";
                 cell.username_lbl.text = self.users[indexPath.row].username;
-                cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[indexPath.row].highscore))";
+                cell.highscore_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", self.users[indexPath.row].highscore));
                 if (indexPath.row == self.maxNumberOfUsers - 1) {
                     var isUserBeingDisplayed:Bool = true;
                     for i in 1...self.maxNumberOfUsers - 1 {
@@ -218,7 +218,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                             cell.rank_lbl.text = "\(self.users[Int(self.theRank)! - 1].rank)";
                             cell.username_lbl.text = self.users[Int(self.theRank)! - 1].username;
                             cell.username_lbl.textColor = .orange;
-                            cell.highscore_lbl.text = "$\(String(format: "%.2f", self.users[Int(self.theRank)! - 1].highscore))";
+                            cell.highscore_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", self.users[Int(self.theRank)! - 1].highscore));
                         } else {
                             cell.isHidden = true;
                         }
@@ -265,7 +265,7 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.profileHighestHolding_lbl.text = userList[index].highestHolding;
         self.profileRank_lbl.text = userList[index].rank;
         self.profileUsername_lbl.text = userList[index].username;
-        self.profilePortfolio_lbl.text = "$\(String(format: "%.2f", userList[index].highscore))";
+        self.profilePortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", userList[index].highscore));
         
         self.setChange(change: &self.profileChange_lbl, changeString: userList[index].change);
         if (userList[index].username.lowercased() == self.currentUsername.lowercased()) {

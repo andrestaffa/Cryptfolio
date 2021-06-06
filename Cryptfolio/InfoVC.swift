@@ -113,6 +113,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
         self.navigationController?.navigationBar.isTranslucent = true;
         updateInfoVC(ticker: self.coin!.ticker, tickerImage: self.coin!.image.getImage()!);
+        self.price_lbl.font = UIFont(name: "PingFangHK-Medium", size: 20.0);
+        self.price_lbl.textColor = .white;
         self.navigationItem.titleView = navTitleWithImageAndText(titleText: self.coin!.ticker.name, imageIcon: self.coin!.image.getImage()!);
         
         self.chartPrice_lbl.isHidden = true;
@@ -265,14 +267,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.name_lbl.text = ticker.name;
         self.symbol_lbl.text = ticker.symbol;
         self.crypto_img.image = tickerImage;
-        self.price_lbl.text = "$\(String(format: "%.4f", ticker.price))";
+        self.price_lbl.text = CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true);
         self.change_lbl.text = setChange(change: String(format: "%.2f", ticker.changePrecent24H));
         setChange(change: self.change_lbl);
         self.rank_lbl.text =  "#" + "\(String(ticker.rank))";
         self.volume24H_lbl.text = formatMoney(money: ticker.volume24H, isMoney: true);
         self.marketCap_lbl.text = formatMoney(money: ticker.marketCap, isMoney: true);
-        self.allTimeHigh_lbl.text = "$\(String(format: "%.2f", ticker.allTimeHigh))";
-        //self.daysRange_lbl.text = self.formatDaysRange(ticker: ticker);
+        self.allTimeHigh_lbl.text = "\(String(format: "%.2f", ticker.allTimeHigh))";
         self.maxSupply_lbl.text = formatMoney(money: ticker.circulation, isMoney: false);
         self.description_view.text = self.setGoodDescription(ticker: ticker);
         self.coinData.append(CoinData(webImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!, title: "Website", linkName: ticker.name));
@@ -282,13 +283,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         if #available(iOS 13.0, *) {
             self.timeStamp_seg.selectedSegmentTintColor = UIColor.orange
         }
-//        self.views.append(self.view1);
-//        self.views.append(self.view2);
-//        self.views.append(self.view3);
-//        self.views.append(self.view4);
-//        self.views.append(self.view5);
-//        self.views.append(self.view6);
-
+        self.price_lbl.adjustsFontSizeToFitWidth = true;
+        self.change_lbl.adjustsFontSizeToFitWidth = true;
+        self.allTimeHigh_lbl.adjustsFontSizeToFitWidth = true;
+        self.daysRange_lbl.adjustsFontSizeToFitWidth = true;
+        self.rank_lbl.adjustsFontSizeToFitWidth = true;
     }
     
     private func setGoodDescription(ticker:Ticker) -> String {
@@ -347,20 +346,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     private func formatDaysRange(ticker:Ticker, data:inout Array<Double>) -> String {
-        var priceString = String(ticker.price);
-        priceString.removeFirst();
-        
-        var otherPrice = String(ticker.price);
-        otherPrice.removeFirst();
-        otherPrice.removeFirst();
-        
-        if (String(ticker.price).first == "0" || priceString.first == ".") {
-            return "\(String(format: "%.5f", data.min()!))" + " - " + "\(String(format: "%.5f", data.max()!))"
-        } else if (otherPrice.first == ".") {
-            return "\(String(format: "%.2f", data.min()!))" + " - " + "\(String(format: "%.2f", data.max()!))"
-        } else {
-            return "\(String(format: "%.0f", data.min()!))" + " - " + "\(String(format: "%.0f", data.max()!))"
-        }
+        return "\(CryptoData.convertToDollar(price: data.min()!, hasSymbol: false)) - \(CryptoData.convertToDollar(price: data.max()!, hasSymbol: false))"
     }
     
     private func formatAllTimeHighRange(ticker:Ticker, data:inout Array<Double>) -> String {
@@ -372,11 +358,11 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         otherPrice.removeFirst();
         
         if (String(ticker.price).first == "0" || priceString.first == ".") {
-            return "$\(String(format: "%.5f", data.max()!))";
+            return "\(String(format: "%.5f", data.max()!))";
         } else if (otherPrice.first == ".") {
-            return "$\(String(format: "%.2f", data.max()!))";
+            return "\(String(format: "%.2f", data.max()!))";
         } else {
-            return "$\(String(format: "%.2f", data.max()!))";
+            return "\(String(format: "%.2f", data.max()!))";
         }
         
     }
@@ -450,7 +436,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             break;
         }
         if (isMoney) {
-            result.insert("$", at: result.startIndex);
+            //result.insert("$", at: result.startIndex);
         }
         return result;
     }
@@ -495,9 +481,9 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self?.chartSetup(data: self!.dataPoints, isDay: false);
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         if let max = self!.dataPoints.max() {
-                            self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", max))";
+                            self!.allTimeHigh_lbl.text = CryptoData.convertToDollar(price: max, hasSymbol: false);
                             self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                            self!.allTimeHigh_lbl.text = "$\(String(format: "%.2f", self!.dataPoints.max()!))";
+                            self!.allTimeHigh_lbl.text = CryptoData.convertToDollar(price:  self!.dataPoints.max()!, hasSymbol: false);
                             self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
                         }
                         self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
@@ -589,17 +575,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     func getFormattedDate(data:Array<Double>?, index: Int) -> String {
         if (!(index >= 0 && index < data!.count)) { return ""; }
         let timeResult = data![index];
-        let date = Date(timeIntervalSince1970: timeResult / 1000);
-        let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = DateFormatter.Style.medium //Set time style
-        dateFormatter.dateStyle = DateFormatter.Style.medium //Set date style
-        dateFormatter.timeZone = .current
+        let date = Date(timeIntervalSince1970: timeResult);
+        let dateFormatter = DateFormatter();
+        dateFormatter.timeStyle = DateFormatter.Style.medium;
+        dateFormatter.dateStyle = DateFormatter.Style.medium;
+        dateFormatter.timeZone = .current;
         if (isDayOrWeekChart) {
             dateFormatter.dateFormat = "MMM d, h:mm a";
         } else {
             dateFormatter.dateFormat = "MMM d, yyyy";
         }
-        let localDate = dateFormatter.string(from: date)
+        let localDate = dateFormatter.string(from: date);
         //let r = localDate.index(localDate.startIndex, offsetBy: 0)..<localDate.index(localDate.endIndex, offsetBy: -14)
         return localDate;
     }
@@ -626,7 +612,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self.chartPrice_lbl.isHidden = false;
                 }
                 let value = chart.valueForSeries(serieIndex, atIndex: dataIndex);
-                self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(10000.0 * value!) / 10000.0))";
+                //self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " $\(String(round(10000.0 * value!) / 10000.0))";
+                self.chartPrice_lbl.text = getFormattedDate(data: self.timestamps, index: dataIndex!) + " \(CryptoData.convertToDollar(price: value!, hasSymbol: false))";
                 
                 // calcualte height
                 if (dataIndex! != self.prevIndex) {

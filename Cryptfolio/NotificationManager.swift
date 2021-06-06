@@ -6,7 +6,8 @@
 //  Copyright © 2020 Andre Staffa. All rights reserved.
 //
 
-import Foundation
+import Foundation;
+import AppTrackingTransparency;
 
 
 public class NotificationManager {
@@ -20,7 +21,35 @@ public class NotificationManager {
                 if (!didAllow) { print("User did not allow notifications"); } else {
                     print("User HAS allowed notifications");
                 }
+                NotificationManager.requestAppTrackingTransparency();
             }
+        }
+    }
+    
+    public static func requestAppTrackingTransparency() -> Void {
+        if #available(iOS 14, *) {
+            ATTrackingManager.requestTrackingAuthorization { status in
+                switch (status) {
+                case .authorized:
+                    print("GRANTED!");
+                    break;
+                case .denied,
+                     .notDetermined,
+                     .restricted:
+                    print("DENIED");
+                    break;
+                default:
+                    break;
+                }
+            }
+        }
+    }
+    
+    public static func isAppTrackingAuthorized() -> Bool {
+        if #available(iOS 14, *) {
+            return ATTrackingManager.trackingAuthorizationStatus == ATTrackingManager.AuthorizationStatus.authorized ? true : false;
+        } else {
+            return true;
         }
     }
     

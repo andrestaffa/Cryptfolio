@@ -76,7 +76,7 @@ class HistoryVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "cell", for: indexPath) as! HistoryCell;
         
         cell.amountOfCoinLbl.text = self.formatPrice(price: self.holdingCoin!.amountOfCoins[indexPath.item])
-        cell.pricesLbl.text = self.formatPrice(price: self.holdingCoin!.prices[indexPath.item]);
+        cell.pricesLbl.text = CryptoData.convertToDollar(price: self.holdingCoin!.prices[indexPath.item], hasSymbol: false);
         cell.dateAddedLbl.text = self.holdingCoin!.dateAddedList[indexPath.row];
         
         if (self.holdingCoin!.isBuyList[indexPath.item]) {

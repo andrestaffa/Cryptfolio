@@ -9,7 +9,7 @@
 import UIKit;
 import SwiftChart;
 
-protocol HomeCellDelgate: class {
+protocol HomeCellDelgate: AnyObject {
     func didTap(_ cell: CustomCell);
 }
 
@@ -50,6 +50,8 @@ class CustomCell: UITableViewCell, ChartDelegate {
     
     let priceTxt: UILabel = {
         let label = UILabel();
+        label.font = UIFont(name: "PingFangHK-Medium", size: 17.0);
+        label.textColor = .white;
         label.translatesAutoresizingMaskIntoConstraints = false;
         return label;
     }();

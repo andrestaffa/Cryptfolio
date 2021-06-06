@@ -105,7 +105,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
         if (loadedCoins != nil) {
             if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime) && loadedCoins!.count == 1) {
-                self.displayAlert(title: "Note", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade crypto without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue");
+                self.displayAlert(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue");
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
             }
         }
@@ -117,6 +117,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.tabBarController?.tabBar.isHidden = false;
         
         //self.glowAffect(view: self.leaderboard_btn, color: .orange);
+        
+        self.availableFunds_lbl.font = UIFont(name: "PingFangHK-Medium", size: 25.0);
+        self.availableFunds_lbl.textColor = .white;
+        
+        self.mainPortfolio_lbl.font = UIFont(name: "PingFangHK-Medium", size: 25.0);
+        self.mainPortfolio_lbl.textColor = .white;
         
         // setup collectionView
         self.getTickerData();
@@ -448,7 +454,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                 }
                                 UserDefaults.standard.set(UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey) - sum, forKey: UserDefaultKeys.availableFundsKey);
                                 UserDefaults.standard.set(sum, forKey: UserDefaultKeys.mainPortfolioKey);
-                                self?.availableFunds_lbl.text = "$\(String(format: "%.2f", UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey)))";
+                                //self?.availableFunds_lbl.text = "$\(String(format: "%.2f", UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey)))";
+                                self?.availableFunds_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey)));
                                 self!.coins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
                                 self?.loadData();
                                 self?.tableVIew.reloadData();
@@ -519,15 +526,19 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
-        let attributedText = NSMutableAttributedString(string: "$\(String(format: "%.2f", updatedMainPort))");
+        let attributedText = NSMutableAttributedString(string: CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPort)));
         if (priceChange > 0) {
             if (String(format: "%.2f", priceChange) != "0.00") {
-                attributedText.append(NSAttributedString(string: "  +\(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.baselineOffset : 1]));
+                var price = CryptoData.convertToMoney(price: String(format: "%.2f", priceChange));
+                price.remove(at: price.startIndex);
+                attributedText.append(NSAttributedString(string: "  +\(price)", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.green, NSAttributedString.Key.baselineOffset : 1]));
                 attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortUpArrow"), color: .green, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
             }
         } else if (priceChange < 0) {
             if (String(format: "%.2f", priceChange) != "-0.00") {
-                attributedText.append(NSAttributedString(string: "  \(String(format: "%.2f", priceChange))", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.baselineOffset : 1]));
+                var price = CryptoData.convertToMoney(price: String(format: "%.2f", priceChange));
+                price.remove(at: price.startIndex);
+                attributedText.append(NSAttributedString(string: "  \(price)", attributes: [NSAttributedString.Key.font: UIFont.boldSystemFont(ofSize: 14), NSAttributedString.Key.foregroundColor: UIColor.red, NSAttributedString.Key.baselineOffset : 1]));
                 attributedText.append(self.attachImageToStringTitle(image: #imageLiteral(resourceName: "sortDownArrow"), color: .red, bounds: CGRect(x: 1, y: -0.5, width: 12, height: 12)));
             }
         }
@@ -536,7 +547,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     public func loadData() -> Void {
         let currentAvailFunds = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
-        self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
+        //self.availableFunds_lbl.text = "$\(String(format: "%.2f", currentAvailFunds))"
+        self.availableFunds_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", currentAvailFunds));
         
         guard var loadedHolding = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) else {
             self.portfolio = 0.00;
@@ -590,13 +602,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                     UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
                                     self?.retreiveUsernameAndUploadHoldings();
                                 } else {
-                                    self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
+                                    self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
                                     self?.retreiveUsernameAndUploadHoldings();
                                 }
                             } else {
                                 print("WAS 0, adding to userDefaults");
                                 UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
-                                self?.mainPortfolio_lbl.text = "$\(String(format: "%.2f", updatedMainPortfolio))";
+                                self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
                                 self?.retreiveUsernameAndUploadHoldings();
                             }
                         }
@@ -1110,10 +1122,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     func didTap(_ cell: PortfolioVCCustomCell) {
         self.vibrate(style: .light);
         let indexPath = self.tableVIew.indexPath(for: cell);
-        let tradeVC = self.storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
-        tradeVC.ticker = self.coins[indexPath!.row].ticker;
-        tradeVC.portfolioVC = self;
-        self.present(tradeVC, animated: true, completion: nil);
+        if let indexPath = indexPath {
+            let tradeVC = self.storyboard?.instantiateViewController(withIdentifier: "tradeVC") as! TradeVC;
+            tradeVC.ticker = self.coins[indexPath.row].ticker;
+            tradeVC.portfolioVC = self;
+            self.present(tradeVC, animated: true, completion: nil);
+        }
     }
     
     
@@ -1159,9 +1173,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         cell.crypto_img.image = coinSet[indexPath.row].image.getImage()!;
         
         // format price
-        let theoPriceString = String(format: "%.2f", coinSet[indexPath.row].ticker.price);
+        //let theoPriceString = String(format: "%.2f", coinSet[indexPath.row].ticker.price);
         //self.appendZero(string: &theoPriceString);
-        cell.price_lbl.text = "$\(theoPriceString)";
+        cell.price_lbl.text = CryptoData.convertToDollar(price: coinSet[indexPath.row].ticker.price, hasSymbol: false);
         
         // format percent change
         if (String(coinSet[indexPath.row].ticker.changePrecent24H).first != "-") {
@@ -1194,7 +1208,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     } else {
                         holding.estCost = holding.amountOfCoin * coinSet[indexPath.row].ticker.price;
                         DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
-                        cell.amountCost_lbl.text = "$\(String(format: "%.2f", holding.estCost))";
+                        cell.amountCost_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", holding.estCost));
                         cell.amountCoin_lbl.text = self.formatPrice(price: holding.amountOfCoin);
                         let percentage:Double = holding.estCost - (holding.amountOfCoin * holding.ticker.price);
                         cell.holdingPercentChange.attributedText = percentage >= 0 ? self.attachImageToString(text: "+\(String(format: "%.2f", percentage))", image: #imageLiteral(resourceName: "sortUpArrow"), color: ChartColors.greenColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7)) : self.attachImageToString(text: String(format: "%.2f", percentage), image: #imageLiteral(resourceName: "sortDownArrow"), color: ChartColors.redColor(), bounds: CGRect(x: 1, y: -1, width: 7, height: 7));
