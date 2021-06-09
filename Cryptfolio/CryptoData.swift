@@ -54,7 +54,8 @@ public class CryptoData {
             print("error loading history, url was nil");
             return;
         }
-        AF.request(url!).responseJSON { (response) in
+        let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
+        AF.request("https://api.coinranking.com/v2/coin/\(id)/history?timePeriod=\(timeFrame)", headers: headers).responseJSON { (response) in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
@@ -106,7 +107,8 @@ public class CryptoData {
         if (url == nil) {
             return;
         }
-        AF.request(url!).responseJSON { (response) in
+        let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
+        AF.request("https://api.coinranking.com/v2/coin/\(id)", headers: headers).responseJSON { (response) in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
@@ -159,7 +161,8 @@ public class CryptoData {
         if (url == nil) {
             return;
         }
-        AF.request(url!).responseJSON { response in
+        let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
+        AF.request("https://api.coinranking.com/v2/coins?limit=100", headers: headers).responseJSON { response in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
@@ -213,7 +216,8 @@ public class CryptoData {
             completion(nil, nil);
             return;
         }
-        AF.request(url!).responseJSON { response in
+        let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
+        AF.request("https://api.coinranking.com/v2/coins?limit=100", headers: headers).responseJSON { response in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
@@ -275,15 +279,10 @@ public class CryptoData {
     }
     
     private static func formatPrice(price:Double) -> (String, Double) {
-        var priceString = String(price);
-        priceString.removeFirst();
-        var otherPrice = String(price);
-        otherPrice.removeFirst();
-        otherPrice.removeFirst();
-        if (String(price).first == "0" || priceString.first == ".") {
-            return ("\(String(format: "%.7f", price))", 10000000);
-        } else if (otherPrice.first == ".") {
-            return ("\(String(format: "%.2f", price))", 100);
+        if (String(price).first == "0") {
+            return ("\(String(format: "%.8f", price))", 100000000);
+        } else if (String(price).contains("e")) {
+            return (price.avoidNotation, 100000000);
         } else {
             return ("\(String(format: "%.2f", price))", 100)
         }
@@ -294,7 +293,7 @@ public class CryptoData {
         let formatter = NumberFormatter();
         formatter.numberStyle = .currencyAccounting;
         //formatter.currencySymbol = "$"
-        formatter.maximumFractionDigits = 7;
+        formatter.maximumFractionDigits = 8;
         formatter.minimumFractionDigits = 2;
         
         let priceData = CryptoData.formatPrice(price: price);
@@ -349,3 +348,21 @@ public class CryptoData {
     
 }
 
+extension String {
+    var length: Int { return self.count; }
+    subscript (r: Range<Int>) -> String {
+        let range = Range(uncheckedBounds: (lower: max(0, min(length, r.lowerBound)), upper: min(length, max(0, r.upperBound))));
+        let start = index(startIndex, offsetBy: range.lowerBound);
+        let end = index(start, offsetBy: range.upperBound - range.lowerBound);
+        return String(self[start ..< end]);
+    }
+}
+
+extension Double {
+    var avoidNotation: String {
+        let numberFormatter = NumberFormatter();
+        numberFormatter.maximumFractionDigits = 8;
+        numberFormatter.numberStyle = .decimal;
+        return numberFormatter.string(for: self) ?? "";
+    }
+}
