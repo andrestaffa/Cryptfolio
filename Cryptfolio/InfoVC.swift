@@ -367,6 +367,32 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         
     }
     
+    private func updatePercentChangeWithGraph(data:inout Array<Double>) -> String {
+        if let first = data.first, let last = data.last {
+            if (first.isZero) {
+                var nonZeroFirst:Double = 1.0;
+                for datapoint in data {
+                    if (!datapoint.isLessThanOrEqualTo(0)) {
+                        nonZeroFirst = datapoint;
+                        break;
+                    }
+                }
+                let percentChange = (last / nonZeroFirst - 1) * 100;
+                var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                finalString.remove(at: finalString.startIndex);
+                finalString = "\(finalString)%";
+                return finalString.first! != "-" ? "+\(finalString)" : finalString;
+            } else {
+                let percentChange = (last / first - 1) * 100;
+                var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                finalString.remove(at: finalString.startIndex);
+                finalString = "\(finalString)%";
+                return finalString.first! != "-" ? "+\(finalString)" : finalString;
+            }
+        }
+        return self.setChange(change: String(format: "%.2f", self.coin!.ticker.changePrecent24H));
+    }
+    
     private func formatMoney(money:Double, isMoney:Bool) -> String {
         var result:String = String(Int(money));
         switch result.count {
@@ -479,6 +505,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     self?.dataPoints = history!.prices;
                     self?.timestamps = history!.timestamps;
                     self?.chartSetup(data: self!.dataPoints, isDay: false);
+                    if (timeFrame != "24h") {
+                        self?.change_lbl.text = self!.updatePercentChangeWithGraph(data: &self!.dataPoints);
+                        self?.setChange(change: self!.change_lbl);
+                    } else {
+                        self?.change_lbl.text = self?.setChange(change: String(format: "%.2f", self!.coin!.ticker.changePrecent24H));
+                        self?.setChange(change: self!.change_lbl);
+                    }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                         if let max = self!.dataPoints.max() {
                             self!.allTimeHigh_lbl.text = CryptoData.convertToDollar(price: max, hasSymbol: false);

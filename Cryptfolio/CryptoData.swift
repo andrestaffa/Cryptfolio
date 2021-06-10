@@ -266,6 +266,17 @@ public class CryptoData {
         return arrayOfStrings;
     }
     
+    public static func findTickerWithinList(tickerList:Array<Ticker>, otherTicker:Ticker) -> Ticker? {
+        var selectedTicker:Ticker? = nil;
+        for ticker in tickerList {
+            if (ticker.symbol.lowercased() == otherTicker.symbol.lowercased()) {
+                selectedTicker = ticker;
+                break;
+            }
+        }
+        return selectedTicker;
+    }
+    
     public static func styleTextField(textField: UITextField, width:CGFloat, color:UIColor) {
         let bottomLine = CALayer();
         bottomLine.frame = CGRect(x: 0.0, y: 30.0, width: width, height: 1.0);
@@ -292,7 +303,7 @@ public class CryptoData {
         var number: NSNumber!;
         let formatter = NumberFormatter();
         formatter.numberStyle = .currencyAccounting;
-        //formatter.currencySymbol = "$"
+        formatter.currencySymbol = "$"
         formatter.maximumFractionDigits = 8;
         formatter.minimumFractionDigits = 2;
         
