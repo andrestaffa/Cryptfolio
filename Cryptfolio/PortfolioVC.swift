@@ -471,10 +471,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                             self?.tableVIew.reloadData();
                                             self?.writeCoinArray();
                                         } else {
-                                            self!.displayAlert(title: "ERROR", message: "The selected coin was null");
+                                            CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
+                                                if let error = error { print(error.localizedDescription); return; }
+                                                CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                                                    coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                                                    coin.ticker = ticker!;
+                                                    self?.tableVIew.reloadData();
+                                                    self?.writeCoinArray();
+                                                }
+                                            }
                                             self?.isLoading = false;
-                                            self?.tableVIew.reloadData();
-                                            self?.writeCoinArray();
                                         }
                                     }
                                 }
@@ -516,10 +522,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self?.tableVIew.reloadData();
                     self?.writeCoinArray();
                 } else {
-                    self!.displayAlert(title: "ERROR", message: "The selected coin was null");
+                    CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
+                        if let error = error { print(error.localizedDescription); return; }
+                        CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                            coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
+                            coin.ticker = ticker!;
+                            self?.tableVIew.reloadData();
+                            self?.writeCoinArray();
+                        }
+                    }
                     self?.isLoading = false;
-                    self?.tableVIew.reloadData();
-                    self?.writeCoinArray();
                 }
             }
         }
@@ -561,6 +573,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         }
         var updatedMainPortfolio:Double = 0.0;
         var counter:Int = 0;
+        var counterInner = 0;
         loadedHolding = loadedHolding.filter({ (holding) -> Bool in
             return holding.amountOfCoin > 0;
         })
@@ -578,50 +591,94 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             if let error = error { print(error.localizedDescription); return; }
             guard let tickerList = tickerList else { return; }
             for holding in loadedHolding {
-                counter += 1;
                 if let selectedTicker:Ticker = CryptoData.findTickerWithinList(tickerList: tickerList, otherTicker: holding.ticker) {
+                    counter += 1;
                     holding.estCost = holding.amountOfCoin * selectedTicker.price;
                     updatedMainPortfolio += holding.estCost;
-                } else {
-                    self!.displayAlert(title: "ERROR", message: "The selected coin was null");
-                }
-                
-                self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
-                self?.portPercentChange = (self!.priceDifference / 10000);
-                
-                if (counter == loadedHolding.count) {
-                    self?.portfolio = updatedMainPortfolio;
-                    let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
-                    if (mainPortChange != 0.0) {
-                        if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
-                            let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
-                            self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
-                            UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
-                            UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                            self?.retreiveUsernameAndUploadHoldings();
-                        } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
-                            let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
-                            self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
-                            UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
-                            UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
-                            self?.retreiveUsernameAndUploadHoldings();
+                    self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
+                    self?.portPercentChange = (self!.priceDifference / 10000);
+                    
+                    if (counter == loadedHolding.count) {
+                        self?.portfolio = updatedMainPortfolio;
+                        let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+                        if (mainPortChange != 0.0) {
+                            if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
+                                let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
+                                UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.retreiveUsernameAndUploadHoldings();
+                            } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
+                                let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
+                                UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                self?.retreiveUsernameAndUploadHoldings();
+                            } else {
+                                self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
+                                self?.retreiveUsernameAndUploadHoldings();
+                            }
                         } else {
+                            print("WAS 0, adding to userDefaults");
+                            UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
                             self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
                             self?.retreiveUsernameAndUploadHoldings();
                         }
-                    } else {
-                        print("WAS 0, adding to userDefaults");
-                        UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
-                        self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
-                        self?.retreiveUsernameAndUploadHoldings();
+                    }
+                    
+                    self?.mainPortPercentChange_lbl.isHidden = false;
+                    self?.mainPortTimeStamp_lbl.isHidden = false;
+                    
+                    self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
+                    self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
+                    
+                } else {
+                    CryptoData.getCryptoID(coinSymbol: holding.ticker.symbol.lowercased()) { (uuid, error) in
+                        if let error = error { print(error.localizedDescription); return; }
+                        CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                            counterInner += 1;
+                            holding.estCost = holding.amountOfCoin * ticker!.price;
+                            updatedMainPortfolio += holding.estCost;
+
+                            self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;
+                            self?.portPercentChange = (self!.priceDifference / 10000);
+
+                            if (counter == loadedHolding.count - counterInner) {
+                                self?.portfolio = updatedMainPortfolio;
+                                let mainPortChange = UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange);
+                                if (mainPortChange != 0.0) {
+                                    if (!(updatedMainPortfolio + currentAvailFunds).isLessThanOrEqualTo(mainPortChange)) {
+                                        let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                        self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
+                                        UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                        UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                        self?.retreiveUsernameAndUploadHoldings();
+                                    } else if ((updatedMainPortfolio + currentAvailFunds).isLess(than: mainPortChange)) {
+                                        let priceChange = ((updatedMainPortfolio + currentAvailFunds) - mainPortChange) - UserDefaults.standard.double(forKey: UserDefaultKeys.cumulativeAdMoney);
+                                        self?.updateMainPortPrice(priceChange: priceChange, updatedMainPort: updatedMainPortfolio);
+                                        UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                        UserDefaults.standard.set(0.00, forKey: UserDefaultKeys.cumulativeAdMoney);
+                                        self?.retreiveUsernameAndUploadHoldings();
+                                    } else {
+                                        self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
+                                        self?.retreiveUsernameAndUploadHoldings();
+                                    }
+                                } else {
+                                    print("WAS 0, adding to userDefaults");
+                                    UserDefaults.standard.set((updatedMainPortfolio + currentAvailFunds), forKey: UserDefaultKeys.mainPortChange);
+                                    self?.mainPortfolio_lbl.text = CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPortfolio));
+                                    self?.retreiveUsernameAndUploadHoldings();
+                                }
+                            }
+
+                            self?.mainPortPercentChange_lbl.isHidden = false;
+                            self?.mainPortTimeStamp_lbl.isHidden = false;
+
+                            self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
+                            self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
+                        }
                     }
                 }
-                
-                self?.mainPortPercentChange_lbl.isHidden = false;
-                self?.mainPortTimeStamp_lbl.isHidden = false;
-                
-                self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
-                self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
             }
         }
         

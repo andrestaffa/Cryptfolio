@@ -205,7 +205,7 @@ public class CryptoData {
     public static func getCryptoID(coinSymbol:String, completion:@escaping (String?, Error?) -> Void) -> Void {
         if let coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
             if let uuid = coinMap.coinMap[coinSymbol] {
-                print("CACHED!!");
+                print("CACHED: \(coinSymbol)");
                 completion(uuid, nil);
                 return;
             }

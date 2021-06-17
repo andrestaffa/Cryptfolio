@@ -378,16 +378,32 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     }
                 }
                 let percentChange = (last / nonZeroFirst - 1) * 100;
-                var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
-                finalString.remove(at: finalString.startIndex);
-                finalString = "\(finalString)%";
-                return finalString.first! != "-" ? "+\(finalString)" : finalString;
+                let cool = String(format: "%.2f", percentChange);
+                if (cool.first! == "-") {
+                    var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                    finalString.remove(at: finalString.startIndex);
+                    finalString = "-\(finalString)%";
+                    return finalString;
+                } else {
+                    var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                    finalString.remove(at: finalString.startIndex);
+                    finalString = "+\(finalString)%";
+                    return finalString;
+                }
             } else {
                 let percentChange = (last / first - 1) * 100;
-                var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
-                finalString.remove(at: finalString.startIndex);
-                finalString = "\(finalString)%";
-                return finalString.first! != "-" ? "+\(finalString)" : finalString;
+                let cool = String(format: "%.2f", percentChange);
+                if (cool.first! == "-") {
+                    var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                    finalString.remove(at: finalString.startIndex);
+                    finalString = "-\(finalString)%";
+                    return finalString;
+                } else {
+                    var finalString = CryptoData.convertToMoney(price: String(format: "%.2f", percentChange));
+                    finalString.remove(at: finalString.startIndex);
+                    finalString = "+\(finalString)%";
+                    return finalString;
+                }
             }
         }
         return self.setChange(change: String(format: "%.2f", self.coin!.ticker.changePrecent24H));
