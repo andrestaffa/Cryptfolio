@@ -474,8 +474,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                             CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
                                                 if let error = error { print(error.localizedDescription); return; }
                                                 CryptoData.getCoinData(id: uuid!) { (ticker, error) in
-                                                    coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
-                                                    coin.ticker = ticker!;
+                                                    if let ticker = ticker {
+                                                        coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!);
+                                                        coin.ticker = ticker;
+                                                    }
                                                     self?.tableVIew.reloadData();
                                                     self?.writeCoinArray();
                                                 }
@@ -525,8 +527,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
                         if let error = error { print(error.localizedDescription); return; }
                         CryptoData.getCoinData(id: uuid!) { (ticker, error) in
-                            coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker!.symbol.lowercased())" + ".png")!);
-                            coin.ticker = ticker!;
+                            if let ticker = ticker {
+                                coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!);
+                                coin.ticker = ticker;
+                            }
                             self?.tableVIew.reloadData();
                             self?.writeCoinArray();
                         }
@@ -539,6 +543,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private func updateMainPortPrice(priceChange:Double, updatedMainPort:Double) -> Void {
         let attributedText = NSMutableAttributedString(string: CryptoData.convertToMoney(price: String(format: "%.2f", updatedMainPort)));
+        UserDefaults.standard.set(updatedMainPort, forKey: UserDefaultKeys.mainPortfolioKey);
         if (priceChange > 0) {
             if (String(format: "%.2f", priceChange) != "0.00") {
                 var price = CryptoData.convertToMoney(price: String(format: "%.2f", priceChange));
@@ -589,7 +594,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         
         CryptoData.getCryptoData { [weak self] (tickerList, error) in
             if let error = error { print(error.localizedDescription); return; }
-            guard let tickerList = tickerList else { return; }
+            guard let tickerList = tickerList else { self?.updateMainPortPrice(priceChange: 0.00, updatedMainPort: UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey)); return; }
             for holding in loadedHolding {
                 if let selectedTicker:Ticker = CryptoData.findTickerWithinList(tickerList: tickerList, otherTicker: holding.ticker) {
                     counter += 1;
@@ -636,8 +641,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     CryptoData.getCryptoID(coinSymbol: holding.ticker.symbol.lowercased()) { (uuid, error) in
                         if let error = error { print(error.localizedDescription); return; }
                         CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                            guard let ticker = ticker else { self?.updateMainPortPrice(priceChange: 0.00, updatedMainPort: UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey)); return; }
                             counterInner += 1;
-                            holding.estCost = holding.amountOfCoin * ticker!.price;
+                            holding.estCost = holding.amountOfCoin * ticker.price;
                             updatedMainPortfolio += holding.estCost;
 
                             self?.priceDifference = (updatedMainPortfolio + currentAvailFunds) - 10000;

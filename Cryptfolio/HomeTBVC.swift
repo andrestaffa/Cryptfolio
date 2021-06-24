@@ -97,15 +97,17 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             if let error = error {
                 print(error.localizedDescription)
             } else {
-                for ticker in tickerList! {
-                    if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
-                        let image = Image(withImage: imageUI);
-                        self?.coins.append(Coin(ticker: ticker, image: image));
-                        if (self!.counter < 2) {
-                            self?.prevLength = (self!.coins.count);
-                        }
-                        if ((self!.coins.count) > self!.prevLength) {
-                            self?.coins.removeSubrange((0...self!.prevLength - 1));
+                if let tickerList = tickerList {
+                    for ticker in tickerList {
+                        if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
+                            let image = Image(withImage: imageUI);
+                            self?.coins.append(Coin(ticker: ticker, image: image));
+                            if (self!.counter < 2) {
+                                self?.prevLength = (self!.coins.count);
+                            }
+                            if ((self!.coins.count) > self!.prevLength) {
+                                self?.coins.removeSubrange((0...self!.prevLength - 1));
+                            }
                         }
                     }
                 }

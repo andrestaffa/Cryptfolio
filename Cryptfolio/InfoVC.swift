@@ -85,8 +85,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
-                    self?.coin!.ticker = ticker!;
-                    self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
+                    if let ticker = ticker {
+                        self?.coin!.ticker = ticker;
+                        self?.updateInfoVC(ticker: (self?.coin!.ticker)!, tickerImage: (self?.coin!.image.getImage()!)!);
+                    }
                     if (self!.description_view.text == "No Description Available.") {
                         self?.infoTableViewYConstraint.constant = 180.0;
                         self?.description_view.isHidden = true;
@@ -346,10 +348,12 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     private func formatDaysRange(ticker:Ticker, data:inout Array<Double>) -> String {
+        if (data.isEmpty) { return "NA" }
         return "\(CryptoData.convertToDollar(price: data.min()!, hasSymbol: false)) - \(CryptoData.convertToDollar(price: data.max()!, hasSymbol: false))"
     }
     
     private func formatAllTimeHighRange(ticker:Ticker, data:inout Array<Double>) -> String {
+        if (data.isEmpty) { return "NA" }
         var priceString = String(ticker.price);
         priceString.removeFirst();
         
@@ -368,6 +372,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     private func updatePercentChangeWithGraph(data:inout Array<Double>) -> String {
+        if (data.isEmpty) { return "NA"; }
         if let first = data.first, let last = data.last {
             if (first.isZero) {
                 var nonZeroFirst:Double = 1.0;
@@ -518,8 +523,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 } else {
                     self?.chart_view.isHidden = false;
                     self?.activityIndicator.stopAnimating();
-                    self?.dataPoints = history!.prices;
-                    self?.timestamps = history!.timestamps;
+                    if let history = history {
+                        self?.dataPoints = history.prices;
+                        self?.timestamps = history.timestamps;
+                    }
                     self?.chartSetup(data: self!.dataPoints, isDay: false);
                     if (timeFrame != "24h") {
                         self?.change_lbl.text = self!.updatePercentChangeWithGraph(data: &self!.dataPoints);
@@ -553,17 +560,19 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.chart_view.labelColor = UIColor.white;
         let series = ChartSeries(data);
         series.area = true;
-        if (isDay) {
-            if (!((data.first?.isLess(than: data.last!))!) || self.change_lbl.text!.first == "-") {
-                series.color = ChartColors.redColor();
+        if (!data.isEmpty) {
+            if (isDay) {
+                if (!((data.first?.isLess(than: data.last!))!) || self.change_lbl.text!.first == "-") {
+                    series.color = ChartColors.redColor();
+                } else {
+                    series.color = ChartColors.greenColor();
+                }
             } else {
-                series.color = ChartColors.greenColor();
-            }
-        } else {
-            if (!((data.first?.isLess(than: data.last!))!)) {
-                series.color = ChartColors.redColor();
-            } else {
-                series.color = ChartColors.greenColor();
+                if (!((data.first?.isLess(than: data.last!))!)) {
+                    series.color = ChartColors.redColor();
+                } else {
+                    series.color = ChartColors.greenColor();
+                }
             }
         }
         if (self.price_lbl.text!.first == "-") { series.color = ChartColors.greenColor(); }
