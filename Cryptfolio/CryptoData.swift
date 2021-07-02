@@ -52,10 +52,10 @@ public class CryptoData {
         let url = URL(string: "https://api.coinranking.com/v2/coin/\(id)/history?timePeriod=\(timeFrame)");
         if (url == nil) {
             print("error loading history, url was nil");
-            return;
+            completion(nil, nil);
         }
         let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
-        AF.request("https://api.coinranking.com/v2/coin/\(id)/history?timePeriod=\(timeFrame)", headers: headers).responseJSON { (response) in
+        AF.request(url!.absoluteString, headers: headers).responseJSON { (response) in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 if let data = jsonObject["data"] as? Dictionary<String, Any> {
@@ -85,20 +85,23 @@ public class CryptoData {
         let url = URL(string: "https://min-api.cryptocompare.com/data/v2/news/?lang=EN");
         if (url == nil) {
             print("url was nil");
-            return;
+            completion(nil, nil);
         }
         AF.request(url!).responseJSON { (response) in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
-                let data = jsonObject["Data"] as! [Dictionary<String, Any>];
-                for index in 0...data.count - 1 {
-                    let title = data[index]["title"] as! String;
-                    let sourceInfo:Dictionary = data[index]["source_info"] as! Dictionary<String, Any>;
-                    let source = sourceInfo["name"] as! String;
-                    let publishedOn = data[index]["published_on"] as! Double;
-                    let urlString = data[index]["url"] as! String;
-                    let news = News(title: title, source: source, publishedOn: publishedOn, url: urlString);
-                    completion(news, nil);
+                if let data = jsonObject["Data"] as? [Dictionary<String, Any>] {
+                    for index in 0...data.count - 1 {
+                        let title = data[index]["title"] as! String;
+                        let sourceInfo:Dictionary = data[index]["source_info"] as! Dictionary<String, Any>;
+                        let source = sourceInfo["name"] as! String;
+                        let publishedOn = data[index]["published_on"] as! Double;
+                        let urlString = data[index]["url"] as! String;
+                        let news = News(title: title, source: source, publishedOn: publishedOn, url: urlString);
+                        completion(news, nil);
+                    }
+                } else {
+                    completion(nil, nil);
                 }
             } else if let error = response.error {
                 completion(nil, error);
@@ -109,10 +112,10 @@ public class CryptoData {
     public static func getCoinData(id: String, completion:@escaping (Ticker?, Error?) -> Void) -> Void {
         let url = URL(string: "https://api.coinranking.com/v2/coin/\(id)");
         if (url == nil) {
-            return;
+            completion(nil, nil);
         }
         let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
-        AF.request("https://api.coinranking.com/v2/coin/\(id)", headers: headers).responseJSON { (response) in
+        AF.request(url!.absoluteString, headers: headers).responseJSON { (response) in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 if let data = jsonObject["data"] as? Dictionary<String, Any> {
@@ -167,10 +170,10 @@ public class CryptoData {
     public static func getCryptoData(completion:@escaping (Array<Ticker>?, Error?) -> Void) -> Void {
         let url = URL(string: "https://api.coinranking.com/v2/coins?limit=100");
         if (url == nil) {
-            return;
+            completion(nil, nil);
         }
         let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
-        AF.request("https://api.coinranking.com/v2/coins?limit=100", headers: headers).responseJSON { response in
+        AF.request(url!.absoluteString, headers: headers).responseJSON { response in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 if let data = jsonObject["data"] as? Dictionary<String, Any> {
@@ -229,26 +232,83 @@ public class CryptoData {
             return;
         }
         let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
-        AF.request("https://api.coinranking.com/v2/coins?limit=100", headers: headers).responseJSON { response in
+        AF.request(url!.absoluteString, headers: headers).responseJSON { response in
             if let json = response.value {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
-                let data:Dictionary = jsonObject["data"] as! Dictionary<String, Any>;
-                let coins = data["coins"] as! [[String: Any]];
-                for i in 0...coins.count - 1 {
-                    let symbol = coins[i]["symbol"] as! String;
-                    if (symbol.lowercased() == coinSymbol.lowercased()) {
-                        let uuid = coins[i]["uuid"] as! String;
-                        if var coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
-                            coinMap.coinMap[coinSymbol] = uuid;
-                            DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
-                        } else {
-                            var coinMap:CoinMap = CoinMap(coinMap: Dictionary<String, String>());
-                            coinMap.coinMap[coinSymbol] = uuid;
-                            DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                if let data = jsonObject["data"] as? Dictionary<String, Any> {
+                    let coins = data["coins"] as! [[String: Any]];
+                    var foundCoin:Bool = false;
+                    for i in 0...coins.count - 1 {
+                        let symbol = coins[i]["symbol"] as! String;
+                        if (symbol.lowercased() == coinSymbol.lowercased()) {
+                            foundCoin = true;
+                            let uuid = coins[i]["uuid"] as! String;
+                            if var coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
+                                coinMap.coinMap[coinSymbol] = uuid;
+                                DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                            } else {
+                                var coinMap:CoinMap = CoinMap(coinMap: Dictionary<String, String>());
+                                coinMap.coinMap[coinSymbol] = uuid;
+                                DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                            }
+                            completion(uuid, nil);
+                            break;
                         }
-                        completion(uuid, nil);
-                        break;
                     }
+                    if (!foundCoin) {
+                        print("COIN NOT FOUND!!");
+                        getCoinDataOffest(coinSymbol: coinSymbol) { (uuid, error) in
+                            if let error = error { completion(nil, error); }
+                            if let uuid = uuid {
+                                completion(uuid, nil);
+                            } else {
+                                print("COIN ID IS NULL");
+                                completion(nil, nil);
+                            }
+                        }
+                    }
+                } else {
+                    print("COIN ID IS NULL");
+                    completion(nil, nil);
+                }
+            } else if let error = response.error {
+                completion(nil, error);
+            }
+        }
+    }
+    
+    private static func getCoinDataOffest(coinSymbol:String, completion:@escaping (String?, Error?) -> Void) -> Void {
+        let url = URL(string: "https://api.coinranking.com/v2/coins?offset=100");
+        if (url == nil) {
+            print("URL IS NIL");
+            completion(nil, nil);
+            return;
+        }
+        let headers: HTTPHeaders = ["x-access-token":"coinrankingb124ac4caf56e1d6f015bb05984b2175e0de8a5d88867a58"]
+        AF.request(url!.absoluteString, headers: headers).responseJSON { response in
+            if let json = response.value {
+                let jsonObject:Dictionary = json as! Dictionary<String, Any>;
+                if let data = jsonObject["data"] as? Dictionary<String, Any> {
+                    let coins = data["coins"] as! [[String: Any]];
+                    for i in 0...coins.count - 1 {
+                        let symbol = coins[i]["symbol"] as! String;
+                        if (symbol.lowercased() == coinSymbol.lowercased()) {
+                            let uuid = coins[i]["uuid"] as! String;
+                            if var coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
+                                coinMap.coinMap[coinSymbol] = uuid;
+                                DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                            } else {
+                                var coinMap:CoinMap = CoinMap(coinMap: Dictionary<String, String>());
+                                coinMap.coinMap[coinSymbol] = uuid;
+                                DataStorageHandler.saveObject(type: coinMap, forKey: UserDefaultKeys.coinMap);
+                            }
+                            completion(uuid, nil);
+                            break;
+                        }
+                    }
+                } else {
+                    print("COIN ID IS NULL");
+                    completion(nil, nil);
                 }
             } else if let error = response.error {
                 completion(nil, error);

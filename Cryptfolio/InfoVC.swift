@@ -81,7 +81,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.navigationController?.navigationBar.setBackgroundImage(nil, for: .default);
         CryptoData.getCryptoID(coinSymbol: coin!.ticker.symbol.lowercased()) { (uuid, error) in
             if let error = error { print(error.localizedDescription); return; }
-            CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+            guard let uuid = uuid else { return; }
+            CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
@@ -517,7 +518,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.activityIndicator.startAnimating();
         CryptoData.getCryptoID(coinSymbol: self.coin!.ticker.symbol.lowercased()) { (uuid, error) in
             if let error = error { print(error.localizedDescription); return; }
-            CryptoData.getCoinHistory(id: uuid!, timeFrame: timeFrame) { [weak self] (history, error) in
+            guard let uuid = uuid else { return; }
+            CryptoData.getCoinHistory(id: uuid, timeFrame: timeFrame) { [weak self] (history, error) in
                 if let error = error {
                     print(error.localizedDescription);
                 } else {

@@ -32,6 +32,7 @@ public class NotificationManager {
                 switch (status) {
                 case .authorized:
                     print("GRANTED!");
+                    IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
                     break;
                 case .denied,
                      .notDetermined,

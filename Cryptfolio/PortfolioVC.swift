@@ -105,7 +105,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey);
         if (loadedCoins != nil) {
             if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime) && loadedCoins!.count == 1) {
-                self.displayAlert(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue");
+                if let tabBarController = self.tabBarController {
+                    let alertView = AAlertView(containingViewController: tabBarController, title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", primaryTheme: .orange);
+                    alertView.addAction(title: "Continue", completion: {});
+                    alertView.enableDarkMode();
+                    alertView.gestureRecognizers?.forEach(alertView.removeGestureRecognizer);
+                    alertView.exitButton.isHidden = true;
+                    alertView.show();
+                } else {
+                    self.displayAlert(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue");
+                }
                 UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
             }
         }
@@ -403,11 +412,15 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                for ticker in tickerList! {
-                    if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
-                        self?.tickers.append(Coin(ticker: ticker, image: Image(withImage: imageUI)));
-                        self?.collectionView.reloadData();
+                if let tickerList = tickerList {
+                    for ticker in tickerList {
+                        if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
+                            self?.tickers.append(Coin(ticker: ticker, image: Image(withImage: imageUI)));
+                            self?.collectionView.reloadData();
+                        }
                     }
+                } else {
+                    self?.collectionView.reloadData();
                 }
             }
         }
@@ -471,9 +484,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                             self?.tableVIew.reloadData();
                                             self?.writeCoinArray();
                                         } else {
-                                            CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
+                                            CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { [weak self] (uuid, error) in
                                                 if let error = error { print(error.localizedDescription); return; }
-                                                CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                                                guard let uuid = uuid else { self?.tableVIew.reloadData(); self?.writeCoinArray(); self?.isLoading = false; return; }
+                                                CryptoData.getCoinData(id: uuid) { (ticker, error) in
                                                     if let ticker = ticker {
                                                         coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!);
                                                         coin.ticker = ticker;
@@ -526,7 +540,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 } else {
                     CryptoData.getCryptoID(coinSymbol: coin.ticker.symbol.lowercased()) { (uuid, error) in
                         if let error = error { print(error.localizedDescription); return; }
-                        CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                        guard let uuid = uuid else { self?.tableVIew.reloadData(); self?.writeCoinArray(); self?.isLoading = false; return; }
+                        CryptoData.getCoinData(id: uuid) { (ticker, error) in
                             if let ticker = ticker {
                                 coin.image = Image(withImage: UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png")!);
                                 coin.ticker = ticker;
@@ -638,9 +653,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
                     
                 } else {
-                    CryptoData.getCryptoID(coinSymbol: holding.ticker.symbol.lowercased()) { (uuid, error) in
+                    CryptoData.getCryptoID(coinSymbol: holding.ticker.symbol.lowercased()) { [weak self] (uuid, error) in
                         if let error = error { print(error.localizedDescription); return; }
-                        CryptoData.getCoinData(id: uuid!) { (ticker, error) in
+                        guard let uuid = uuid else { self?.updateMainPortPrice(priceChange: 0.00, updatedMainPort: UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey)); return; }
+                        CryptoData.getCoinData(id: uuid) { (ticker, error) in
                             guard let ticker = ticker else { self?.updateMainPortPrice(priceChange: 0.00, updatedMainPort: UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey)); return; }
                             counterInner += 1;
                             holding.estCost = holding.amountOfCoin * ticker.price;
@@ -716,6 +732,25 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         } else { DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { self.saveUserData(); } }
     }
     
+//    private func addCustomCoin(id:String) -> Void {
+//        CryptoData.getCoinData(id: id) { (ticker, error) in
+//            if let error = error { print(error.localizedDescription); return; }
+//            if let ticker = ticker {
+//                let coin = Coin(ticker: ticker, image: Image(withImage: UIImage(named: "Images/\(ticker.symbol.lowercased()).png")!));
+//                DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
+//                var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
+//                loadedCoins.append(coin);
+//                DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
+//            }
+//        }
+//    }
+//
+//    private func removeAllData() -> Void {
+//        let domain = Bundle.main.bundleIdentifier!
+//        UserDefaults.standard.removePersistentDomain(forName: domain)
+//        UserDefaults.standard.set(13680.58, forKey: UserDefaultKeys.availableFundsKey);
+//        UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
+//    }
     
     @objc private func availFundsTapped() -> Void {
         print("Avail Tapped");
@@ -951,23 +986,28 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     private func quickBuy(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
         self.vibrate(style: .light);
-        let alert = UIAlertController(title: "Warning", message: "Are you sure you want to use all your funds to buy \(self.coins[indexPathRow].ticker.symbol.uppercased())", preferredStyle: .alert);
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
-        let buyAction = UIAlertAction(title: "BUY", style: .default) { (action) in
+        let alertView = AAlertView(containingViewController: self.tabBarController!, title: "Warning", message: "Are you sure you want to use all your funds to buy \(self.coins[indexPathRow].ticker.symbol.uppercased())", primaryTheme: .orange);
+        alertView.addAction(title: "Cancel", completion: {});
+        alertView.addAction(title: "BUY") {
             let currentFunds = UserDefaults.standard.value(forKey: UserDefaultKeys.availableFundsKey) as? Double;
             if (currentFunds != nil) {
-                CryptoData.getCryptoID(coinSymbol: coinSet[indexPathRow].ticker.symbol.lowercased()) { (uuid, error) in
+                CryptoData.getCryptoID(coinSymbol: coinSet[indexPathRow].ticker.symbol.lowercased()) { [weak self] (uuid, error) in
                     if let error = error { print(error.localizedDescription); return; }
-                    CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+                    guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again."); return; }
+                    CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
                         if let error = error {
                             print(error.localizedDescription);
                         } else {
-                            let amountCoin = currentFunds! / ticker!.price;
-                            if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker!)) {
-                                self?.loadData();
-                                self?.tableVIew.reloadData();
+                            if let ticker = ticker {
+                                let amountCoin = currentFunds! / ticker.price;
+                                if (OrderHandler.buy(amountCost: currentFunds!, amountOfCoin: amountCoin, ticker: ticker)) {
+                                    self?.loadData();
+                                    self?.tableVIew.reloadData();
+                                } else {
+                                    //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
+                                }
                             } else {
-                                //self.displayAlert(title: "Error", message: "Buy order unsuccessful, try again")
+                                self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again.")
                             }
                         }
                     }
@@ -976,16 +1016,22 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 self.displayAlert(title: "Sorry", message: "Insufficient funds")
             }
         }
-        buyAction.titleTextColor = .green;
-        alert.addAction(buyAction);
-        self.present(alert, animated: true, completion: nil);
+        alertView.leftButton.backgroundColor = .lightGray;
+        alertView.rightButton.backgroundColor = UIColor(red: 0, green: 120/255, blue: 0, alpha: 1);
+        alertView.rightButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        alertView.rightButton.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+        alertView.rightButton.layer.shadowOpacity = 1.0
+        alertView.rightButton.layer.borderWidth = 1;
+        alertView.rightButton.layer.borderColor = UIColor.green.cgColor;
+        alertView.enableDarkMode();
+        alertView.show();
     }
     
     private func quickSell(coinSet:Array<Coin>, indexPathRow:Int) -> Void {
         self.vibrate(style: .light);
-        let alert = UIAlertController(title: "Warning", message: "Are you sure want to sell all holdings of \(self.coins[indexPathRow].ticker.symbol.uppercased())", preferredStyle: .alert);
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
-        alert.addAction(UIAlertAction(title: "SELL", style: .destructive, handler: { (action) in
+        let alertView = AAlertView(containingViewController: self.tabBarController!, title: "Warning", message: "Are you sure want to sell all holdings of \(self.coins[indexPathRow].ticker.symbol.uppercased())", primaryTheme: .orange);
+        alertView.addAction(title: "Cancel", completion: {});
+        alertView.addAction(title: "SELL") {
             var currentHoldings:Holding?
             let loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey);
             for holding in loadedHoldings! {
@@ -994,24 +1040,37 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     break;
                 }
             }
-            CryptoData.getCryptoID(coinSymbol: currentHoldings!.ticker.symbol.lowercased()) { (uuid, error) in
+            CryptoData.getCryptoID(coinSymbol: currentHoldings!.ticker.symbol.lowercased()) { [weak self] (uuid, error) in
                 if let error = error { print(error.localizedDescription); return; }
-                CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+                guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again."); return; }
+                CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
                     if let error = error {
                         print(error.localizedDescription);
                     } else {
-                        let amountCost = currentHoldings!.amountOfCoin * ticker!.price;
-                        if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker!)) {
-                            self?.loadData();
-                            self?.tableVIew.reloadData();
+                        if let ticker = ticker {
+                            let amountCost = currentHoldings!.amountOfCoin * ticker.price;
+                            if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: currentHoldings!.amountOfCoin, ticker: ticker)) {
+                                self?.loadData();
+                                self?.tableVIew.reloadData();
+                            } else {
+                                self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again.");
+                            }
                         } else {
-                            self?.displayAlert(title: "Error", message: "Sell order unsucessful, try again");
+                            self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again.");
                         }
                     }
                 }
             }
-        }))
-        self.present(alert, animated: true, completion: nil);
+        }
+        alertView.leftButton.backgroundColor = .lightGray;
+        alertView.rightButton.backgroundColor = UIColor(red: 120/255, green: 0, blue: 0, alpha: 1);
+        alertView.rightButton.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor
+        alertView.rightButton.layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+        alertView.rightButton.layer.shadowOpacity = 1.0
+        alertView.rightButton.layer.borderWidth = 1;
+        alertView.rightButton.layer.borderColor = UIColor.red.cgColor;
+        alertView.enableDarkMode();
+        alertView.show();
     }
     
     // MARK: - TableView methods

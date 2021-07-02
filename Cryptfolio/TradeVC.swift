@@ -369,21 +369,26 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         // buy the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
             let resultingCost = self.isUSDAmount ? tempCalc * self.ticker!.price : doubleAmount! * self.ticker!.price;
-            CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { (uuid, error)  in
+            CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { [weak self] (uuid, error)  in
                 if let error = error { print(error.localizedDescription); return; }
-                CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+                guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again."); return; }
+                CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
                     if let error = error {
                         print(error.localizedDescription);
                     } else {
-                        let affectedAmountOfCoin:Double = resultingCost / ticker!.price;
-                        if (OrderHandler.buy(amountCost: resultingCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker!)) {
-                            self?.dismiss(animated: true) {
-                                if let portVC = self?.portfolioVC {
-                                    portVC.loadData();
-                                    portVC.tableVIew.reloadData();
-                                    portVC.updateCells();
-                                }
-                            };
+                        if let ticker = ticker {
+                            let affectedAmountOfCoin:Double = resultingCost / ticker.price;
+                            if (OrderHandler.buy(amountCost: resultingCost, amountOfCoin: affectedAmountOfCoin, ticker: ticker)) {
+                                self?.dismiss(animated: true) {
+                                    if let portVC = self?.portfolioVC {
+                                        portVC.loadData();
+                                        portVC.tableVIew.reloadData();
+                                        portVC.updateCells();
+                                    }
+                                };
+                            }
+                        } else {
+                            self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again.");
                         }
                     }
                 }
@@ -440,20 +445,25 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         print("CALC OUT: \(tempCalc)")
         // sell the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
-            CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { (uuid, error) in
+            CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { [weak self] (uuid, error) in
                 if let error = error { print(error.localizedDescription); return; }
-                CryptoData.getCoinData(id: uuid!) { [weak self] (ticker, error) in
+                guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again."); return; }
+                CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
                     if let error = error {
                         print(error.localizedDescription);
                     } else {
-                        let amountCost = tempCalc * ticker!.price;
-                        if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: tempCalc, ticker: ticker!)) {
-                            self?.dismiss(animated: true) {
-                                if let portVC = self?.portfolioVC {
-                                    portVC.loadData();
-                                    portVC.tableVIew.reloadData();
-                                }
-                            };
+                        if let ticker = ticker {
+                            let amountCost = tempCalc * ticker.price;
+                            if (OrderHandler.sell(amountCost: amountCost, amountOfCoin: tempCalc, ticker: ticker)) {
+                                self?.dismiss(animated: true) {
+                                    if let portVC = self?.portfolioVC {
+                                        portVC.loadData();
+                                        portVC.tableVIew.reloadData();
+                                    }
+                                };
+                            }
+                        } else {
+                            self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again.");
                         }
                     }
                 }

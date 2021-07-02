@@ -45,12 +45,16 @@ class NewsTBVC: UITableViewController {
             if let error = error {
                 print(error.localizedDescription);
             } else {
-                self?.newsList.append(news!);
-                if (self!.counter < 2) {
-                    self!.prevLength = (self!.newsList.count);
-                }
-                if ((self!.newsList.count) > self!.prevLength) {
-                    self?.newsList.removeSubrange((0...self!.prevLength - 1));
+                if let news = news {
+                    self?.newsList.append(news);
+                    if (self!.counter < 2) {
+                        self!.prevLength = (self!.newsList.count);
+                    }
+                    if ((self!.newsList.count) > self!.prevLength) {
+                        self?.newsList.removeSubrange((0...self!.prevLength - 1));
+                    }
+                } else {
+                    self?.newsList.append(News(title: "Error Loading News", source: "There was an error loading news", publishedOn: Date().timeIntervalSince1970, url: "https://www.calculatedinc.org"));
                 }
             }
             self?.isLoading = false;

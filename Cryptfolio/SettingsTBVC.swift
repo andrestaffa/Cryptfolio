@@ -373,7 +373,14 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     }
     
     private func showDisclaimer() -> Void {
-        self.displayAlertNormal(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
+        if let tabBarController = self.tabBarController {
+            let alertView = AAlertView(containingViewController: tabBarController, title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", primaryTheme: .orange);
+            alertView.addAction(title: "Continue", completion: {});
+            alertView.enableDarkMode();
+            alertView.show();
+        } else {
+            self.displayAlertNormal(title: "Welcome!", message: "Buying and selling cryptocurrency in this app is practice.\n\n Cryptfolio is intentionally designed this way to allow you to learn how to trade cryptocurrencies without the risks of real trading.\n\n The funds in your account are practice funds but the rest of the app is real-time updated information.", submitTitle: "Continue", style: .default);
+        }
     }
         
     private func watchAdForMoney() -> Void {
