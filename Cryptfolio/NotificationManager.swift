@@ -21,7 +21,9 @@ public class NotificationManager {
                 if (!didAllow) { print("User did not allow notifications"); } else {
                     print("User HAS allowed notifications");
                 }
-                NotificationManager.requestAppTrackingTransparency();
+                if (!NotificationManager.isAppTrackingAuthorized()) {
+                    NotificationManager.requestAppTrackingTransparency();
+                }
             }
         }
     }

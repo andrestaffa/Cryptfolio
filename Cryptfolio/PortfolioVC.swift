@@ -437,6 +437,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 if (username != "NA") {
                     DatabaseManager.getObjects(username: username, type: [Holding].self, typeName: "holdings") { [weak self] (object, error) in
                         if let error = error { print(error.localizedDescription); } else {
+                            self?.availableFunds_lbl.text = "Loading...";
+                            self?.mainPortfolio_lbl.text = "Loading...";
                             guard let holdings = object as? [Holding] else {
                                 UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortChange);
                                 self?.getCoinDataFromDisk();

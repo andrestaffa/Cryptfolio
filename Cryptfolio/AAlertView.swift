@@ -143,10 +143,22 @@ public class AAlertView : UIView {
         self.backgroundView.frame = self.containingViewController.view.frame;
         
         // constraints for self (view)
-        self.centerYAnchor.constraint(equalTo: self.containingViewController.view.centerYAnchor).isActive = true;
-        self.centerXAnchor.constraint(equalTo: self.containingViewController.view.centerXAnchor).isActive = true;
-        self.widthAnchor.constraint(equalTo: self.containingViewController.view.widthAnchor, multiplier: 0.9).isActive = true;
-        self.bottomAnchor.constraint(equalTo: self.messageLabel.bottomAnchor, constant: 80.0).isActive = true;
+        let width = self.containingViewController.view.frame.width;
+        let height = self.containingViewController.view.frame.height;
+        let isiPad12Inch = width.isEqual(to: 1024) && height.isEqual(to: 1366);
+        let isiPad105Inch = width.isEqual(to: 1112) && height.isEqual(to: 834);
+        let isiPadOther = width.isEqual(to: 768) && height.isEqual(to: 1024);
+        if (isiPad12Inch || isiPad105Inch || isiPadOther) {
+            self.centerYAnchor.constraint(equalTo: self.containingViewController.view.centerYAnchor).isActive = true;
+            self.centerXAnchor.constraint(equalTo: self.containingViewController.view.centerXAnchor).isActive = true;
+            self.widthAnchor.constraint(equalTo: self.containingViewController.view.widthAnchor, multiplier: 0.5).isActive = true;
+            self.bottomAnchor.constraint(equalTo: self.messageLabel.bottomAnchor, constant: 80.0).isActive = true;
+        } else {
+            self.centerYAnchor.constraint(equalTo: self.containingViewController.view.centerYAnchor).isActive = true;
+            self.centerXAnchor.constraint(equalTo: self.containingViewController.view.centerXAnchor).isActive = true;
+            self.widthAnchor.constraint(equalTo: self.containingViewController.view.widthAnchor, multiplier: 0.9).isActive = true;
+            self.bottomAnchor.constraint(equalTo: self.messageLabel.bottomAnchor, constant: 80.0).isActive = true;
+        }
         
         // constraints for exitButton
         self.exitButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 10.0).isActive = true;
