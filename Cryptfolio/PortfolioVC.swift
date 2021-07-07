@@ -648,9 +648,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                         }
                     }
                     
-                    self?.mainPortPercentChange_lbl.isHidden = false;
-                    self?.mainPortTimeStamp_lbl.isHidden = false;
-                    
                     self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
                     self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));
                     
@@ -694,9 +691,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                                     self?.retreiveUsernameAndUploadHoldings();
                                 }
                             }
-
-                            self?.mainPortPercentChange_lbl.isHidden = false;
-                            self?.mainPortTimeStamp_lbl.isHidden = false;
 
                             self?.mainPortPercentChange_lbl.textColor = String(self!.portPercentChange).first == "-" && !self!.portPercentChange.isZero ? ChartColors.redColor() : ChartColors.greenColor();
                             self?.mainPortPercentChange_lbl.attributedText = String(self!.portPercentChange).first == "-" && !(self!.portPercentChange.isZero) ? self?.attachImageToStringNew(text: "\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortDownArrow")) : self?.attachImageToStringNew(text: "+\(String(format: "%.2f", self!.portPercentChange * 100))%", image: #imageLiteral(resourceName: "sortUpArrow"));

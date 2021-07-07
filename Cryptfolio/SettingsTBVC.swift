@@ -30,8 +30,9 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     override func viewWillAppear(_ animated: Bool) {
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
             self.accountItems.removeAll();
-            self.accountItems.append(Section(title: "Change Username", image: UIImage(named: "Images/btc.png")!));
-            self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Change username", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Logout", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Delete account", image: UIImage(named: "Images/btc.png")!));
             self.tableView.reloadData();
         }
         
@@ -85,7 +86,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         }
         
         // section 2 - Feedback and Support
-        self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
+        self.feedbackItems.append(Section(title: "More info", image: UIImage(named: "Images/btc.png")!));
         self.feedbackItems.append(Section(title: "Share Cryptfolio", image: UIImage(named: "Images/ltc.png")!));
         self.feedbackItems.append(Section(title: "Send bug report", image: UIImage(named: "Images/xmr.png")!));
         self.feedbackItems.append(Section(title: "About Cryptfolio", image: UIImage(named: "Images/eos.png")!));
@@ -185,7 +186,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                 cell.textLabel?.textColor = .white;
                 self.glowAffect(view: cell.textLabel!, color: .clear);
                 cell.textLabel?.text = self.accountItems[indexPath.row].title
-                if (indexPath.row == 1 && indexPath.section == 3) {
+                if (indexPath.row == 2 && indexPath.section == 3) {
                     cell.textLabel?.textColor = .red;
                 }
             } else {
@@ -234,6 +235,9 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
             self.changeUsername();
         case (3, 1):
             self.signOutPressed();
+            break;
+        case (3, 2):
+            self.deleteUser();
             break;
         default:
             break;
@@ -303,7 +307,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         cell?.isUserInteractionEnabled = false;
         let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to sign out?", preferredStyle: .alert);
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in cell?.isUserInteractionEnabled = true; }));
-        alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
+        alertController.addAction(UIAlertAction(title: "Logout", style: .destructive, handler: { [weak self] (action) in
             SVProgressHUD.show(withStatus: "Loading...")
             var highscore:Double = 0.0;
             if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && !UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0)) {
@@ -323,14 +327,20 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                                     if let error = error { print(error.localizedDescription); } else {
                                         do {
                                             try firebaseAuth.signOut();
-                                            self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                             self?.tableView.reloadData();
-                                            let domain = Bundle.main.bundleIdentifier!
-                                            UserDefaults.standard.removePersistentDomain(forName: domain)
+                                            if let domain = Bundle.main.bundleIdentifier {
+                                                UserDefaults.standard.removePersistentDomain(forName: domain);
+                                            } else {
+                                                self?.displayAlertNormal(title: "Error", message: "Something went wrong on our end. Please try again.", style: .default);
+                                                cell?.isUserInteractionEnabled = true;
+                                                SVProgressHUD.dismiss();
+                                                return;
+                                            }
                                             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
                                             UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
                                             SVProgressHUD.dismiss();
                                             cell?.isUserInteractionEnabled = true;
+                                            self?.tabBarController?.selectedIndex = 0;
                                         } catch let signOutError as NSError {
                                             print ("Error signing out: %@", signOutError)
                                             cell?.isUserInteractionEnabled = true;
@@ -341,14 +351,20 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                             } else {
                                 do {
                                     try firebaseAuth.signOut();
-                                    self?.displayAlertNormal(title: "Signed Out!", message: "You successfully signed out", style: .default);
                                     self?.tableView.reloadData();
-                                    let domain = Bundle.main.bundleIdentifier!
-                                    UserDefaults.standard.removePersistentDomain(forName: domain)
+                                    if let domain = Bundle.main.bundleIdentifier {
+                                        UserDefaults.standard.removePersistentDomain(forName: domain);
+                                    } else {
+                                        self?.displayAlertNormal(title: "Error", message: "Something went wrong on our end. Please try again.", style: .default);
+                                        cell?.isUserInteractionEnabled = true;
+                                        SVProgressHUD.dismiss();
+                                        return;
+                                    }
                                     UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
                                     UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
                                     SVProgressHUD.dismiss();
                                     cell?.isUserInteractionEnabled = true;
+                                    self?.tabBarController?.selectedIndex = 0;
                                 } catch let signOutError as NSError {
                                     print ("Error signing out: %@", signOutError)
                                     cell?.isUserInteractionEnabled = true;
@@ -358,6 +374,50 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                         }
                     }
                 }
+            }
+        }))
+        self.present(alertController, animated: true, completion: nil);
+    }
+    
+    private func deleteUser() -> Void {
+        let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to delete your account? You will not be able to recover your data afterwards.", preferredStyle: .alert);
+        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil));
+        alertController.addAction(UIAlertAction(title: "Delete Account", style: .destructive, handler: { [weak self] (action) in
+            SVProgressHUD.show(withStatus: "Loading...");
+            if let currentUser = Auth.auth().currentUser {
+                if let email = currentUser.email {
+                    DatabaseManager.getUsername(email: email) { [weak self] (username) in
+                        DatabaseManager.deleteUser(username: username) { [weak self] (error) in
+                            if let error = error { self?.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default); SVProgressHUD.dismiss(); } else {
+                                currentUser.delete { [weak self] (error) in
+                                    if let error = error {
+                                        self?.displayAlertNormal(title: "Error", message: error.localizedDescription, style: .default);
+                                        SVProgressHUD.dismiss();
+                                    } else {
+                                        self?.tableView.reloadData();
+                                        if let domain = Bundle.main.bundleIdentifier {
+                                            UserDefaults.standard.removePersistentDomain(forName: domain);
+                                        } else {
+                                            self?.displayAlertNormal(title: "Error", message: "Something went wrong on our end. Please try again.", style: .default);
+                                            SVProgressHUD.dismiss();
+                                            return;
+                                        }
+                                        UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);
+                                        UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
+                                        SVProgressHUD.dismiss();
+                                        self?.tabBarController?.selectedIndex = 0;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    self?.displayAlertNormal(title: "Error", message: "Cannot find email address. Logout and sign back in to try again.", style: .default);
+                    SVProgressHUD.dismiss();
+                }
+            } else {
+                self?.displayAlertNormal(title: "Error", message: "Something went wrong on our end. Please try again.", style: .default);
+                SVProgressHUD.dismiss();
             }
         }))
         self.present(alertController, animated: true, completion: nil);
