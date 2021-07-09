@@ -98,6 +98,12 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             }
         }
         
+        DispatchQueue.main.asyncAfter(deadline: .now() + 12.5) {
+            if (self.mainPortfolio_lbl.text! == "Loading...") {
+                self.displayAlert(title: "Connection Error", message: "You may have a weak connection. Please reload the application.");
+            }
+        }
+        
         if (UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             NotificationManager.askPermission();
         }
