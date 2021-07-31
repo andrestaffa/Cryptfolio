@@ -290,9 +290,11 @@ public class CryptoData {
                 let jsonObject:Dictionary = json as! Dictionary<String, Any>;
                 if let data = jsonObject["data"] as? Dictionary<String, Any> {
                     let coins = data["coins"] as! [[String: Any]];
+                    var foundCoin:Bool = false;
                     for i in 0...coins.count - 1 {
                         let symbol = coins[i]["symbol"] as! String;
                         if (symbol.lowercased() == coinSymbol.lowercased()) {
+                            foundCoin = true;
                             let uuid = coins[i]["uuid"] as! String;
                             if var coinMap = DataStorageHandler.loadObject(type: CoinMap.self, forKey: UserDefaultKeys.coinMap) {
                                 coinMap.coinMap[coinSymbol] = uuid;
@@ -305,6 +307,26 @@ public class CryptoData {
                             completion(uuid, nil);
                             break;
                         }
+                    }
+                    if (!foundCoin) {
+                        print("REALLY GOT TO THIS POINT!!");
+                        if var loadedHoldings = DataStorageHandler.loadObject(type: [Holding].self, forKey: UserDefaultKeys.holdingsKey) {
+                            for holding in loadedHoldings {
+                                if (holding.ticker.symbol == coinSymbol || holding.ticker.symbol.lowercased() == coinSymbol.lowercased()) {
+                                    var availFunds = UserDefaults.standard.double(forKey: UserDefaultKeys.availableFundsKey);
+                                    availFunds += holding.estCost;
+                                    UserDefaults.standard.set(availFunds, forKey: UserDefaultKeys.availableFundsKey);
+                                    break;
+                                }
+                            }
+                            loadedHoldings.removeAll { (holding) in return holding.ticker.symbol == coinSymbol || holding.ticker.symbol.lowercased() == coinSymbol.lowercased(); }
+                            DataStorageHandler.saveObject(type: loadedHoldings, forKey: UserDefaultKeys.holdingsKey);
+                        }
+                        if var coinArray = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {
+                            coinArray.removeAll { (coin) in return coin.ticker.symbol == coinSymbol || coin.ticker.symbol.lowercased() == coinSymbol.lowercased(); }
+                            DataStorageHandler.saveObject(type: coinArray, forKey: UserDefaultKeys.coinArrayKey);
+                        }
+                        completion(nil, nil);
                     }
                 } else {
                     print("COIN ID IS NULL");
