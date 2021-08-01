@@ -34,6 +34,9 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         return sceneView;
     }();
     
+    public var dataPoints:Array<Array<Double>>!;
+    public var coin:Coin!;
+    
     var barChart: ARBarChart? {
         didSet {
             chartButton.setTitle(barChart == nil ? "Add Chart" : "Remove Chart", for: .normal)
@@ -46,25 +49,12 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     
     var screenCenter: CGPoint?
     var dataSeries: ARDataSeries?
-    var prices:[[Double]] = [];
     
     // MARK: - Life Cycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // BTC: Qwsogvtv82FCd
-        // ETH: razxDUgYGNAdQ
-        // USDT: HIVsRcGKkPFtW
-        // DOGE: a91GCGd_u96cF
-        self.getCoinHistory(id: "Qwsogvtv82FCd", timeFrame: "24h") { (history, error) in
-            if let error = error { print(error.localizedDescription); return; }
-            if let history = history {
-                for v in history {
-                    self.prices.append([v]);
-                }
-            }
-        }
-        
+       
         self.setupConstraints();
         self.chartButton.addTarget(self, action: #selector(self.handleTapChartButton(_:)), for: .touchUpInside);
         
@@ -72,7 +62,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene = SCNScene()
         sceneView.showsStatistics = false
         sceneView.antialiasingMode = .multisampling4X
-        sceneView.automaticallyUpdatesLighting = false
+        sceneView.automaticallyUpdatesLighting = true
         sceneView.contentScaleFactor = 1.0
         sceneView.preferredFramesPerSecond = 60
         DispatchQueue.main.async {
@@ -139,43 +129,11 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         self.chartButton.heightAnchor.constraint(equalToConstant: 60.0).isActive = true;
         
     }
-    
-    private func getCoinHistory(id: String, timeFrame:String, completion:@escaping ([Double]?, Error?) -> Void) -> Void {
-        if let url = URL(string: "https://api.coinranking.com/v2/coin/\(id)/history?timePeriod=\(timeFrame)") {
-            var request = URLRequest(url: url);
-            request.httpMethod = "GET";
-            URLSession.shared.dataTask(with: request) { (data, response, error) in
-                if let error = error { completion(nil, error); }
-                if let data = data {
-                    if let json = try? JSONSerialization.jsonObject(with: data, options: []) as? Dictionary<String, Any> {
-                        if let d = json["data"] as? Dictionary<String, Any> {
-                            let historys = d["history"] as! [[String: Any]];
-                            var prices = [Double]();
-                            for i in 0...historys.count - 1 {
-                                let price = historys[i]["price"] as? String;
-                                let priceDouble = Double(price ?? "0.0");
-                                prices.append(priceDouble!);
-                            }
-                            DispatchQueue.main.async { completion(prices, nil); }
-                        } else {
-                            DispatchQueue.main.async { completion(nil, nil); }
-                        }
-                    } else {
-                        DispatchQueue.main.async { completion(nil, nil); }
-                    }
-                } else {
-                    DispatchQueue.main.async { completion(nil, nil); }
-                }
-            }.resume();
-        } else {
-            DispatchQueue.main.async { completion(nil, nil); }
-        }
-    }
-    
+        
     private func getMaxMin() -> (Double, Double) {
         var max:Double = Double.leastNormalMagnitude;
         var min:Double = Double.greatestFiniteMagnitude;
-        for col in self.prices {
+        for col in self.dataPoints {
             for val in col {
                 if (val > max) {
                     max = val;
@@ -192,10 +150,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         var values:[[Double]] = [];
         let (max, min) = self.getMaxMin();
         let delta:Double = (max - (0.999 * min));
-        for i in 0..<self.prices.count {
+        for i in 0..<self.dataPoints.count {
             if (i % divider == 0) {
-                for j in 0..<self.prices[i].count {
-                    let a = ((max - self.prices[i][j]) / delta);
+                for j in 0..<self.dataPoints[i].count {
+                    let a = ((max - self.dataPoints[i][j]) / delta);
                     var b = (1 - a) * max;
                     if (b == 0) { b = max; }
                     values.append([b]);
@@ -207,7 +165,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
 
     private func getColors() -> Array<UIColor> {
         var colors:Array<UIColor> = Array<UIColor>();
-        if let first = self.prices.first, let last = self.prices.last {
+        if let first = self.dataPoints.first, let last = self.dataPoints.last {
             if (!first[0].isLess(than: last[0])) {
                 colors = [
                     UIColor(red: 100.0/255.0, green: 0, blue: 0, alpha: 1.0),
@@ -269,8 +227,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
             barChart?.removeFromParentNode()
             barChart = nil
         }
-        
-        let values = self.scaledPrices(divider: 5);
+                
+        let values = self.scaledPrices(divider: Int(self.dataPoints.count / 100));
         let colors = self.getColors();
         let labels = self.getSeriesLabels(values: values);
         
@@ -282,22 +240,51 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         
         dataSeries?.seriesLabels = labels;
         
+        print("VALUES COUNT: \(values.count)");
         
         barChart = ARBarChart()
         if let barChart = barChart {
             barChart.dataSource = dataSeries
             barChart.delegate = dataSeries
-            setupGraph()
+            barChart.animationType = ARChartPresenter.AnimationType.grow;
+            barChart.size = SCNVector3(0.08, 0.25, 0.5);  // 0.08, 0.25, 0.5
             barChart.position = position
             barChart.draw()
             sceneView.scene.rootNode.addChildNode(barChart)
+            
+            let sphere = self.addSphere(contents: UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png"), position: SCNVector3(0, 0.30, 0));
+            sphere.scale = SCNVector3(sphere.scale.x, sphere.scale.y, sphere.scale.z / 2);
+            barChart.addChildNode(sphere);
+            
+            let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(-0.035, -0.040, 0));
+            sphere.addChildNode(priceText);
+            
+            barChart.eulerAngles = SCNVector3(0, Double.pi/2, 0);
+            sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
+            
         }
     }
     
-    private func setupGraph() {
-        barChart?.animationType = ARChartPresenter.AnimationType.grow;
-        // 0.08, 0.25, 0.5
-        barChart?.size = SCNVector3(0.08, 0.25, 0.5);
+    private func add3dText(message:String, position: SCNVector3) -> SCNNode {
+        let text = SCNText(string: message, extrusionDepth: 1);
+        let material = SCNMaterial();
+        material.diffuse.contents = UIColor.orange;
+        text.materials = [material];
+        let textNode = SCNNode();
+        textNode.position = position;
+        textNode.scale = SCNVector3(0.0012, 0.0012, 0.0012);
+        textNode.geometry = text;
+        return textNode;
+    }
+    
+    private func addSphere(contents:Any?, position: SCNVector3) -> SCNNode {
+        let sphereGeometry = SCNSphere(radius: 0.015)
+        let material = SCNMaterial();
+        material.diffuse.contents = contents;
+        sphereGeometry.materials = [material];
+        let sphereNode = SCNNode(geometry: sphereGeometry)
+        sphereNode.position = position;
+        return sphereNode;
     }
     
     private func addLightSource(ofType type: SCNLight.LightType, at position: SCNVector3? = nil) {

@@ -756,9 +756,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     @objc private func availFundsTapped() -> Void {
         print("Avail Tapped");
-        let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
-        chartVC.hidesBottomBarWhenPushed = true;
-        self.navigationController?.pushViewController(chartVC, animated: true);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
 //        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);

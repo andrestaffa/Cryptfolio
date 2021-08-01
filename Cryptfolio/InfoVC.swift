@@ -55,6 +55,13 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var view5: UIView!
     @IBOutlet weak var view6: UIView!
     @IBOutlet weak var infoTableViewYConstraint: NSLayoutConstraint!
+        
+    let ARCube : UIButton = {
+        let button = UIButton();
+        button.setBackgroundImage(UIImage(named: "ARCube_96"), for: .normal);
+        button.translatesAutoresizingMaskIntoConstraints = false;
+        return button;
+    }();
     
     private var circleView:UIView = UIView();
     private var prevIndex:Int = 0;
@@ -138,6 +145,10 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.allTimeHigh_lbl.adjustsFontSizeToFitWidth = true;
         self.daysRange_lbl.adjustsFontSizeToFitWidth = true;
         
+        self.ARCube.addTarget(self, action: #selector(self.ARButtonTapped), for: .touchUpInside);
+                
+        self.setupConstraints();
+        
     }
     
     @objc func trade() {
@@ -155,6 +166,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
         self.displayAlertWithCompletion(title: "Coin Added!", message: "\(self.coin!.ticker.name) added to dashboard", style: .default) { (action) in
             self.updateRightBarItem();
+        }
+    }
+    
+    @objc private func ARButtonTapped() -> Void {
+        self.vibrate(style: .light);
+        if let coin = self.coin {
+            if (!self.dataPoints.isEmpty) {
+                var series:Array<Array<Double>> = Array<Array<Double>>();
+                for dataPoint in self.dataPoints {
+                    series.append([dataPoint]);
+                }
+                let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
+                chartVC.dataPoints = series;
+                chartVC.coin = coin;
+                chartVC.hidesBottomBarWhenPushed = true;
+                self.navigationController?.pushViewController(chartVC, animated: true);
+            }
         }
     }
     
@@ -176,11 +204,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             tradeButton.addTarget(self, action: #selector(trade), for: .touchUpInside);
             let rightBarButton = UIBarButtonItem(customView: tradeButton);
             self.navigationItem.rightBarButtonItem = rightBarButton;
-//            let button = UIButton()
-//            button.setImage(#imageLiteral(resourceName: "trade"), for: .normal);
-//            button.addTarget(self, action: #selector(self.trade), for: .touchUpInside);
-//            let barButton = UIBarButtonItem(customView: button)
-//            self.navigationItem.rightBarButtonItem = barButton;
         } else {
             let addButton = UIButton();
             addButton.frame = CGRect(x:0, y:0, width:80, height:20);
@@ -192,6 +215,17 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
             let rightBarButton = UIBarButtonItem(customView: addButton);
             self.navigationItem.rightBarButtonItem = rightBarButton;
         }
+    }
+    
+    private func setupConstraints() -> Void {
+        self.view.addSubview(self.ARCube);
+        
+        // constraints for ARCube
+        self.ARCube.topAnchor.constraint(equalTo: self.chart_view.topAnchor, constant: 10.0).isActive = true;
+        self.ARCube.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15.0).isActive = true;
+        self.ARCube.widthAnchor.constraint(equalToConstant: 50.0).isActive = true;
+        self.ARCube.heightAnchor.constraint(equalToConstant: 50.0).isActive = true;
+        
     }
     
     // MARK: - Table view data source methodd

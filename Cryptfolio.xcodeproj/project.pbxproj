@@ -212,7 +212,7 @@
 			isa = PBXGroup;
 			children = (
 				20462FE826B5F21F005E0AF0 /* ARCharts */,
-				20462FF426B5F21F005E0AF0 /* SampleApp */,
+				20462FF426B5F21F005E0AF0 /* Main */,
 			);
 			path = ARGraphs;
 			sourceTree = "<group>";
@@ -242,14 +242,14 @@
 			path = Extensions;
 			sourceTree = "<group>";
 		};
-		20462FF426B5F21F005E0AF0 /* SampleApp */ = {
+		20462FF426B5F21F005E0AF0 /* Main */ = {
 			isa = PBXGroup;
 			children = (
 				20462FF526B5F21F005E0AF0 /* Utilities.swift */,
 				20462FFB26B5F21F005E0AF0 /* FocusSquare.swift */,
 				20462FFD26B5F21F005E0AF0 /* ARChartViewController.swift */,
 			);
-			path = SampleApp;
+			path = Main;
 			sourceTree = "<group>";
 		};
 		56C97AABF7FEEF18D4DEF7EB /* Pods */ = {
