@@ -1790,6 +1790,21 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
             </objects>
             <point key="canvasLocation" x="3567" y="96"/>
         </scene>
+        <!--Chart View Controller-->
+        <scene sceneID="Uhu-Ye-Yi8">
+            <objects>
+                <viewController storyboardIdentifier="ARChartVC" id="GWR-Jc-ebc" customClass="ARChartViewController" customModule="Cryptfolio" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="2YF-Qb-4Bl">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <viewLayoutGuide key="safeArea" id="QfJ-xr-sZ3"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ohr-uy-aj0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1554" y="753"/>
+        </scene>
         <!--LeaderboardVC-->
         <scene sceneID="nin-9C-ZEt">
             <objects>

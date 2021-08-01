@@ -23,6 +23,17 @@
 		2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */; };
 		2035C16F2461E77D00C539B3 /* PortfolioVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */; };
 		20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20437EB3258C0355005479C7 /* NotificationManager.swift */; };
+		2046300E26B5F21F005E0AF0 /* ARDataSeries.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FE926B5F21F005E0AF0 /* ARDataSeries.swift */; };
+		2046300F26B5F21F005E0AF0 /* ARBarChart.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FEA26B5F21F005E0AF0 /* ARBarChart.swift */; };
+		2046301026B5F21F005E0AF0 /* ARChartHighlighter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FEB26B5F21F005E0AF0 /* ARChartHighlighter.swift */; };
+		2046301126B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FED26B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift */; };
+		2046301226B5F21F005E0AF0 /* ARChartPresenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FEE26B5F21F005E0AF0 /* ARChartPresenter.swift */; };
+		2046301326B5F21F005E0AF0 /* ARBarChartProtocols.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FEF26B5F21F005E0AF0 /* ARBarChartProtocols.swift */; };
+		2046301526B5F21F005E0AF0 /* ARBarChartBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FF226B5F21F005E0AF0 /* ARBarChartBar.swift */; };
+		2046301626B5F21F005E0AF0 /* ARChartLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FF326B5F21F005E0AF0 /* ARChartLabel.swift */; };
+		2046301726B5F21F005E0AF0 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FF526B5F21F005E0AF0 /* Utilities.swift */; };
+		2046301B26B5F21F005E0AF0 /* FocusSquare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FFB26B5F21F005E0AF0 /* FocusSquare.swift */; };
+		2046301D26B5F21F005E0AF0 /* ARChartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20462FFD26B5F21F005E0AF0 /* ARChartViewController.swift */; };
 		204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */; };
 		2053C4CF245F851B00A04769 /* Coin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2053C4CE245F851B00A04769 /* Coin.swift */; };
 		2062A22124ED920800185BF8 /* TipManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2062A22024ED920800185BF8 /* TipManager.swift */; };
@@ -74,6 +85,18 @@
 		2035B586247852FE00626463 /* NewsTBVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsTBVCCustomCell.swift; sourceTree = "<group>"; };
 		2035C16E2461E77D00C539B3 /* PortfolioVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVCCustomCell.swift; sourceTree = "<group>"; };
 		20437EB3258C0355005479C7 /* NotificationManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationManager.swift; sourceTree = "<group>"; };
+		20462FE926B5F21F005E0AF0 /* ARDataSeries.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARDataSeries.swift; sourceTree = "<group>"; };
+		20462FEA26B5F21F005E0AF0 /* ARBarChart.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARBarChart.swift; sourceTree = "<group>"; };
+		20462FEB26B5F21F005E0AF0 /* ARChartHighlighter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARChartHighlighter.swift; sourceTree = "<group>"; };
+		20462FED26B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CABasicAnimation+Utilities.swift"; sourceTree = "<group>"; };
+		20462FEE26B5F21F005E0AF0 /* ARChartPresenter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARChartPresenter.swift; sourceTree = "<group>"; };
+		20462FEF26B5F21F005E0AF0 /* ARBarChartProtocols.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARBarChartProtocols.swift; sourceTree = "<group>"; };
+		20462FF026B5F21F005E0AF0 /* ARCharts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ARCharts.h; sourceTree = "<group>"; };
+		20462FF226B5F21F005E0AF0 /* ARBarChartBar.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARBarChartBar.swift; sourceTree = "<group>"; };
+		20462FF326B5F21F005E0AF0 /* ARChartLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARChartLabel.swift; sourceTree = "<group>"; };
+		20462FF526B5F21F005E0AF0 /* Utilities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
+		20462FFB26B5F21F005E0AF0 /* FocusSquare.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FocusSquare.swift; sourceTree = "<group>"; };
+		20462FFD26B5F21F005E0AF0 /* ARChartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ARChartViewController.swift; sourceTree = "<group>"; };
 		204CF6B9245F56C200FCE6DA /* PortfolioVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PortfolioVC.swift; sourceTree = "<group>"; };
 		2053C4CE245F851B00A04769 /* Coin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Coin.swift; sourceTree = "<group>"; };
 		2062A22024ED920800185BF8 /* TipManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TipManager.swift; sourceTree = "<group>"; };
@@ -137,6 +160,7 @@
 		2010F1D923FE113C007B4343 /* Cryptfolio */ = {
 			isa = PBXGroup;
 			children = (
+				20462FDC26B5F200005E0AF0 /* ARGraphs */,
 				200D7B5B2592635400DAF8B5 /* Cryptfolio.entitlements */,
 				2078010B24EC8554001BDC81 /* GoogleService-Info.plist */,
 				2088E8BA268E963A0091FBB0 /* AAlertView.swift */,
@@ -182,6 +206,50 @@
 				20437EB3258C0355005479C7 /* NotificationManager.swift */,
 			);
 			path = Cryptfolio;
+			sourceTree = "<group>";
+		};
+		20462FDC26B5F200005E0AF0 /* ARGraphs */ = {
+			isa = PBXGroup;
+			children = (
+				20462FE826B5F21F005E0AF0 /* ARCharts */,
+				20462FF426B5F21F005E0AF0 /* SampleApp */,
+			);
+			path = ARGraphs;
+			sourceTree = "<group>";
+		};
+		20462FE826B5F21F005E0AF0 /* ARCharts */ = {
+			isa = PBXGroup;
+			children = (
+				20462FE926B5F21F005E0AF0 /* ARDataSeries.swift */,
+				20462FEA26B5F21F005E0AF0 /* ARBarChart.swift */,
+				20462FEB26B5F21F005E0AF0 /* ARChartHighlighter.swift */,
+				20462FEC26B5F21F005E0AF0 /* Extensions */,
+				20462FEE26B5F21F005E0AF0 /* ARChartPresenter.swift */,
+				20462FEF26B5F21F005E0AF0 /* ARBarChartProtocols.swift */,
+				20462FF026B5F21F005E0AF0 /* ARCharts.h */,
+				20462FF226B5F21F005E0AF0 /* ARBarChartBar.swift */,
+				20462FF326B5F21F005E0AF0 /* ARChartLabel.swift */,
+			);
+			name = ARCharts;
+			path = ARCharts/ARCharts;
+			sourceTree = "<group>";
+		};
+		20462FEC26B5F21F005E0AF0 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				20462FED26B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		20462FF426B5F21F005E0AF0 /* SampleApp */ = {
+			isa = PBXGroup;
+			children = (
+				20462FF526B5F21F005E0AF0 /* Utilities.swift */,
+				20462FFB26B5F21F005E0AF0 /* FocusSquare.swift */,
+				20462FFD26B5F21F005E0AF0 /* ARChartViewController.swift */,
+			);
+			path = SampleApp;
 			sourceTree = "<group>";
 		};
 		56C97AABF7FEEF18D4DEF7EB /* Pods */ = {
@@ -328,9 +396,12 @@
 				2053C4CF245F851B00A04769 /* Coin.swift in Sources */,
 				20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */,
 				2088E8BB268E963A0091FBB0 /* AAlertView.swift in Sources */,
+				2046301526B5F21F005E0AF0 /* ARBarChartBar.swift in Sources */,
 				2035B58524784F6100626463 /* NewsTBVC.swift in Sources */,
 				2062A22124ED920800185BF8 /* TipManager.swift in Sources */,
+				2046301D26B5F21F005E0AF0 /* ARChartViewController.swift in Sources */,
 				2010F1E323FE113C007B4343 /* Cryptfolio.xcdatamodeld in Sources */,
+				2046301026B5F21F005E0AF0 /* ARChartHighlighter.swift in Sources */,
 				20AF258424633AC4000265A5 /* TradeVC.swift in Sources */,
 				20D0F0BD25002D7500C458E4 /* DatabaseManager.swift in Sources */,
 				2010F1DB23FE113C007B4343 /* AppDelegate.swift in Sources */,
@@ -339,23 +410,31 @@
 				20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */,
 				2007D42C2464E5D200D422E6 /* Holding.swift in Sources */,
 				20DAB4D1247EF3DB00DD57CC /* SettingsTBVC.swift in Sources */,
+				2046300E26B5F21F005E0AF0 /* ARDataSeries.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
+				2046301626B5F21F005E0AF0 /* ARChartLabel.swift in Sources */,
 				2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */,
 				20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
+				2046301126B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift in Sources */,
 				20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */,
 				2016FEB524F2E6E200E38535 /* HoldingVC.swift in Sources */,
 				20C4C05B24ECDB1C0096B31E /* InvestingTipsVC.swift in Sources */,
 				2010F1F423FE1240007B4343 /* CustomCell.swift in Sources */,
+				2046301B26B5F21F005E0AF0 /* FocusSquare.swift in Sources */,
 				20F218FC25070DAF002A01AC /* Forgot.swift in Sources */,
 				2016FEB724F2EF7300E38535 /* HistoryVC.swift in Sources */,
+				2046301726B5F21F005E0AF0 /* Utilities.swift in Sources */,
+				2046300F26B5F21F005E0AF0 /* ARBarChart.swift in Sources */,
 				20F218FA2506F82A002A01AC /* SignUpVC.swift in Sources */,
 				2010F1F223FE1202007B4343 /* HomeTBVC.swift in Sources */,
 				20D0F0BF2500363500C458E4 /* LeaderboardVC.swift in Sources */,
 				2010C6302482CD2A00CECAC5 /* ReferenceTBVC.swift in Sources */,
 				20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */,
+				2046301326B5F21F005E0AF0 /* ARBarChartProtocols.swift in Sources */,
 				20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */,
 				209965C124EEE8020091F0F1 /* TipVC.swift in Sources */,
+				2046301226B5F21F005E0AF0 /* ARChartPresenter.swift in Sources */,
 				206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
