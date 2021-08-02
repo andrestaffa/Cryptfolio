@@ -10,28 +10,59 @@ import ARCharts
 import ARKit
 import SceneKit
 import UIKit
+import SideMenu
 
-class ARChartViewController: UIViewController, ARSCNViewDelegate {
+public class ARSettings {
+    
+    public static let shared = ARSettings();
+    
+    // Lighting settings
+    public var lightingSettings:SCNLight.LightType = .spot;
+    
+    // Color settings
+    public var adjustedColor:Bool = false;
+    public var brightnessPrecentage:CGFloat = 100.0;
+    public var redValue:CGFloat = 0.0;
+    public var greenValue:CGFloat = 0.0;
+    public var blueValue:CGFloat = 0.0;
+    
+    private init() {}
+    
+    public func resetAll() -> Void {
+        ARSettings.shared.lightingSettings = .spot;
+        ARSettings.shared.adjustedColor = false;
+        ARSettings.shared.brightnessPrecentage = 100.0;
+        ARSettings.shared.redValue = 0.0;
+        ARSettings.shared.greenValue = 0.0;
+        ARSettings.shared.blueValue = 0.0;
+    }
+    
+}
+
+class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNavigationControllerDelegate, UINavigationControllerDelegate {
+    
+    private var sideMenu : SideMenuNavigationController?
+    
+    let sceneView : ARSCNView = {
+        let sceneView = ARSCNView();
+        sceneView.translatesAutoresizingMaskIntoConstraints = false;
+        return sceneView;
+    }();
     
     let chartButton : UIButton = {
         let button = UIButton();
         button.setTitle("Add Chart", for: .normal)
         button.setTitleColor(.white, for: .normal);
-        button.backgroundColor = .orange
+        button.backgroundColor = .mainBackgroundColor;
+        button.layer.borderWidth = 1.0;
+        button.layer.borderColor = UIColor.orange.cgColor;
         button.layer.cornerRadius = 5.0;
-        button.layer.cornerRadius = 3.0;
         button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor;
         button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0);
         button.layer.shadowOpacity = 1.0;
         button.layer.shadowRadius = 5.0;
         button.translatesAutoresizingMaskIntoConstraints = false;
         return button;
-    }();
-    
-    let sceneView : ARSCNView = {
-        let sceneView = ARSCNView();
-        sceneView.translatesAutoresizingMaskIntoConstraints = false;
-        return sceneView;
     }();
     
     public var dataPoints:Array<Array<Double>>!;
@@ -54,7 +85,16 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-       
+        
+        if let first = self.dataPoints.first, let last = self.dataPoints.last {
+            if (!first[0].isLess(than: last[0])) {
+                ARSettings.shared.redValue = 255.0 / 2.0;
+            } else {
+                ARSettings.shared.greenValue = 255.0 / 2.0;
+            }
+        }
+        
+        self.setupSideMenu();
         self.setupConstraints();
         self.chartButton.addTarget(self, action: #selector(self.handleTapChartButton(_:)), for: .touchUpInside);
         
@@ -80,11 +120,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         chartButton.clipsToBounds = true
         
         setupFocusSquare()
-        setupRotationGesture()
+        setupRotationGesture();
+        setupTranslationGesture();
         setupPinchScaleGesture();
-        setupHighlightGesture()
-
-        addLightSource(ofType: .spot);
+        setupHighlightGesture();
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -103,6 +142,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
+        ARSettings.shared.resetAll();
         sceneView.session.pause()
     }
     
@@ -111,6 +151,42 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     }
     
     // MARK: - ANDRE METHODS
+    
+    func sideMenuDidAppear(menu: SideMenuNavigationController, animated: Bool) {
+        self.removeBarChart();
+        self.chartButton.isUserInteractionEnabled = false;
+    }
+    
+    func sideMenuDidDisappear(menu: SideMenuNavigationController, animated: Bool) {
+        self.chartButton.isUserInteractionEnabled = true;
+    }
+    
+    private func setupSideMenu() -> Void {
+        self.sideMenu = SideMenuNavigationController(rootViewController: ARSettingsVC());
+        self.sideMenu?.delegate = self;
+        self.sideMenu?.setNavigationBarHidden(true, animated: false);
+        self.sideMenu?.menuWidth = self.view.frame.width * 0.8;
+        self.sideMenu?.enableSwipeToDismissGesture = false;
+        SideMenuManager.default.rightMenuNavigationController = self.sideMenu;
+        
+        let settings = UIButton();
+        settings.frame = CGRect(x:0, y:0, width:100, height:20);
+        settings.setTitle("Settings", for: .normal);
+        settings.setTitle("Settings", for: .highlighted);
+        settings.backgroundColor = .mainBackgroundColor;
+        settings.layer.borderWidth = 1.0;
+        settings.layer.borderColor = UIColor.orange.cgColor;
+        settings.layer.cornerRadius = 5.0;
+        settings.addTarget(self, action: #selector(self.openSettings), for: .touchUpInside);
+        let rightBarButton = UIBarButtonItem(customView: settings);
+        self.navigationItem.rightBarButtonItem = rightBarButton;
+    }
+    
+    @objc private func openSettings() -> Void {
+        if let sideMenu = self.sideMenu {
+            self.present(sideMenu, animated: true, completion: nil);
+        }
+    }
     
     private func setupConstraints() -> Void {
         self.view.addSubview(self.sceneView);
@@ -165,27 +241,29 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
 
     private func getColors() -> Array<UIColor> {
         var colors:Array<UIColor> = Array<UIColor>();
-        if let first = self.dataPoints.first, let last = self.dataPoints.last {
-            if (!first[0].isLess(than: last[0])) {
-                colors = [
-                    UIColor(red: 100.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 100.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 110.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 100.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 110.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 110.0/255.0, green: 0, blue: 0, alpha: 1.0),
-                    UIColor(red: 100.0/255.0, green: 0, blue: 0, alpha: 1.0)
-                ]
-            } else {
-                colors = [
-                    UIColor(red: 0, green: 100.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 100.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 110.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 100.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 110.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 110.0/255.0, blue: 0, alpha: 1.0),
-                    UIColor(red: 0, green: 100.0/255.0, blue: 0, alpha: 1.0)
-                ]
+        if (ARSettings.shared.adjustedColor) {
+            if let first = self.dataPoints.first, let last = self.dataPoints.last {
+                if (!first[0].isLess(than: last[0])) {
+                    var color = UIColor(red: ARSettings.shared.redValue/255.0, green: ARSettings.shared.greenValue/255.0, blue: ARSettings.shared.blueValue/255.0, alpha: 1.0);
+                    color = color.adjust(by: ARSettings.shared.brightnessPrecentage);
+                    colors = [color];
+                } else {
+                    var color = UIColor(red: ARSettings.shared.redValue/255.0, green: ARSettings.shared.greenValue/255.0, blue: ARSettings.shared.blueValue/255.0, alpha: 1.0);
+                    color = color.adjust(by: CGFloat(ARSettings.shared.brightnessPrecentage));
+                    colors = [color];
+                }
+            }
+        } else {
+            if let first = self.dataPoints.first, let last = self.dataPoints.last {
+                if (!first[0].isLess(than: last[0])) {
+                    var color = UIColor(red: 100/255.0, green: 0.0, blue: 0.0, alpha: 1.0)
+                    color = color.adjust(by: ARSettings.shared.brightnessPrecentage);
+                    colors = [color];
+                } else {
+                    var color = UIColor(red: 0.0, green: 100.0/255.0, blue: 0.0, alpha: 1.0)
+                    color = color.adjust(by: ARSettings.shared.brightnessPrecentage);
+                    colors = [color];
+                }
             }
         }
         return colors;
@@ -209,6 +287,13 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         return label;
     }
     
+    private func removeBarChart() -> Void {
+        if (self.barChart != nil) {
+            self.barChart?.removeFromParentNode()
+            self.barChart = nil
+        }
+    }
+    
     // MARK: - ANDRE METHODS (END)
     
     
@@ -227,8 +312,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
             barChart?.removeFromParentNode()
             barChart = nil
         }
+        
+        let _ = Int(self.dataPoints.count / 100);
                 
-        let values = self.scaledPrices(divider: Int(self.dataPoints.count / 100));
+        let values = self.scaledPrices(divider: 5);
         let colors = self.getColors();
         let labels = self.getSeriesLabels(values: values);
         
@@ -240,10 +327,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         
         dataSeries?.seriesLabels = labels;
         
-        print("VALUES COUNT: \(values.count)");
         
         barChart = ARBarChart()
         if let barChart = barChart {
+            addLightSource(ofType: ARSettings.shared.lightingSettings);
             barChart.dataSource = dataSeries
             barChart.delegate = dataSeries
             barChart.animationType = ARChartPresenter.AnimationType.grow;
@@ -301,6 +388,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
             self.sceneView.scene.rootNode.addChildNode(lightNode)
         } else {
             // Make the light source follow the camera position
+            //self.sceneView.pointOfView?.enumerateChildNodes({ (node, stop) in node.removeFromParentNode(); });
             self.sceneView.pointOfView?.addChildNode(lightNode)
         }
     }
@@ -308,6 +396,11 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     private func setupRotationGesture() {
         let rotationGestureRecognizer = UIRotationGestureRecognizer(target: self, action: #selector(handleRotation))
         self.view.addGestureRecognizer(rotationGestureRecognizer)
+    }
+    
+    private func setupTranslationGesture() -> Void {
+        let translationGesture = UIPanGestureRecognizer(target: self, action: #selector(self.handleTranslation(_:)));
+        self.view.addGestureRecognizer(translationGesture);
     }
     
     private func setupPinchScaleGesture() -> Void {
@@ -365,6 +458,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
     
     private var startingRotation: Float = 0.0
     private var startingVectorScale: SCNVector3 = SCNVector3();
+    private var startingTranslation: SCNVector3 = SCNVector3();
     
     @objc func handleRotation(rotationGestureRecognizer: UIRotationGestureRecognizer) {
         guard let barChart = barChart,
@@ -379,6 +473,17 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
             self.barChart?.eulerAngles.y = startingRotation - Float(rotationGestureRecognizer.rotation)
         }
     }
+    
+    @objc func handleTranslation(_ gesture: UIPanGestureRecognizer) {
+        guard let barChart = self.barChart, let pointOfView = self.sceneView.pointOfView, self.sceneView.isNode(barChart, insideFrustumOf: pointOfView) else { return; }
+        if (gesture.state == .began) {
+            startingTranslation = barChart.position;
+        } else if (gesture.state == .changed) {
+            let translation = gesture.translation(in: self.view);
+            barChart.position = SCNVector3(startingTranslation.x + (Float(translation.x) * 0.001), startingTranslation.y, startingTranslation.z + (Float(translation.y) * 0.001));
+        }
+    }
+
     
     @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
         guard let barChart = self.barChart, let pointOfView = self.sceneView.pointOfView, self.sceneView.isNode(barChart, insideFrustumOf: pointOfView) else { return; }
@@ -494,12 +599,6 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate {
         }
         
         return (nil, nil, false)
-    }
-    
-    // MARK: Navigation
-    
-    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
-        return .none
     }
     
 }

@@ -170,7 +170,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     @objc private func ARButtonTapped() -> Void {
-        self.vibrate(style: .light);
         if let coin = self.coin {
             if (!self.dataPoints.isEmpty) {
                 var series:Array<Array<Double>> = Array<Array<Double>>();
@@ -549,6 +548,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     private func updateGraph(timeFrame: String) {
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
+        self.ARCube.isHidden = true;
         self.activityIndicator.startAnimating();
         CryptoData.getCryptoID(coinSymbol: self.coin!.ticker.symbol.lowercased()) { (uuid, error) in
             if let error = error { print(error.localizedDescription); return; }
@@ -558,6 +558,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     print(error.localizedDescription);
                 } else {
                     self?.chart_view.isHidden = false;
+                    self?.ARCube.isHidden = false;
                     self?.activityIndicator.stopAnimating();
                     if let history = history {
                         self?.dataPoints = history.prices;

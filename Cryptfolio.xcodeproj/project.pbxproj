@@ -53,6 +53,7 @@
 		20DF8F4C246F1664002754E2 /* OrderHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DF8F4B246F1664002754E2 /* OrderHandler.swift */; };
 		20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E924FF24494FC8002B59B1 /* CryptoData.swift */; };
 		20E9250624495016002B59B1 /* Data.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 20E9250524495016002B59B1 /* Data.bundle */; };
+		20E998E426B737D900AF96E9 /* ARSettingsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20E998E326B737D900AF96E9 /* ARSettingsVC.swift */; };
 		20F218F82506DB69002A01AC /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F218F72506DB69002A01AC /* LoginVC.swift */; };
 		20F218FA2506F82A002A01AC /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F218F92506F82A002A01AC /* SignUpVC.swift */; };
 		20F218FC25070DAF002A01AC /* Forgot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F218FB25070DAF002A01AC /* Forgot.swift */; };
@@ -117,6 +118,7 @@
 		20DF8F4B246F1664002754E2 /* OrderHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderHandler.swift; sourceTree = "<group>"; };
 		20E924FF24494FC8002B59B1 /* CryptoData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CryptoData.swift; sourceTree = "<group>"; };
 		20E9250524495016002B59B1 /* Data.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Data.bundle; sourceTree = "<group>"; };
+		20E998E326B737D900AF96E9 /* ARSettingsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARSettingsVC.swift; sourceTree = "<group>"; };
 		20F218F72506DB69002A01AC /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
 		20F218F92506F82A002A01AC /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		20F218FB25070DAF002A01AC /* Forgot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forgot.swift; sourceTree = "<group>"; };
@@ -248,6 +250,7 @@
 				20462FF526B5F21F005E0AF0 /* Utilities.swift */,
 				20462FFB26B5F21F005E0AF0 /* FocusSquare.swift */,
 				20462FFD26B5F21F005E0AF0 /* ARChartViewController.swift */,
+				20E998E326B737D900AF96E9 /* ARSettingsVC.swift */,
 			);
 			path = Main;
 			sourceTree = "<group>";
@@ -414,6 +417,7 @@
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				2046301626B5F21F005E0AF0 /* ARChartLabel.swift in Sources */,
 				2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */,
+				20E998E426B737D900AF96E9 /* ARSettingsVC.swift in Sources */,
 				20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
 				2046301126B5F21F005E0AF0 /* CABasicAnimation+Utilities.swift in Sources */,

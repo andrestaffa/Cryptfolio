@@ -358,6 +358,7 @@ PODS:
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
   - PromisesObjC (2.0.0)
+  - SideMenu (6.5.0)
   - SVProgressHUD (2.2.5)
   - SwiftChart (1.0.1)
 
@@ -370,6 +371,7 @@ DEPENDENCIES:
   - Firebase/Database
   - Firebase/Firestore
   - IronSourceSDK (= 7.1.6.0)
+  - SideMenu
   - SVProgressHUD
   - SwiftChart
 
@@ -398,6 +400,7 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - SideMenu
     - SVProgressHUD
     - SwiftChart
 
@@ -425,9 +428,10 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
+  SideMenu: f583187d21c5b1dd04c72002be544b555a2627a2
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftChart: ba767a678d568a5ee22d419e146a0582865e1aff
 
-PODFILE CHECKSUM: 5c6794a1138568dd5c5ebb94edc6db37edd9e53d
+PODFILE CHECKSUM: c6d1c9d2ae86a93880977e0bb2d1a076eb379bb5
 
 COCOAPODS: 1.10.1
