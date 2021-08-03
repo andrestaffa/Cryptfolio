@@ -16,8 +16,13 @@ public class ARSettings {
     
     public static let shared = ARSettings();
     
+    // global boolean whether or not chart is default green or red
+    public var isGreen:Bool = false;
+    
     // Lighting settings
-    public var lightingSettings:SCNLight.LightType = .spot;
+    public var lightingTypeSettings:SCNLight.LightType = .spot;
+    public var intensitySetting:CGFloat = 2500.0;
+    public var temperatureSetting:CGFloat = 6500.0;
     
     // Color settings
     public var adjustedColor:Bool = false;
@@ -28,8 +33,10 @@ public class ARSettings {
     
     private init() {}
     
-    public func resetAll() -> Void {
-        ARSettings.shared.lightingSettings = .spot;
+    public func resetAllSettings() -> Void {
+        ARSettings.shared.lightingTypeSettings = .spot;
+        ARSettings.shared.intensitySetting = 2500.0;
+        ARSettings.shared.temperatureSetting = 6500.0
         ARSettings.shared.adjustedColor = false;
         ARSettings.shared.brightnessPrecentage = 100.0;
         ARSettings.shared.redValue = 0.0;
@@ -37,9 +44,25 @@ public class ARSettings {
         ARSettings.shared.blueValue = 0.0;
     }
     
+    public func resetLightingSettings() -> Void {
+        ARSettings.shared.lightingTypeSettings = .spot;
+        ARSettings.shared.intensitySetting = 2500.0;
+        ARSettings.shared.temperatureSetting = 6500.0;
+    }
+    
+    public func resetColorSettings() -> Void {
+        ARSettings.shared.adjustedColor = false;
+        ARSettings.shared.brightnessPrecentage = 100;
+        ARSettings.shared.redValue = ARSettings.shared.isGreen ? 0.0 : 255.0 / 2.0;
+        ARSettings.shared.greenValue = ARSettings.shared.isGreen ? 255.0 / 2.0 : 0.0;
+        ARSettings.shared.blueValue = 0.0;
+    }
+    
 }
 
 class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNavigationControllerDelegate, UINavigationControllerDelegate {
+    
+    override var prefersStatusBarHidden: Bool { return true; }
     
     private var sideMenu : SideMenuNavigationController?
     
@@ -88,8 +111,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         
         if let first = self.dataPoints.first, let last = self.dataPoints.last {
             if (!first[0].isLess(than: last[0])) {
+                ARSettings.shared.isGreen = false;
                 ARSettings.shared.redValue = 255.0 / 2.0;
             } else {
+                ARSettings.shared.isGreen = true;
                 ARSettings.shared.greenValue = 255.0 / 2.0;
             }
         }
@@ -124,6 +149,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         setupTranslationGesture();
         setupPinchScaleGesture();
         setupHighlightGesture();
+        
+        addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -142,7 +169,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
-        ARSettings.shared.resetAll();
+        ARSettings.shared.resetAllSettings();
         sceneView.session.pause()
     }
     
@@ -159,6 +186,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     
     func sideMenuDidDisappear(menu: SideMenuNavigationController, animated: Bool) {
         self.chartButton.isUserInteractionEnabled = true;
+        addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
     }
     
     private func setupSideMenu() -> Void {
@@ -169,23 +197,47 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         self.sideMenu?.enableSwipeToDismissGesture = false;
         SideMenuManager.default.rightMenuNavigationController = self.sideMenu;
         
-        let settings = UIButton();
-        settings.frame = CGRect(x:0, y:0, width:100, height:20);
-        settings.setTitle("Settings", for: .normal);
-        settings.setTitle("Settings", for: .highlighted);
-        settings.backgroundColor = .mainBackgroundColor;
-        settings.layer.borderWidth = 1.0;
-        settings.layer.borderColor = UIColor.orange.cgColor;
-        settings.layer.cornerRadius = 5.0;
-        settings.addTarget(self, action: #selector(self.openSettings), for: .touchUpInside);
-        let rightBarButton = UIBarButtonItem(customView: settings);
+        // right bar item
+        let settingsButton = UIButton();
+        settingsButton.frame = CGRect(x: 0, y: 0, width: 45, height: 50);
+        settingsButton.setImage(UIImage(named: "settings")?.withRenderingMode(.alwaysTemplate), for: .normal);
+        settingsButton.tintColor = .white
+        settingsButton.backgroundColor = .mainBackgroundColor;
+        settingsButton.layer.borderWidth = 1.0;
+        settingsButton.layer.borderColor = UIColor.orange.cgColor;
+        settingsButton.layer.cornerRadius = settingsButton.bounds.size.width / 2;
+        settingsButton.layer.masksToBounds = true;
+        settingsButton.clipsToBounds = true;
+        settingsButton.addTarget(self, action: #selector(self.openSettings), for: .touchUpInside);
+        let rightBarButton = UIBarButtonItem(customView: settingsButton);
         self.navigationItem.rightBarButtonItem = rightBarButton;
+        
+        // left bar item
+        self.navigationItem.backBarButtonItem = nil;
+        let exitButton = UIButton();
+        exitButton.frame = CGRect(x: 0, y: 0, width: 45, height: 50);
+        exitButton.setImage(UIImage(named: "exit")?.withRenderingMode(.alwaysTemplate), for: .normal);
+        exitButton.tintColor = .white
+        exitButton.backgroundColor = .mainBackgroundColor;
+        exitButton.layer.borderWidth = 1.0;
+        exitButton.layer.borderColor = UIColor.orange.cgColor;
+        exitButton.layer.cornerRadius = exitButton.bounds.size.width / 2;
+        exitButton.layer.masksToBounds = true;
+        exitButton.clipsToBounds = true;
+        exitButton.addTarget(self, action: #selector(self.exitButtonTapped), for: .touchUpInside);
+        let leftBarButton = UIBarButtonItem(customView: exitButton);
+        self.navigationItem.leftBarButtonItem = leftBarButton;
+        
     }
     
     @objc private func openSettings() -> Void {
         if let sideMenu = self.sideMenu {
             self.present(sideMenu, animated: true, completion: nil);
         }
+    }
+    
+    @objc private func exitButtonTapped() -> Void {
+        self.navigationController?.popViewController(animated: true);
     }
     
     private func setupConstraints() -> Void {
@@ -330,7 +382,6 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         
         barChart = ARBarChart()
         if let barChart = barChart {
-            addLightSource(ofType: ARSettings.shared.lightingSettings);
             barChart.dataSource = dataSeries
             barChart.delegate = dataSeries
             barChart.animationType = ARChartPresenter.AnimationType.grow;
@@ -374,11 +425,12 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         return sphereNode;
     }
     
-    private func addLightSource(ofType type: SCNLight.LightType, at position: SCNVector3? = nil) {
+    private func addLightSource(ofType type: SCNLight.LightType, intensity:CGFloat, temperature:CGFloat, at position: SCNVector3? = nil) {
         let light = SCNLight()
         light.color = UIColor.white
         light.type = type
-        light.intensity = 2500 // Default SCNLight intensity is 1000
+        light.intensity = intensity // Default SCNLight intensity is 1000
+        light.temperature = temperature; // Default SCNLight temperature is 6500
         
         let lightNode = SCNNode()
         lightNode.light = light
@@ -388,7 +440,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.sceneView.scene.rootNode.addChildNode(lightNode)
         } else {
             // Make the light source follow the camera position
-            //self.sceneView.pointOfView?.enumerateChildNodes({ (node, stop) in node.removeFromParentNode(); });
+            self.sceneView.pointOfView?.enumerateChildNodes({ (node, stop) in node.removeFromParentNode(); });
             self.sceneView.pointOfView?.addChildNode(lightNode)
         }
     }

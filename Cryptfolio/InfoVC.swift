@@ -57,8 +57,14 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var infoTableViewYConstraint: NSLayoutConstraint!
         
     let ARCube : UIButton = {
-        let button = UIButton();
-        button.setBackgroundImage(UIImage(named: "ARCube_96"), for: .normal);
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 75));
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 35, height: 35));
+        imageView.center = button.center - CGPoint(x: 0, y: 2.5);
+        imageView.image = UIImage(named: "ARCube");
+        button.addSubview(imageView);
+        button.backgroundColor = .mainBackgroundColor;
+        button.layer.borderWidth = 2.0;
+        button.layer.borderColor = UIColor.orange.cgColor;
         button.translatesAutoresizingMaskIntoConstraints = false;
         return button;
     }();
@@ -107,6 +113,14 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 }
             }
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews();
+        
+        self.ARCube.layer.cornerRadius = self.ARCube.bounds.size.width / 2;
+        self.ARCube.layer.masksToBounds = true;
+        self.ARCube.clipsToBounds = true;
     }
     
     override func viewDidLoad() {
@@ -169,22 +183,6 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
-    @objc private func ARButtonTapped() -> Void {
-        if let coin = self.coin {
-            if (!self.dataPoints.isEmpty) {
-                var series:Array<Array<Double>> = Array<Array<Double>>();
-                for dataPoint in self.dataPoints {
-                    series.append([dataPoint]);
-                }
-                let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
-                chartVC.dataPoints = series;
-                chartVC.coin = coin;
-                chartVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(chartVC, animated: true);
-            }
-        }
-    }
-    
     private func updateRightBarItem() -> Void {
         let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
          for coin in loadedCoins {
@@ -216,14 +214,32 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
+    // MARK: - AR Cube Methods
+    
+    @objc private func ARButtonTapped() -> Void {
+        if let coin = self.coin {
+            if (!self.dataPoints.isEmpty) {
+                var series:Array<Array<Double>> = Array<Array<Double>>();
+                for dataPoint in self.dataPoints {
+                    series.append([dataPoint]);
+                }
+                let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
+                chartVC.dataPoints = series;
+                chartVC.coin = coin;
+                chartVC.hidesBottomBarWhenPushed = true;
+                self.navigationController?.pushViewController(chartVC, animated: true);
+            }
+        }
+    }
+    
     private func setupConstraints() -> Void {
         self.view.addSubview(self.ARCube);
         
         // constraints for ARCube
-        self.ARCube.topAnchor.constraint(equalTo: self.chart_view.topAnchor, constant: 10.0).isActive = true;
+        self.ARCube.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -25.0).isActive = true;
         self.ARCube.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15.0).isActive = true;
-        self.ARCube.widthAnchor.constraint(equalToConstant: 50.0).isActive = true;
-        self.ARCube.heightAnchor.constraint(equalToConstant: 50.0).isActive = true;
+        self.ARCube.widthAnchor.constraint(equalToConstant: 75.0).isActive = true;
+        self.ARCube.heightAnchor.constraint(equalToConstant: 75.0).isActive = true;
         
     }
     
@@ -548,7 +564,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     private func updateGraph(timeFrame: String) {
         self.deleteDataForReuse(dataPoints: &self.dataPoints, timestaps: &self.timestamps);
         self.chart_view.isHidden = true;
-        self.ARCube.isHidden = true;
+        self.ARCube.isUserInteractionEnabled = false;
         self.activityIndicator.startAnimating();
         CryptoData.getCryptoID(coinSymbol: self.coin!.ticker.symbol.lowercased()) { (uuid, error) in
             if let error = error { print(error.localizedDescription); return; }
@@ -558,7 +574,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                     print(error.localizedDescription);
                 } else {
                     self?.chart_view.isHidden = false;
-                    self?.ARCube.isHidden = false;
+                    self?.ARCube.isUserInteractionEnabled = true;
                     self?.activityIndicator.stopAnimating();
                     if let history = history {
                         self?.dataPoints = history.prices;
