@@ -389,16 +389,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             barChart.position = position
             barChart.draw()
             sceneView.scene.rootNode.addChildNode(barChart)
-            
-            let sphere = self.addSphere(contents: UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png"), position: SCNVector3(0, 0.30, 0));
-            sphere.scale = SCNVector3(sphere.scale.x, sphere.scale.y, sphere.scale.z / 2);
-            barChart.addChildNode(sphere);
-            
-            let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(-0.035, -0.040, 0));
-            sphere.addChildNode(priceText);
-            
             barChart.eulerAngles = SCNVector3(0, Double.pi/2, 0);
-            sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
             
         }
     }

@@ -474,7 +474,6 @@ extension Double {
 
 extension UIColor {
     public static let mainBackgroundColor = UIColor(red: 31/255, green: 36/255, blue: 37/255, alpha: 1);
-    
     func adjust(by percentage: CGFloat = 30.0) -> UIColor {
         var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0;
         if (self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)) {
@@ -483,6 +482,4 @@ extension UIColor {
             return self;
         }
     }
-    
-        
 }

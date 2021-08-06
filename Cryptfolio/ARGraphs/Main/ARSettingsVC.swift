@@ -81,10 +81,10 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         if (sender.tag == 0) {
             ARSettings.shared.resetLightingSettings();
             self.lightingSelectedIndex = 0;
-            self.settingsTableView.reloadSections(IndexSet(integer: sender.tag), with: .middle);
+            self.settingsTableView.reloadData();
         } else if (sender.tag == 1) {
             ARSettings.shared.resetColorSettings();
-            self.settingsTableView.reloadSections(IndexSet(integer: sender.tag), with: .middle);
+            self.settingsTableView.reloadData();
         }
     }
     
@@ -92,13 +92,13 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         let headerView = UIView();
         headerView.backgroundColor = UIColor.clear;
         
-        let sectionLabel = UILabel(frame: CGRect(x: 8, y: 20, width: tableView.bounds.size.width * 0.4, height: tableView.bounds.size.height));
+        let sectionLabel = UILabel(frame: CGRect(x: 0, y: 25, width: tableView.bounds.size.width * 0.4, height: tableView.bounds.size.height));
         sectionLabel.font = UIFont.systemFont(ofSize: 18.0, weight: .bold);
         sectionLabel.textColor = .white;
         sectionLabel.text = self.settings[section][0].headerTitle;
         sectionLabel.sizeToFit();
         
-        let resetButton = UIButton(frame: CGRect(x: tableView.bounds.size.width * 0.75, y: 15, width: tableView.bounds.size.width * 0.3, height: tableView.bounds.size.height));
+        let resetButton = UIButton(frame: CGRect(x: tableView.bounds.size.width * 0.75, y: 20, width: tableView.bounds.size.width * 0.3, height: tableView.bounds.size.height));
         resetButton.tag = section;
         resetButton.setAttributedTitle(NSAttributedString(string: "Reset", attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 15.0, weight: .bold)]), for: .normal);
         resetButton.setTitleColor(.orange, for: .normal);
@@ -293,7 +293,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         ARSettings.shared.redValue = CGFloat.random(in: 0...255);
         ARSettings.shared.greenValue = CGFloat.random(in: 0...255);
         ARSettings.shared.blueValue = CGFloat.random(in: 0...255);
-        self.settingsTableView.reloadRows(at: [IndexPath(row: 1, section: 1), IndexPath(row: 2, section: 1), IndexPath(row: 3, section: 1)], with: .none);
+        self.settingsTableView.reloadData();
     }
         
 }
@@ -313,7 +313,8 @@ class SelectionSectionCell : UITableViewCell {
     
     let settingLabel : UILabel = {
         let label = UILabel();
-        label.textColor = .gray;
+        label.textColor = .white;
+        label.font = UIFont.systemFont(ofSize: 15, weight: .medium);
         label.textAlignment = .left;
         label.adjustsFontSizeToFitWidth = true;
         label.translatesAutoresizingMaskIntoConstraints = false;
@@ -339,16 +340,14 @@ class SelectionSectionCell : UITableViewCell {
         self.addSubview(self.settingLabel);
         
         // constraints for settingsImageView
-        self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5.0).isActive = true;
+        self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
         self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingsImageView.widthAnchor.constraint(equalToConstant: 25.0).isActive = true;
-        self.settingsImageView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
+        self.settingsImageView.widthAnchor.constraint(equalToConstant: 15.0).isActive = true;
+        self.settingsImageView.heightAnchor.constraint(equalToConstant: 15.0).isActive = true;
         
         // constraints for settingLabel
         self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
         self.settingLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingLabel.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.4).isActive = true;
-        self.settingLabel.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
         
     }
     
@@ -357,7 +356,6 @@ class SelectionSectionCell : UITableViewCell {
         self.layoutSubviews();
         self.sizeToFit();
     }
-    
     
 }
 
@@ -378,6 +376,7 @@ class SliderSectionCell : UITableViewCell {
     let settingLabel : UILabel = {
         let label = UILabel();
         label.textColor = .white;
+        label.font = UIFont.systemFont(ofSize: 15, weight: .medium);
         label.textAlignment = .left;
         label.adjustsFontSizeToFitWidth = true;
         label.translatesAutoresizingMaskIntoConstraints = false;
@@ -396,14 +395,6 @@ class SliderSectionCell : UITableViewCell {
         button.isHidden = true;
         button.setAttributedTitle(NSAttributedString(string: "Random", attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 15.0, weight: .bold)]), for: .normal);
         button.setTitleColor(.orange, for: .normal);
-//        button.layer.borderWidth = 1;
-//        button.layer.borderColor = UIColor.orange.cgColor;
-//        button.backgroundColor = UIColor(red: 41/255, green: 46/255, blue: 47/255, alpha: 1);
-//        button.layer.cornerRadius = 10.0;
-//        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor;
-//        button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0);
-//        button.layer.shadowOpacity = 1.0;
-//        button.layer.shadowRadius = 5.0;
         button.translatesAutoresizingMaskIntoConstraints = false;
         return button;
     }();
@@ -432,25 +423,22 @@ class SliderSectionCell : UITableViewCell {
         self.addSubview(self.randomButton);
         
         // constraints for settingsImageView
-        self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5.0).isActive = true;
+        self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
         self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingsImageView.widthAnchor.constraint(equalToConstant: 25.0).isActive = true;
-        self.settingsImageView.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
+        self.settingsImageView.widthAnchor.constraint(equalToConstant: 15.0).isActive = true;
+        self.settingsImageView.heightAnchor.constraint(equalToConstant: 15.0).isActive = true;
         
         // constraints for settingLabel
         self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
         self.settingLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingLabel.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.4).isActive = true;
-        self.settingLabel.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
         
         // constraints for slider
-        self.slider.leadingAnchor.constraint(equalTo: self.settingLabel.trailingAnchor, constant: 5.0).isActive = true;
-        self.slider.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true;
         self.slider.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.slider.heightAnchor.constraint(equalTo: self.heightAnchor).isActive = true;
+        self.slider.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true;
+        self.slider.leadingAnchor.constraint(equalTo: self.settingLabel.trailingAnchor, constant: 10.0).isActive = true;
         
         // constraints for randomButton
-        self.randomButton.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 5.0).isActive = true;
+        self.randomButton.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
         self.randomButton.topAnchor.constraint(equalTo: self.topAnchor, constant: 5.0).isActive = true;
         self.randomButton.widthAnchor.constraint(equalToConstant: 110.0).isActive = true;
         self.randomButton.heightAnchor.constraint(equalToConstant: 15.0).isActive = true;

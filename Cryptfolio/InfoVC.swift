@@ -57,8 +57,8 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @IBOutlet weak var infoTableViewYConstraint: NSLayoutConstraint!
         
     let ARCube : UIButton = {
-        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 75, height: 75));
-        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 35, height: 35));
+        let button = UIButton(frame: CGRect(x: 0, y: 0, width: 60, height: 60));
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 30, height: 30));
         imageView.center = button.center - CGPoint(x: 0, y: 2.5);
         imageView.image = UIImage(named: "ARCube");
         button.addSubview(imageView);
@@ -160,6 +160,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.daysRange_lbl.adjustsFontSizeToFitWidth = true;
         
         self.ARCube.addTarget(self, action: #selector(self.ARButtonTapped), for: .touchUpInside);
+        self.ARCube.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handleTranslationARCube(gesture:))))
                 
         self.setupConstraints();
         
@@ -232,14 +233,51 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         }
     }
     
+    private var currentARCubeTransform:CGAffineTransform = CGAffineTransform.identity;
+    
+    @objc private func handleTranslationARCube(gesture:UIPanGestureRecognizer) -> Void {
+        if (gesture.state == .began) {
+            self.currentARCubeTransform = self.ARCube.transform;
+        } else if (gesture.state == .changed) {
+            let translation = gesture.translation(in: self.view);
+            self.ARCube.transform = CGAffineTransform(translationX: self.currentARCubeTransform.tx + translation.x, y: self.currentARCubeTransform.ty + translation.y);
+            let y = self.ARCube.frame.origin.y;
+            let maxHeight = ((self.view.frame.size.height - (self.tabBarController?.tabBar.frame.size.height ?? 49.0)) - self.ARCube.frame.size.height) - 10
+            let minHeight = self.view.frame.size.height * 0.15;
+            if (y >= maxHeight || y <= minHeight) { gesture.state = .ended; }
+        } else if (gesture.state == .ended) {
+            let x = self.ARCube.frame.origin.x;
+            let y = self.ARCube.frame.origin.y;
+            let maxHeight = ((self.view.frame.size.height - (self.tabBarController?.tabBar.frame.size.height ?? 49.0)) - self.ARCube.frame.size.height) - 10
+            let minHeight = self.view.frame.size.height * 0.15;
+            var yValue:CGFloat = 0.0
+            if (y >= maxHeight) {
+                yValue = -(self.view.frame.size.height / 2);
+            } else if (y <= minHeight) {
+                yValue = self.view.frame.size.height / 2;
+            } else {
+                yValue = 0.0;
+            }
+            if (x < self.view.frame.size.width / 2) {
+                UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: [.allowUserInteraction, .beginFromCurrentState, .curveEaseOut], animations: {
+                    self.ARCube.transform = self.ARCube.transform.translatedBy(x: 15 - x, y: yValue);
+                }, completion: nil)
+            } else if (x >= self.view.frame.size.width / 2) {
+                UIView.animate(withDuration: 0.75, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: [.allowUserInteraction, .beginFromCurrentState, .curveEaseOut], animations: {
+                    self.ARCube.transform = self.ARCube.transform.translatedBy(x: ((self.view.frame.size.width - self.ARCube.frame.size.width) - 15) - x, y: yValue);
+                }, completion: nil);
+            }
+        }
+    }
+    
     private func setupConstraints() -> Void {
         self.view.addSubview(self.ARCube);
         
         // constraints for ARCube
         self.ARCube.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -25.0).isActive = true;
         self.ARCube.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -15.0).isActive = true;
-        self.ARCube.widthAnchor.constraint(equalToConstant: 75.0).isActive = true;
-        self.ARCube.heightAnchor.constraint(equalToConstant: 75.0).isActive = true;
+        self.ARCube.widthAnchor.constraint(equalToConstant: 60.0).isActive = true;
+        self.ARCube.heightAnchor.constraint(equalToConstant: 60.0).isActive = true;
         
     }
     
