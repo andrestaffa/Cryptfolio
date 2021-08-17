@@ -19,7 +19,6 @@ public class ARSettings {
     // transformation settings
     public var transformationType:Set<String> = ["Move", "Rotate", "Scale"];
 
-    
     // Lighting settings
     public var lightingTypeSettings:SCNLight.LightType = .spot;
     public var intensitySetting:CGFloat = 2500.0;
@@ -33,6 +32,11 @@ public class ARSettings {
     public var greenValue:CGFloat = 0.0;
     public var blueValue:CGFloat = 0.0;
     
+    // Animation settings
+    public var animationTypeSetting:ARChartPresenter.AnimationType = .grow;
+    public var animationDuration:Double = 2.0;
+    
+    
     private init() {}
     
     public func resetAllSettings() -> Void {
@@ -45,6 +49,8 @@ public class ARSettings {
         self.redValue = 0.0;
         self.greenValue = 0.0;
         self.blueValue = 0.0;
+        self.animationTypeSetting = .grow;
+        self.animationDuration = 2.0;
     }
     
     public func resetTransformationSettings() -> Void {
@@ -63,6 +69,11 @@ public class ARSettings {
         self.redValue = ARSettings.shared.isGreen ? 0.0 : 255.0 / 2.0;
         self.greenValue = ARSettings.shared.isGreen ? 255.0 / 2.0 : 0.0;
         self.blueValue = 0.0;
+    }
+    
+    public func resetAnimationSettings() -> Void {
+        self.animationTypeSetting = .grow;
+        self.animationDuration = 2.0;
     }
     
 }
@@ -424,7 +435,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         if let barChart = barChart {
             barChart.dataSource = dataSeries
             barChart.delegate = dataSeries
-            barChart.animationType = ARChartPresenter.AnimationType.grow;
+            barChart.animationType = ARSettings.shared.animationTypeSetting;
+            barChart.animationDuration = ARSettings.shared.animationDuration;
             barChart.size = SCNVector3(0.08, 0.25, 0.5);  // 0.08, 0.25, 0.5
             barChart.position = position
             barChart.draw()

@@ -23,6 +23,9 @@ class ARSettingsVC: UIViewController {
     // Lighting section member fields
     private var lightingSelectedIndex:Int = 0;
     
+    // Animation sectio member fields
+    private var animationSelectedIndex:Int = 0;
+    
     let settingsTableView : UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped);
         tableView.translatesAutoresizingMaskIntoConstraints = false;
@@ -64,7 +67,8 @@ class ARSettingsVC: UIViewController {
         let transformationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Transformation", cellTitle: "Move"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Rotate"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Scale")];
         let lightingSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Lighting", cellTitle: "Spotlight"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Omnidirectional"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Intensity"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Temperature")];
         let colorSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Color", cellTitle: "Brightness"), ARSettingSection(headerTitle: "Color", cellTitle: "Red"), ARSettingSection(headerTitle: "Color", cellTitle: "Green"), ARSettingSection(headerTitle: "Color", cellTitle: "Blue"), ARSettingSection(headerTitle: "Color", cellTitle: "Random")];
-        self.settings = [transformationSection, lightingSection, colorSection];
+        let animationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Animation", cellTitle: "Grow"), ARSettingSection(headerTitle: "Animation", cellTitle: "Fade"), ARSettingSection(headerTitle: "Animation", cellTitle: "Duration")];
+        self.settings = [transformationSection, lightingSection, colorSection, animationSection];
     }
 
 }
@@ -81,14 +85,34 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { sender.alpha = 1.0; }
         if (sender.tag == 0) {
             ARSettings.shared.resetTransformationSettings();
-            self.settingsTableView.reloadData();
+            var indexPaths:Array<IndexPath> = Array<IndexPath>();
+            for row in 0...2 {
+                indexPaths.append(IndexPath(row: row, section: 0));
+            }
+            self.settingsTableView.reloadRows(at: indexPaths, with: .none);
         } else if (sender.tag == 1) {
             ARSettings.shared.resetLightingSettings();
             self.lightingSelectedIndex = 0;
-            self.settingsTableView.reloadData();
+            var indexPaths:Array<IndexPath> = Array<IndexPath>();
+            for row in 0...3 {
+                indexPaths.append(IndexPath(row: row, section: 1));
+            }
+            self.settingsTableView.reloadRows(at: indexPaths, with: .none);
         } else if (sender.tag == 2) {
             ARSettings.shared.resetColorSettings();
-            self.settingsTableView.reloadData();
+            var indexPaths:Array<IndexPath> = Array<IndexPath>();
+            for row in 0...3 {
+                indexPaths.append(IndexPath(row: row, section: 2));
+            }
+            self.settingsTableView.reloadRows(at: indexPaths, with: .none);
+        } else if (sender.tag == 3) {
+            ARSettings.shared.resetAnimationSettings();
+            self.animationSelectedIndex = 0;
+            var indexPaths:Array<IndexPath> = Array<IndexPath>();
+            for row in 0...2 {
+                indexPaths.append(IndexPath(row: row, section: 3));
+            }
+            self.settingsTableView.reloadRows(at: indexPaths, with: .none);
         }
     }
     
@@ -146,6 +170,9 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         } else if (indexPath.section == 2) {
             let cell = self.initColorCell(indexPath: indexPath, tableView: tableView);
             return cell;
+        } else if (indexPath.section == 3) {
+            let cell = self.initAnimationCell(tableView: tableView, indexPath: indexPath);
+            return cell;
         }
         let cell = UITableViewCell();
         cell.backgroundColor = .clear;
@@ -162,13 +189,17 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             if let cell = tableView.cellForRow(at: indexPath) as? SelectionSectionCell {
                 self.didSelectLightingCell(cell: cell, indexPath: indexPath, tableView: tableView);
             }
+        } else if (indexPath.section == 3) {
+            if let cell = tableView.cellForRow(at: indexPath) as? SelectionSectionCell {
+                self.didSelectAnimationCell(cell: cell, indexPath: indexPath, tableView: tableView);
+            }
         }
     }
     
     // MARK: - Transformation Cell Methods
     
     private func initTransformationCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SelectionSectionCell.reuseIdentifier, for: indexPath) as! SelectionSectionCell;
+        let cell = SelectionSectionCell(style: .default, reuseIdentifier: SelectionSectionCell.reuseIdentifier);
         cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
         self.transformationSelectedLogic(cell: cell, indexPath: indexPath);
         if (indexPath.row == 0) {
@@ -191,10 +222,10 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.settingLabel.highlightedTextColor = .white;
             ARSettings.shared.transformationType.remove(self.settings[indexPath.section][indexPath.row].cellTitle);
         } else {
-            cell.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-            cell.settingLabel.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-            cell.settingLabel.textColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-            cell.settingLabel.highlightedTextColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+            cell.tintColor = .orange;
+            cell.settingLabel.tintColor = .orange;
+            cell.settingLabel.textColor = .orange;
+            cell.settingLabel.highlightedTextColor = .orange;
             cell.accessoryType = .checkmark;
             ARSettings.shared.transformationType.insert(self.settings[indexPath.section][indexPath.row].cellTitle);
         }
@@ -249,10 +280,10 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     }
     
     private func transformationSelectedCell(cell:SelectionSectionCell) -> Void {
-        cell.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-        cell.settingLabel.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-        cell.settingLabel.textColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
-        cell.settingLabel.highlightedTextColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+        cell.tintColor = .orange;
+        cell.settingLabel.tintColor = .orange;
+        cell.settingLabel.textColor = .orange;
+        cell.settingLabel.highlightedTextColor = .orange;
         cell.accessoryType = .checkmark;
     }
     
@@ -267,7 +298,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     
     private func initLightingCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
         if (indexPath.row < 2) {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SelectionSectionCell.reuseIdentifier, for: indexPath) as! SelectionSectionCell;
+            let cell = SelectionSectionCell(style: .default, reuseIdentifier: SelectionSectionCell.reuseIdentifier);
             cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
             if (indexPath.row == 0) {
                 cell.settingsImageView.image = UIImage(named: "spotlight");
@@ -285,24 +316,24 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             }
             return cell;
         } else {
-            let cell = tableView.dequeueReusableCell(withIdentifier: SliderSectionCell.reuseIdentifier, for: indexPath) as! SliderSectionCell;
+            let cell = SliderSectionCell(style: .default, reuseIdentifier: SliderSectionCell.reuseIdentifier);
             cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
-            if (indexPath.row == 2) { cell.randomButton.isHidden = true; cell.slider.isHidden = false; cell.settingsImageView.isHidden = false; }
+            if (indexPath.row == 2 || indexPath.row == 3) { cell.randomButton.isHidden = true; cell.slider.isHidden = false; cell.settingsImageView.isHidden = false; }
             cell.slider.tag = indexPath.row;
             if (cell.slider.tag == 2) {
                 cell.slider.maximumValue = 5000;
                 cell.slider.minimumValue = 500;
-                cell.slider.setValue(Float(ARSettings.shared.intensitySetting), animated: true);
+                cell.slider.setValue(Float(ARSettings.shared.intensitySetting), animated: false);
                 cell.setSlider(slider: cell.slider, stillColor: UIColor(red: 224/255, green: 184/255, blue: 81/255, alpha: 1));
                 cell.settingsImageView.image = UIImage(named: "intensity_color");
             } else if (cell.slider.tag == 3) {
                 cell.slider.maximumValue = 40_000;
                 cell.slider.minimumValue = 0;
-                cell.slider.setValue(40_000 - Float(ARSettings.shared.temperatureSetting), animated: true);
+                cell.slider.setValue(40_000 - Float(ARSettings.shared.temperatureSetting), animated: false);
                 cell.setSlider(slider: cell.slider, colors: [UIColor.blue.cgColor, UIColor.green.cgColor, UIColor.yellow.cgColor, UIColor.orange.cgColor, UIColor.red.cgColor]);
                 cell.settingsImageView.image = UIImage(named: "temp_color");
             }
-            cell.slider.addTarget(self, action: #selector(self.lightingSliderChanged(_:)), for: .valueChanged)
+            cell.slider.addTarget(self, action: #selector(self.lightingSliderChanged(_:)), for: .valueChanged);
             return cell;
         }
     }
@@ -340,32 +371,32 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     // MARK: - Color Cell Methods
     
     private func initColorCell(indexPath:IndexPath, tableView:UITableView) -> SliderSectionCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: SliderSectionCell.reuseIdentifier, for: indexPath) as! SliderSectionCell;
+        let cell = SliderSectionCell(style: .default, reuseIdentifier: SliderSectionCell.reuseIdentifier);
         cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
         if (indexPath.row != 4) { cell.randomButton.isHidden = true; cell.slider.isHidden = false; cell.settingsImageView.isHidden = false;}
         cell.slider.tag = indexPath.row;
         if (cell.slider.tag == 0) {
             cell.slider.maximumValue = 255;
             cell.slider.minimumValue = 50;
-            cell.slider.setValue(Float(ARSettings.shared.brightnessPrecentage), animated: true);
+            cell.slider.setValue(Float(ARSettings.shared.brightnessPrecentage), animated: false);
             cell.setSlider(slider: cell.slider, colors: [UIColor.black.cgColor, UIColor.darkGray.cgColor, UIColor.gray.cgColor, UIColor.lightGray.cgColor, UIColor.white.cgColor]);
             cell.settingsImageView.image = UIImage(named: "brightness");
         } else if (cell.slider.tag == 1) {
             cell.slider.maximumValue = 255;
             cell.slider.minimumValue = 0;
-            cell.slider.setValue(Float(ARSettings.shared.redValue), animated: true);
+            cell.slider.setValue(Float(ARSettings.shared.redValue), animated: false);
             cell.setSlider(slider: cell.slider, stillColor: .red);
             cell.settingsImageView.image = UIImage(named: "red_circle");
         } else if (cell.slider.tag == 2) {
             cell.slider.maximumValue = 255;
             cell.slider.minimumValue = 0;
-            cell.slider.setValue(Float(ARSettings.shared.greenValue), animated: true);
+            cell.slider.setValue(Float(ARSettings.shared.greenValue), animated: false);
             cell.setSlider(slider: cell.slider, stillColor: .green);
             cell.settingsImageView.image = UIImage(named: "green_circle");
         } else if (cell.slider.tag == 3) {
             cell.slider.maximumValue = 255;
             cell.slider.minimumValue = 0;
-            cell.slider.setValue(Float(ARSettings.shared.blueValue), animated: true);
+            cell.slider.setValue(Float(ARSettings.shared.blueValue), animated: false);
             cell.setSlider(slider: cell.slider, stillColor: .blue);
             cell.settingsImageView.image = UIImage(named: "blue_circle");
         } else if (cell.slider.tag == 4) {
@@ -402,8 +433,70 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         ARSettings.shared.redValue = CGFloat.random(in: 0...255);
         ARSettings.shared.greenValue = CGFloat.random(in: 0...255);
         ARSettings.shared.blueValue = CGFloat.random(in: 0...255);
-        self.settingsTableView.reloadData();
+        self.settingsTableView.reloadRows(at: [IndexPath(row: 1, section: 2), IndexPath(row: 2, section: 2), IndexPath(row: 3, section: 2)], with: .none);
     }
+    
+    // MARK: - Animation Cell Methods
+    
+    private func initAnimationCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
+        if (indexPath.row < 2) {
+            let cell = SelectionSectionCell(style: .default, reuseIdentifier: SelectionSectionCell.reuseIdentifier);
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            if (indexPath.row == 0) {
+                cell.settingsImageView.image = UIImage(named: "grow");
+            } else if (indexPath.row == 1) {
+                cell.settingsImageView.image = UIImage(named: "fade");
+            }
+            cell.tintColor = .orange;
+            cell.backgroundColor = .clear;
+            if (indexPath.row == self.animationSelectedIndex) {
+                cell.accessoryType = .checkmark;
+                cell.settingLabel.textColor = .orange;
+            } else {
+                cell.accessoryType = .none;
+                cell.settingLabel.textColor = .white;
+            }
+            return cell;
+        } else {
+            let cell = SliderSectionCell(style: .default, reuseIdentifier: SliderSectionCell.reuseIdentifier);
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.settingsImageView.image = UIImage(named: "duration");
+            if (indexPath.row == 2) { cell.randomButton.isHidden = true; cell.slider.isHidden = false; }
+            cell.slider.maximumValue = 5;
+            cell.slider.minimumValue = 1;
+            cell.slider.setValue(Float(ARSettings.shared.animationDuration), animated: false);
+            cell.setSlider(slider: cell.slider, colors: [UIColor.blue.cgColor, UIColor.green.cgColor, UIColor.yellow.cgColor, UIColor.orange.cgColor, UIColor.red.cgColor]);
+            cell.slider.addTarget(self, action: #selector(self.animationSliderChanged(_:)), for: .valueChanged);
+            return cell;
+        }
+    }
+    
+    private func didSelectAnimationCell(cell:SelectionSectionCell, indexPath:IndexPath, tableView:UITableView) -> Void {
+        let impact = UIImpactFeedbackGenerator(style: .light);
+        impact.impactOccurred();
+        cell.settingLabel.highlightedTextColor = .orange;
+        switch (indexPath.row) {
+            case 0:
+                if (self.animationSelectedIndex == indexPath.row) { break; }
+                self.animationSelectedIndex = 0;
+                ARSettings.shared.animationTypeSetting = .grow;
+                break;
+            case 1:
+                if (self.animationSelectedIndex == indexPath.row) { break; }
+                self.animationSelectedIndex = 1;
+                ARSettings.shared.animationTypeSetting = .fade;
+                break;
+            default:
+                break;
+        }
+        self.animationSelectedIndex = indexPath.row;
+        tableView.reloadRows(at: [IndexPath(row: 0, section: indexPath.section), IndexPath(row: 1, section: indexPath.section)], with: .none);
+    }
+    
+    @objc private func animationSliderChanged(_ sender:UISlider) -> Void {
+        ARSettings.shared.animationDuration = Double(sender.value);
+    }
+    
         
 }
 
