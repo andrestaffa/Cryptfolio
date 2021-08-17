@@ -16,8 +16,9 @@ public class ARSettings {
     
     public static let shared = ARSettings();
     
-    // global boolean whether or not chart is default green or red
-    public var isGreen:Bool = false;
+    // transformation settings
+    public var transformationType:Set<String> = ["Move", "Rotate", "Scale"];
+
     
     // Lighting settings
     public var lightingTypeSettings:SCNLight.LightType = .spot;
@@ -25,6 +26,7 @@ public class ARSettings {
     public var temperatureSetting:CGFloat = 6500.0;
     
     // Color settings
+    public var isGreen:Bool = false;
     public var adjustedColor:Bool = false;
     public var brightnessPrecentage:CGFloat = 100.0;
     public var redValue:CGFloat = 0.0;
@@ -34,28 +36,33 @@ public class ARSettings {
     private init() {}
     
     public func resetAllSettings() -> Void {
-        ARSettings.shared.lightingTypeSettings = .spot;
-        ARSettings.shared.intensitySetting = 2500.0;
-        ARSettings.shared.temperatureSetting = 6500.0
-        ARSettings.shared.adjustedColor = false;
-        ARSettings.shared.brightnessPrecentage = 100.0;
-        ARSettings.shared.redValue = 0.0;
-        ARSettings.shared.greenValue = 0.0;
-        ARSettings.shared.blueValue = 0.0;
+        self.transformationType = ["Move", "Rotate", "Scale"];
+        self.lightingTypeSettings = .spot;
+        self.intensitySetting = 2500.0;
+        self.temperatureSetting = 6500.0
+        self.adjustedColor = false;
+        self.brightnessPrecentage = 100.0;
+        self.redValue = 0.0;
+        self.greenValue = 0.0;
+        self.blueValue = 0.0;
+    }
+    
+    public func resetTransformationSettings() -> Void {
+        self.transformationType = ["Move", "Rotate", "Scale"];
     }
     
     public func resetLightingSettings() -> Void {
-        ARSettings.shared.lightingTypeSettings = .spot;
-        ARSettings.shared.intensitySetting = 2500.0;
-        ARSettings.shared.temperatureSetting = 6500.0;
+        self.lightingTypeSettings = .spot;
+        self.intensitySetting = 2500.0;
+        self.temperatureSetting = 6500.0;
     }
     
     public func resetColorSettings() -> Void {
-        ARSettings.shared.adjustedColor = false;
-        ARSettings.shared.brightnessPrecentage = 100;
-        ARSettings.shared.redValue = ARSettings.shared.isGreen ? 0.0 : 255.0 / 2.0;
-        ARSettings.shared.greenValue = ARSettings.shared.isGreen ? 255.0 / 2.0 : 0.0;
-        ARSettings.shared.blueValue = 0.0;
+        self.adjustedColor = false;
+        self.brightnessPrecentage = 100;
+        self.redValue = ARSettings.shared.isGreen ? 0.0 : 255.0 / 2.0;
+        self.greenValue = ARSettings.shared.isGreen ? 255.0 / 2.0 : 0.0;
+        self.blueValue = 0.0;
     }
     
 }
@@ -179,14 +186,47 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     
     // MARK: - ANDRE METHODS
     
+    private func adjustTransformationSettings() -> Void {
+        self.view.gestureRecognizers?.removeAll();
+        if (ARSettings.shared.transformationType.count == 3) {
+            self.setupTranslationGesture();
+            self.setupRotationGesture();
+            self.setupPinchScaleGesture();
+        } else if (ARSettings.shared.transformationType.count == 2) {
+            if (ARSettings.shared.transformationType.contains("Move") && ARSettings.shared.transformationType.contains("Rotate")) {
+                self.setupTranslationGesture();
+                self.setupRotationGesture();
+            } else if (ARSettings.shared.transformationType.contains("Move") && ARSettings.shared.transformationType.contains("Scale")) {
+                self.setupTranslationGesture();
+                self.setupPinchScaleGesture();
+            } else if (ARSettings.shared.transformationType.contains("Rotate") && ARSettings.shared.transformationType.contains("Scale")) {
+                self.setupRotationGesture();
+                self.setupPinchScaleGesture();
+            }
+        } else if (ARSettings.shared.transformationType.count == 1) {
+            if (ARSettings.shared.transformationType.contains("Move")) {
+                self.setupTranslationGesture();
+            } else if ARSettings.shared.transformationType.contains("Rotate") {
+                self.setupRotationGesture();
+            } else if (ARSettings.shared.transformationType.contains("Scale")) {
+                self.setupPinchScaleGesture();
+            }
+        }
+    }
+    
+    private func adjustLightingSettings() -> Void {
+        addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
+    }
+    
     func sideMenuDidAppear(menu: SideMenuNavigationController, animated: Bool) {
-        self.removeBarChart();
+        //self.removeBarChart();
         self.chartButton.isUserInteractionEnabled = false;
     }
     
     func sideMenuDidDisappear(menu: SideMenuNavigationController, animated: Bool) {
         self.chartButton.isUserInteractionEnabled = true;
-        addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
+        self.adjustLightingSettings();
+        self.adjustTransformationSettings();
     }
     
     private func setupSideMenu() -> Void {

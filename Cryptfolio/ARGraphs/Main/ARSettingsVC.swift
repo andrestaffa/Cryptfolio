@@ -16,9 +16,9 @@ private struct ARSettingSection {
 class ARSettingsVC: UIViewController {
 
     // MARK: - Member Fields
-    
-    
+
     private var settings:Array<Array<ARSettingSection>> = Array<Array<ARSettingSection>>();
+
     
     // Lighting section member fields
     private var lightingSelectedIndex:Int = 0;
@@ -61,9 +61,10 @@ class ARSettingsVC: UIViewController {
     }
     
     private func createSettings() -> Void {
+        let transformationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Transformation", cellTitle: "Move"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Rotate"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Scale")];
         let lightingSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Lighting", cellTitle: "Spotlight"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Omnidirectional"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Intensity"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Temperature")];
         let colorSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Color", cellTitle: "Brightness"), ARSettingSection(headerTitle: "Color", cellTitle: "Red"), ARSettingSection(headerTitle: "Color", cellTitle: "Green"), ARSettingSection(headerTitle: "Color", cellTitle: "Blue"), ARSettingSection(headerTitle: "Color", cellTitle: "Random")];
-        self.settings = [lightingSection, colorSection];
+        self.settings = [transformationSection, lightingSection, colorSection];
     }
 
 }
@@ -79,10 +80,13 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         sender.alpha = 0.5;
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { sender.alpha = 1.0; }
         if (sender.tag == 0) {
+            ARSettings.shared.resetTransformationSettings();
+            self.settingsTableView.reloadData();
+        } else if (sender.tag == 1) {
             ARSettings.shared.resetLightingSettings();
             self.lightingSelectedIndex = 0;
             self.settingsTableView.reloadData();
-        } else if (sender.tag == 1) {
+        } else if (sender.tag == 2) {
             ARSettings.shared.resetColorSettings();
             self.settingsTableView.reloadData();
         }
@@ -134,9 +138,12 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         if (indexPath.section == 0) {
-            let cell = self.initLightingCell(tableView: tableView, indexPath: indexPath);
+            let cell = self.initTransformationCell(tableView: tableView, indexPath: indexPath);
             return cell;
         } else if (indexPath.section == 1) {
+            let cell = self.initLightingCell(tableView: tableView, indexPath: indexPath);
+            return cell;
+        } else if (indexPath.section == 2) {
             let cell = self.initColorCell(indexPath: indexPath, tableView: tableView);
             return cell;
         }
@@ -149,9 +156,111 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true);
         if (indexPath.section == 0) {
             if let cell = tableView.cellForRow(at: indexPath) as? SelectionSectionCell {
+                self.didSelectTransformationCell(cell: cell, indexPath: indexPath);
+            }
+        } else if (indexPath.section == 1) {
+            if let cell = tableView.cellForRow(at: indexPath) as? SelectionSectionCell {
                 self.didSelectLightingCell(cell: cell, indexPath: indexPath, tableView: tableView);
             }
         }
+    }
+    
+    // MARK: - Transformation Cell Methods
+    
+    private func initTransformationCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: SelectionSectionCell.reuseIdentifier, for: indexPath) as! SelectionSectionCell;
+        cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+        self.transformationSelectedLogic(cell: cell, indexPath: indexPath);
+        if (indexPath.row == 0) {
+            cell.settingsImageView.image = UIImage(named: "move");
+        } else if (indexPath.row == 1) {
+            cell.settingsImageView.image = UIImage(named: "rotate");
+        } else if (indexPath.row == 2) {
+            cell.settingsImageView.image = UIImage(named: "scale");
+        }
+        return cell;
+    }
+    
+    private func didSelectTransformationCell(cell:SelectionSectionCell, indexPath:IndexPath) -> Void {
+        let impact = UIImpactFeedbackGenerator(style: .light);
+        impact.impactOccurred();
+        if (cell.accessoryType == .checkmark) {
+            cell.accessoryType = .none;
+            cell.tintColor = .white;
+            cell.settingLabel.textColor = .white;
+            cell.settingLabel.highlightedTextColor = .white;
+            ARSettings.shared.transformationType.remove(self.settings[indexPath.section][indexPath.row].cellTitle);
+        } else {
+            cell.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+            cell.settingLabel.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+            cell.settingLabel.textColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+            cell.settingLabel.highlightedTextColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+            cell.accessoryType = .checkmark;
+            ARSettings.shared.transformationType.insert(self.settings[indexPath.section][indexPath.row].cellTitle);
+        }
+    }
+    
+    private func transformationSelectedLogic(cell:SelectionSectionCell, indexPath:IndexPath) -> Void {
+        if (ARSettings.shared.transformationType.count == 3) {
+            self.transformationSelectedCell(cell: cell);
+        } else if (ARSettings.shared.transformationType.count == 2) {
+            if (ARSettings.shared.transformationType.contains("Move") && ARSettings.shared.transformationType.contains("Rotate")) {
+                if (indexPath.row == 0 || indexPath.row == 1) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            } else if (ARSettings.shared.transformationType.contains("Move") && ARSettings.shared.transformationType.contains("Scale")) {
+                if (indexPath.row == 0 || indexPath.row == 2) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            } else if (ARSettings.shared.transformationType.contains("Rotate") && ARSettings.shared.transformationType.contains("Scale")) {
+                if (indexPath.row == 1 || indexPath.row == 2) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            }
+        } else if (ARSettings.shared.transformationType.count == 1) {
+            if (ARSettings.shared.transformationType.contains("Move")) {
+                if (indexPath.row == 0) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            } else if ARSettings.shared.transformationType.contains("Rotate") {
+                if (indexPath.row == 1) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            } else if (ARSettings.shared.transformationType.contains("Scale")) {
+                if (indexPath.row == 2) {
+                    self.transformationSelectedCell(cell: cell);
+                } else {
+                    self.transformationUnselectedCell(cell: cell);
+                }
+            }
+        } else {
+            self.transformationUnselectedCell(cell: cell);
+        }
+    }
+    
+    private func transformationSelectedCell(cell:SelectionSectionCell) -> Void {
+        cell.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+        cell.settingLabel.tintColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+        cell.settingLabel.textColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+        cell.settingLabel.highlightedTextColor = UIColor(red: 144/255, green: 0, blue: 229/255, alpha: 1);
+        cell.accessoryType = .checkmark;
+    }
+    
+    private func transformationUnselectedCell(cell:SelectionSectionCell) -> Void {
+        cell.accessoryType = .none;
+        cell.tintColor = .white;
+        cell.settingLabel.textColor = .white;
+        cell.settingLabel.highlightedTextColor = .white;
     }
     
     // MARK: - Lighting Cell Methods
@@ -342,8 +451,8 @@ class SelectionSectionCell : UITableViewCell {
         // constraints for settingsImageView
         self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
         self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingsImageView.widthAnchor.constraint(equalToConstant: 15.0).isActive = true;
-        self.settingsImageView.heightAnchor.constraint(equalToConstant: 15.0).isActive = true;
+        self.settingsImageView.widthAnchor.constraint(equalToConstant: 20.0).isActive = true;
+        self.settingsImageView.heightAnchor.constraint(equalToConstant: 20.0).isActive = true;
         
         // constraints for settingLabel
         self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
@@ -425,8 +534,8 @@ class SliderSectionCell : UITableViewCell {
         // constraints for settingsImageView
         self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
         self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
-        self.settingsImageView.widthAnchor.constraint(equalToConstant: 15.0).isActive = true;
-        self.settingsImageView.heightAnchor.constraint(equalToConstant: 15.0).isActive = true;
+        self.settingsImageView.widthAnchor.constraint(equalToConstant: 20.0).isActive = true;
+        self.settingsImageView.heightAnchor.constraint(equalToConstant: 20.0).isActive = true;
         
         // constraints for settingLabel
         self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
