@@ -33,8 +33,12 @@ public class ARSettings {
     public var blueValue:CGFloat = 0.0;
     
     // Animation settings
-    public var animationTypeSetting:ARChartPresenter.AnimationType = .grow;
+    public var animationTypeSetting:Optional<ARChartPresenter.AnimationType> = .grow;
     public var animationDuration:Double = 2.0;
+    
+    // Viewables settings
+    public var viewableType:Set<String> = Set<String>();
+    public var viewableCoinImage:UIImage? = nil;
     
     
     private init() {}
@@ -51,6 +55,8 @@ public class ARSettings {
         self.blueValue = 0.0;
         self.animationTypeSetting = .grow;
         self.animationDuration = 2.0;
+        self.viewableType = Set<String>();
+        self.viewableCoinImage = nil;
     }
     
     public func resetTransformationSettings() -> Void {
@@ -74,6 +80,10 @@ public class ARSettings {
     public func resetAnimationSettings() -> Void {
         self.animationTypeSetting = .grow;
         self.animationDuration = 2.0;
+    }
+    
+    public func resetViewablesSettings() -> Void {
+        self.viewableType = Set<String>();
     }
     
 }
@@ -120,7 +130,6 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     }
     
     var screenCenter: CGPoint?
-    var dataSeries: ARDataSeries?
     
     // MARK: - Life Cycle
     
@@ -225,19 +234,82 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         }
     }
     
+    private func adjustViewablesSettings(barChart:ARBarChart) -> Void {
+        if (ARSettings.shared.viewableType.count == 2) {
+            let sphere = self.addSphere(contents: UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png"), position: SCNVector3(0, 0.30, 0));
+            sphere.scale = SCNVector3(sphere.scale.x, sphere.scale.y, sphere.scale.z / 2);
+            barChart.addChildNode(sphere);
+            let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(-0.035, -0.040, 0));
+            sphere.addChildNode(priceText);
+            sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
+        } else if (ARSettings.shared.viewableType.count == 1) {
+            if (ARSettings.shared.viewableType.contains("Coin Symbol")) {
+                let sphere = self.addSphere(contents: UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png"), position: SCNVector3(0, 0.30, 0));
+                sphere.scale = SCNVector3(sphere.scale.x, sphere.scale.y, sphere.scale.z / 2);
+                sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
+                barChart.addChildNode(sphere);
+            } else if (ARSettings.shared.viewableType.contains("Coin Price")) {
+                let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(0, 0.30, 0));
+                priceText.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
+                barChart.addChildNode(priceText);
+            }
+        }
+    }
+    
     private func adjustLightingSettings() -> Void {
         addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
     }
     
     func sideMenuDidAppear(menu: SideMenuNavigationController, animated: Bool) {
-        //self.removeBarChart();
         self.chartButton.isUserInteractionEnabled = false;
+        
+        // external settings to bring into ARSettingsVC
+        ARSettings.shared.viewableCoinImage = UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png");
+        
     }
     
     func sideMenuDidDisappear(menu: SideMenuNavigationController, animated: Bool) {
+        
+        // internal settings affecting the ARBarChart object
+        if (self.barChart != nil) {
+            let lastPosition = self.barChart!.position;
+            self.barChart!.removeFromParentNode();
+            self.barChart = nil;
+            self.barChart = ARBarChart();
+            
+            let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / 60.0)));
+            let colors = self.getColors();
+            let labels = self.getSeriesLabels(values: values);
+            
+            let dataSeries = ARDataSeries(withValues: values.0);
+            dataSeries.spaceForIndexLabels = 0.2;
+            dataSeries.spaceForIndexLabels = 0.2;
+            dataSeries.barColors = colors;
+            dataSeries.barOpacity = 1;
+            
+            dataSeries.seriesLabels = labels;
+            
+            self.barChart!.dataSource = dataSeries
+            self.barChart!.delegate = dataSeries
+            self.barChart!.animationType = .none;
+            self.barChart!.animationDuration = 0;
+            self.barChart!.size = SCNVector3(0.08, 0.25, 0.5);  // 0.08, 0.25, 0.5
+            self.barChart!.position = lastPosition;
+            self.barChart!.draw();
+            self.sceneView.scene.rootNode.addChildNode(self.barChart!);
+            self.adjustViewablesSettings(barChart: self.barChart!);
+            self.barChart!.eulerAngles = SCNVector3(0, Double.pi/2, 0);
+        }
+        
+        // external settings outside of the ARBarChart object.
         self.chartButton.isUserInteractionEnabled = true;
         self.adjustLightingSettings();
         self.adjustTransformationSettings();
+        
+    }
+    
+    func sideMenuWillDisappear(menu: SideMenuNavigationController, animated: Bool) {
+        // MAYBE HERE
     }
     
     private func setupSideMenu() -> Void {
@@ -325,21 +397,22 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         return (max, min);
     }
     
-    private func scaledPrices(divider:Int) -> [[Double]] {
+    private func scaledPrices(divider:Int) -> ([[Double]], [Double]) {
         var values:[[Double]] = [];
+        var realValues:[Double] = [];
         let (max, min) = self.getMaxMin();
         let delta:Double = (max - (0.999 * min));
         for i in 0..<self.dataPoints.count {
             if (i % divider == 0) {
                 for j in 0..<self.dataPoints[i].count {
                     let a = ((max - self.dataPoints[i][j]) / delta);
-                    var b = (1 - a) * max;
-                    if (b == 0) { b = max; }
+                    let b = (1 - a) * max;
                     values.append([b]);
+                    realValues.append(self.dataPoints[i][j]);
                 }
             }
         }
-        return values;
+        return (values, realValues);
     }
 
     private func getColors() -> Array<UIColor> {
@@ -372,18 +445,18 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         return colors;
     }
     
-    private func getSeriesLabels(values:[[Double]]) -> Array<String> {
+    private func getSeriesLabels(values:([[Double]], [Double])) -> Array<String> {
         var label:Array<String> = Array<String>();
-        for i in 0..<values.count {
-            for val in values[i] {
+        for i in 0..<values.0.count {
+            for _ in values.0[i] {
                 if (i == 0) {
                     label.append("START");
-                } else if (i == values.count / 2) {
+                } else if (i == values.0.count / 2) {
                     label.append("MID")
-                } else if (i == values.count - 1) {
+                } else if (i == values.0.count - 1) {
                     label.append("END");
                 } else {
-                    label.append("\(String(format: "%.2f", val))");
+                    label.append("\(String(format: "%.2f", values.1[i]))");
                 }
             }
         }
@@ -415,21 +488,18 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             barChart?.removeFromParentNode()
             barChart = nil
         }
-        
-        let _ = Int(self.dataPoints.count / 100);
                 
-        let values = self.scaledPrices(divider: 5);
+        let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / 60.0)));
         let colors = self.getColors();
         let labels = self.getSeriesLabels(values: values);
         
-        dataSeries = ARDataSeries(withValues: values);
-        dataSeries?.spaceForIndexLabels = 0.2
-        dataSeries?.spaceForIndexLabels = 0.2
-        dataSeries?.barColors = colors;
-        dataSeries?.barOpacity = 1;
+        let dataSeries = ARDataSeries(withValues: values.0);
+        dataSeries.spaceForIndexLabels = 0.2
+        dataSeries.spaceForIndexLabels = 0.2
+        dataSeries.barColors = colors;
+        dataSeries.barOpacity = 1;
         
-        dataSeries?.seriesLabels = labels;
-        
+        dataSeries.seriesLabels = labels;
         
         barChart = ARBarChart()
         if let barChart = barChart {
@@ -441,9 +511,10 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             barChart.position = position
             barChart.draw()
             sceneView.scene.rootNode.addChildNode(barChart)
+            self.adjustViewablesSettings(barChart: barChart);
             barChart.eulerAngles = SCNVector3(0, Double.pi/2, 0);
-            
         }
+        
     }
     
     private func add3dText(message:String, position: SCNVector3) -> SCNNode {
