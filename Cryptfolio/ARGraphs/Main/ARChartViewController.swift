@@ -6,6 +6,15 @@
 //  Copyright © 2017 Boris Emorine. All rights reserved.
 //
 
+/* TODO:
+     - Toggle users flashlight (add ability to turn on flashlight). √
+     - Add graphics setting section (Very Low, Low, Mid, High, Ultra).
+     - Add "Tweaks" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted).
+     - Add pop up panels that display values of the sliders when the user is dragging along.
+     - Add sensitivity slider for transformations.
+     - Possible optimizations (change chart animation to .none after it loads).
+ */
+
 import ARCharts
 import ARKit
 import SceneKit
@@ -93,6 +102,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     override var prefersStatusBarHidden: Bool { return true; }
     
     private var sideMenu : SideMenuNavigationController?
+    
+    private var flashToggle:Bool = true;
     
     let sceneView : ARSCNView = {
         let sceneView = ARSCNView();
@@ -273,6 +284,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         // internal settings affecting the ARBarChart object
         if (self.barChart != nil) {
             let lastPosition = self.barChart!.position;
+            let lastSize = self.barChart!.size;
+            let lastScale = self.barChart!.scale;
             self.barChart!.removeFromParentNode();
             self.barChart = nil;
             self.barChart = ARBarChart();
@@ -293,7 +306,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.barChart!.delegate = dataSeries
             self.barChart!.animationType = .none;
             self.barChart!.animationDuration = 0;
-            self.barChart!.size = SCNVector3(0.08, 0.25, 0.5);  // 0.08, 0.25, 0.5
+            self.barChart!.size = lastSize;
+            self.barChart!.scale = lastScale;
             self.barChart!.position = lastPosition;
             self.barChart!.draw();
             self.sceneView.scene.rootNode.addChildNode(self.barChart!);
@@ -320,7 +334,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         self.sideMenu?.enableSwipeToDismissGesture = false;
         SideMenuManager.default.rightMenuNavigationController = self.sideMenu;
         
-        // right bar item
+        // right bar items
         let settingsButton = UIButton();
         settingsButton.frame = CGRect(x: 0, y: 0, width: 45, height: 50);
         settingsButton.setImage(UIImage(named: "settings")?.withRenderingMode(.alwaysTemplate), for: .normal);
@@ -332,8 +346,9 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         settingsButton.layer.masksToBounds = true;
         settingsButton.clipsToBounds = true;
         settingsButton.addTarget(self, action: #selector(self.openSettings), for: .touchUpInside);
-        let rightBarButton = UIBarButtonItem(customView: settingsButton);
-        self.navigationItem.rightBarButtonItem = rightBarButton;
+        
+        let rightBarButtons = [UIBarButtonItem(customView: settingsButton), UIBarButtonItem(image: UIImage(named: "flash_off"), landscapeImagePhone: nil, style: .plain, target: self, action: #selector(self.flashButtonTapped(_:)))];
+        self.navigationItem.rightBarButtonItems = rightBarButtons;
         
         // left bar item
         self.navigationItem.backBarButtonItem = nil;
@@ -359,8 +374,29 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         }
     }
     
+    @objc private func flashButtonTapped(_ sender:UIBarButtonItem) -> Void {
+        sender.image = (self.flashToggle) ? UIImage(named: "flash_on") : UIImage(named: "flash_off");
+        self.toggleTorch(on: self.flashToggle);
+        self.flashToggle = !self.flashToggle;
+    }
+    
     @objc private func exitButtonTapped() -> Void {
         self.navigationController?.popViewController(animated: true);
+    }
+    
+    private func toggleTorch(on: Bool) -> Void {
+        guard let device = AVCaptureDevice.default(for: .video) else { return; }
+        if (device.hasTorch) {
+            do {
+                try device.lockForConfiguration();
+                device.torchMode = (on) ? .on : .off;
+                device.unlockForConfiguration();
+            } catch {
+                print("Torch could not be used");
+            }
+        } else {
+            print("Torch is not available");
+        }
     }
     
     private func setupConstraints() -> Void {
