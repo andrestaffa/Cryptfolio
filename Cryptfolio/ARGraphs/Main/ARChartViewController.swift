@@ -7,11 +7,13 @@
 //
 
 /* TODO:
+     - Make graphics cycles actually work (First complete all other graphics settings).
      - Toggle users flashlight (add ability to turn on flashlight). √
-     - Add graphics setting section (Very Low, Low, Mid, High, Ultra).
-     - Add "Tweaks" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted).
+     - Add "Graphics" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted).
      - Add pop up panels that display values of the sliders when the user is dragging along.
-     - Add sensitivity slider for transformations.
+     - Add sensitivity slider for transformations. √
+     - Fix price not being to short.
+     - Share functionality
      - Possible optimizations (change chart animation to .none after it loads).
  */
 
@@ -27,6 +29,7 @@ public class ARSettings {
     
     // transformation settings
     public var transformationType:Set<String> = ["Move", "Rotate", "Scale"];
+    public var transformationSensitivity:Float = 0.001;
 
     // Lighting settings
     public var lightingTypeSettings:SCNLight.LightType = .spot;
@@ -49,11 +52,19 @@ public class ARSettings {
     public var viewableType:Set<String> = Set<String>();
     public var viewableCoinImage:UIImage? = nil;
     
+    // Graphics settings
+    public let graphicsCycles:Array<Array<String>> = [["Medium", "High", "Ultra", "Custom", "Low"], ["MXAA 4x", "None", "MXAA 2x"], ["60", "30", "45"]];
+    public var presetIndex:Int = 0;
+    public var antiAliasingIndex:Int = 0;
+    public var framerateIndex:Int = 0;
+    public var numberOfBars:Int = 60;
+    
     
     private init() {}
     
     public func resetAllSettings() -> Void {
         self.transformationType = ["Move", "Rotate", "Scale"];
+        self.transformationSensitivity = 0.001;
         self.lightingTypeSettings = .spot;
         self.intensitySetting = 2500.0;
         self.temperatureSetting = 6500.0
@@ -66,10 +77,15 @@ public class ARSettings {
         self.animationDuration = 2.0;
         self.viewableType = Set<String>();
         self.viewableCoinImage = nil;
+        self.presetIndex = 0;
+        self.antiAliasingIndex = 0;
+        self.framerateIndex = 0;
+        self.numberOfBars = 60;
     }
     
     public func resetTransformationSettings() -> Void {
         self.transformationType = ["Move", "Rotate", "Scale"];
+        self.transformationSensitivity = 0.001;
     }
     
     public func resetLightingSettings() -> Void {
@@ -93,6 +109,13 @@ public class ARSettings {
     
     public func resetViewablesSettings() -> Void {
         self.viewableType = Set<String>();
+    }
+    
+    public func resetGraphicsSettings() -> Void {
+        self.presetIndex = 0;
+        self.antiAliasingIndex = 0;
+        self.framerateIndex = 0
+        self.numberOfBars = 60;
     }
     
 }
@@ -167,6 +190,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         sceneView.antialiasingMode = .multisampling4X
         sceneView.automaticallyUpdatesLighting = true
         sceneView.contentScaleFactor = 1.0
+        sceneView.rendersMotionBlur = false
+        sceneView.rendersCameraGrain = false;
         sceneView.preferredFramesPerSecond = 60
         DispatchQueue.main.async {
             self.screenCenter = self.sceneView.bounds.mid
@@ -177,6 +202,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             camera.wantsExposureAdaptation = true
             camera.exposureOffset = -1
             camera.minimumExposure = -1
+            camera.wantsDepthOfField = false;
+            camera.motionBlurIntensity = 0.0
         }
         
         chartButton.layer.cornerRadius = 5.0
@@ -286,11 +313,13 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             let lastPosition = self.barChart!.position;
             let lastSize = self.barChart!.size;
             let lastScale = self.barChart!.scale;
+            let angles = self.barChart!.eulerAngles
+            let rotation = self.barChart!.rotation;
             self.barChart!.removeFromParentNode();
             self.barChart = nil;
             self.barChart = ARBarChart();
             
-            let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / 60.0)));
+            let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / Double(ARSettings.shared.numberOfBars))));
             let colors = self.getColors();
             let labels = self.getSeriesLabels(values: values);
             
@@ -309,10 +338,12 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.barChart!.size = lastSize;
             self.barChart!.scale = lastScale;
             self.barChart!.position = lastPosition;
+            self.barChart!.eulerAngles = angles;
+            self.barChart!.rotation = rotation;
             self.barChart!.draw();
             self.sceneView.scene.rootNode.addChildNode(self.barChart!);
             self.adjustViewablesSettings(barChart: self.barChart!);
-            self.barChart!.eulerAngles = SCNVector3(0, Double.pi/2, 0);
+            //self.barChart!.eulerAngles = SCNVector3(0, Double.pi/2, 0);
         }
         
         // external settings outside of the ARBarChart object.
@@ -525,7 +556,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             barChart = nil
         }
                 
-        let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / 60.0)));
+        let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / Double(ARSettings.shared.numberOfBars))));
         let colors = self.getColors();
         let labels = self.getSeriesLabels(values: values);
         
@@ -682,7 +713,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             startingTranslation = barChart.position;
         } else if (gesture.state == .changed) {
             let translation = gesture.translation(in: self.view);
-            barChart.position = SCNVector3(startingTranslation.x + (Float(translation.x) * 0.001), startingTranslation.y, startingTranslation.z + (Float(translation.y) * 0.001));
+            barChart.position = SCNVector3(startingTranslation.x + (Float(translation.x) * ARSettings.shared.transformationSensitivity), startingTranslation.y, startingTranslation.z + (Float(translation.y) * ARSettings.shared.transformationSensitivity));
         }
     }
 

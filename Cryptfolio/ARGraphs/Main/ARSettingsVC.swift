@@ -44,6 +44,7 @@ class ARSettingsVC: UIViewController {
         self.settingsTableView.dataSource = self;
         self.settingsTableView.register(SelectionSectionCell.self, forCellReuseIdentifier: SelectionSectionCell.reuseIdentifier);
         self.settingsTableView.register(SliderSectionCell.self, forCellReuseIdentifier: SliderSectionCell.reuseIdentifier);
+        self.settingsTableView.register(CycleSectionCell.self, forCellReuseIdentifier: CycleSectionCell.reuseIdentifier);
         self.settingsTableView.separatorStyle = .none;
         self.settingsTableView.backgroundColor = .mainBackgroundColor;
         
@@ -64,12 +65,24 @@ class ARSettingsVC: UIViewController {
     }
     
     private func createSettings() -> Void {
-        let transformationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Transformation", cellTitle: "Move"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Rotate"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Scale")];
+        let transformationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Transformation", cellTitle: "Move"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Rotate"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Scale"), ARSettingSection(headerTitle: "Transformation", cellTitle: "Sensitivity")];
         let lightingSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Lighting", cellTitle: "Spotlight"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Omnidirectional"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Intensity"), ARSettingSection(headerTitle: "Lighting", cellTitle: "Temperature")];
         let colorSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Color", cellTitle: "Brightness"), ARSettingSection(headerTitle: "Color", cellTitle: "Red"), ARSettingSection(headerTitle: "Color", cellTitle: "Green"), ARSettingSection(headerTitle: "Color", cellTitle: "Blue"), ARSettingSection(headerTitle: "Color", cellTitle: "Random")];
         let animationSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Animation", cellTitle: "Grow"), ARSettingSection(headerTitle: "Animation", cellTitle: "Fade"), ARSettingSection(headerTitle: "Animation", cellTitle: "None"), ARSettingSection(headerTitle: "Animation", cellTitle: "Duration")];
-        let viewables:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Viewables", cellTitle: "Coin Symbol"), ARSettingSection(headerTitle: "Viewables", cellTitle: "Coin Price")];
-        self.settings = [transformationSection, lightingSection, colorSection, animationSection, viewables];
+        let viewablesSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Viewables", cellTitle: "Coin Symbol"), ARSettingSection(headerTitle: "Viewables", cellTitle: "Coin Price")];
+        
+        let graphicsSection:Array<ARSettingSection> = [ARSettingSection(headerTitle: "Graphics", cellTitle: "Preset"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Anti-aliasing"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "# of Bars"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Framerate"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Motion Blur"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Film Grain"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "HDR"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Depth of Field"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Show Labels"),
+                                                        ARSettingSection(headerTitle: "Graphics", cellTitle: "Show Statistics")];
+            
+        self.settings = [transformationSection, lightingSection, colorSection, animationSection, viewablesSection, graphicsSection];
     }
 
 }
@@ -87,7 +100,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         if (sender.tag == 0) {
             ARSettings.shared.resetTransformationSettings();
             var indexPaths:Array<IndexPath> = Array<IndexPath>();
-            for row in 0...2 {
+            for row in 0...3 {
                 indexPaths.append(IndexPath(row: row, section: 0));
             }
             self.settingsTableView.reloadRows(at: indexPaths, with: .none);
@@ -121,6 +134,8 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
                 indexPaths.append(IndexPath(row: row, section: 4));
             }
             self.settingsTableView.reloadRows(at: indexPaths, with: .none);
+        } else if (sender.tag == 5) {
+            self.resetGraphicsSettings();
         }
     }
     
@@ -184,6 +199,9 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         } else if (indexPath.section == 4) {
             let cell = self.initViewablesCell(tableView: tableView, indexPath: indexPath);
             return cell;
+        } else if (indexPath.section == 5) {
+            let cell = self.initGraphicsCell(tableView: tableView, indexPath: indexPath);
+            return cell;
         }
         let cell = UITableViewCell();
         cell.backgroundColor = .clear;
@@ -214,17 +232,29 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     // MARK: - Transformation Cell Methods
     
     private func initTransformationCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
-        let cell = SelectionSectionCell(style: .default, reuseIdentifier: SelectionSectionCell.reuseIdentifier);
-        cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
-        self.transformationSelectedLogic(cell: cell, indexPath: indexPath);
-        if (indexPath.row == 0) {
-            cell.settingsImageView.image = UIImage(named: "move");
-        } else if (indexPath.row == 1) {
-            cell.settingsImageView.image = UIImage(named: "rotate");
-        } else if (indexPath.row == 2) {
-            cell.settingsImageView.image = UIImage(named: "scale");
+        if (indexPath.row < 3) {
+            let cell = SelectionSectionCell(style: .default, reuseIdentifier: SelectionSectionCell.reuseIdentifier);
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            self.transformationSelectedLogic(cell: cell, indexPath: indexPath);
+            if (indexPath.row == 0) {
+                cell.settingsImageView.image = UIImage(named: "move");
+            } else if (indexPath.row == 1) {
+                cell.settingsImageView.image = UIImage(named: "rotate");
+            } else if (indexPath.row == 2) {
+                cell.settingsImageView.image = UIImage(named: "scale");
+            }
+            return cell;
+        } else {
+            let cell = SliderSectionCell(style: .default, reuseIdentifier: SliderSectionCell.reuseIdentifier);
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.settingsImageView.image = UIImage(named: "sensitivity");
+            cell.slider.maximumValue = 0.005;
+            cell.slider.minimumValue = 0.001;
+            cell.slider.setValue(ARSettings.shared.transformationSensitivity, animated: false);
+            cell.setSlider(slider: cell.slider, colors: nil, stillColor: .cyan);
+            cell.slider.addTarget(self, action: #selector(self.sensitivityChanged(_:)), for: .valueChanged)
+            return cell;
         }
-        return cell;
     }
     
     private func didSelectTransformationCell(cell:SelectionSectionCell, indexPath:IndexPath) -> Void {
@@ -307,6 +337,10 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         cell.tintColor = .white;
         cell.settingLabel.textColor = .white;
         cell.settingLabel.highlightedTextColor = .white;
+    }
+    
+    @objc private func sensitivityChanged(_ sender:UISlider) -> Void {
+        ARSettings.shared.transformationSensitivity = sender.value;
     }
     
     // MARK: - Lighting Cell Methods
@@ -592,13 +626,106 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     }
     
     
+    // MARK: - Graphics Cell Methods
     
-        
+    
+    
+    private func resetGraphicsSettings() -> Void {
+        ARSettings.shared.resetGraphicsSettings();
+    }
+    
+    private func initGraphicsCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
+        if (indexPath.row == 0) {
+            let cell = CycleSectionCell(style: .default, reuseIdentifier: CycleSectionCell.reuseIdentifier);
+            cell.settingsImageView.image = nil;
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.attributeLabel.text = ARSettings.shared.graphicsCycles[0][ARSettings.shared.presetIndex];
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.cycleImageTapped(_:)));
+            tapGesture.name = "\(indexPath.row)";
+            cell.cycleArrowImage.addGestureRecognizer(tapGesture);
+            return cell;
+        } else if (indexPath.row == 1) {
+            let cell = CycleSectionCell(style: .default, reuseIdentifier: CycleSectionCell.reuseIdentifier);
+            cell.settingsImageView.image = nil;
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.attributeLabel.text = ARSettings.shared.graphicsCycles[1][ARSettings.shared.antiAliasingIndex];
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.cycleImageTapped(_:)));
+            tapGesture.name = "\(indexPath.row)";
+            cell.cycleArrowImage.addGestureRecognizer(tapGesture);
+            return cell;
+        } else if (indexPath.row == 2) {
+            let cell = SliderSectionCell(style: .default, reuseIdentifier: SliderSectionCell.reuseIdentifier);
+            cell.settingsImageView.image = nil;
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.slider.tag = indexPath.row;
+            cell.slider.maximumValue = 250.0;
+            cell.slider.minimumValue = 25.0;
+            cell.slider.setValue(Float(ARSettings.shared.numberOfBars), animated: false);
+            cell.setSlider(slider: cell.slider, colors: nil, stillColor: .purple);
+            cell.slider.addTarget(self, action: #selector(self.graphicsSliderChanged), for: .valueChanged);
+            return cell;
+        } else if (indexPath.row == 3) {
+            let cell = CycleSectionCell(style: .default, reuseIdentifier: CycleSectionCell.reuseIdentifier);
+            cell.settingsImageView.image = nil;
+            cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+            cell.attributeLabel.text = ARSettings.shared.graphicsCycles[2][ARSettings.shared.framerateIndex];
+            let tapGesture = UITapGestureRecognizer(target: self, action: #selector(self.cycleImageTapped(_:)));
+            tapGesture.name = "\(indexPath.row)";
+            cell.cycleArrowImage.addGestureRecognizer(tapGesture);
+            return cell;
+        } else {
+            let cell = UITableViewCell();
+            cell.backgroundColor = .clear;
+            return cell;
+        }
+    }
+    
+    @objc private func cycleImageTapped(_ sender:UITapGestureRecognizer) -> Void {
+        let impact = UIImpactFeedbackGenerator(style: .light);
+        impact.prepare();
+        impact.impactOccurred();
+        let row = Int(sender.name!)!;
+        let section:Int = 5;
+        if (row == 0) {
+            if (ARSettings.shared.presetIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
+                ARSettings.shared.presetIndex = 0;
+                self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+                return;
+            }
+            ARSettings.shared.presetIndex += 1;
+            self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+        } else if (row == 1) {
+            if (ARSettings.shared.antiAliasingIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
+                ARSettings.shared.antiAliasingIndex = 0;
+                self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+                return;
+            }
+            ARSettings.shared.antiAliasingIndex += 1;
+            self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+        } else if (row == 3) {
+            if (ARSettings.shared.framerateIndex == ARSettings.shared.graphicsCycles[row - 1].count - 1) {
+                ARSettings.shared.framerateIndex = 0;
+                self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+                return;
+            }
+            ARSettings.shared.framerateIndex += 1;
+            self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+        }
+    }
+    
+    @objc private func graphicsSliderChanged(_ sender:UISlider) -> Void {
+        if (sender.tag == 2) {
+            ARSettings.shared.numberOfBars = Int(sender.value);
+        }
+    }
+    
+    
+    
 }
 
+// MARK: - SelectionSectionCell
+
 class SelectionSectionCell : UITableViewCell {
-    
-    // MARK: - Member Fields
     
     public static let reuseIdentifier = "selectionSectionCell";
     
@@ -619,8 +746,6 @@ class SelectionSectionCell : UITableViewCell {
         return label;
     }();
     
-    // MARK: - Constructor
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier);
         
@@ -630,8 +755,6 @@ class SelectionSectionCell : UITableViewCell {
         self.setupConstraints();
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented"); }
-    
-    // MARK: - Setting Up Constraints
     
     private func setupConstraints() -> Void {
         self.addSubview(self.settingsImageView);
@@ -657,11 +780,10 @@ class SelectionSectionCell : UITableViewCell {
     
 }
 
+// MARK: - SliderSectionCell
 
 class SliderSectionCell : UITableViewCell {
-    
-    // MARK: - Member Fields
-    
+        
     public static let reuseIdentifier = "sliderSectionCell";
     
     let settingsImageView : UIImageView = {
@@ -697,9 +819,6 @@ class SliderSectionCell : UITableViewCell {
         return button;
     }();
     
-    
-    // MARK: - Constructor
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier);
         
@@ -710,9 +829,6 @@ class SliderSectionCell : UITableViewCell {
         self.setupConstraints();
     }
     required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented"); }
-    
-    
-    // MARK: - Setting Up Constraints
     
     private func setupConstraints() -> Void {
         self.addSubview(self.settingsImageView);
@@ -771,5 +887,87 @@ class SliderSectionCell : UITableViewCell {
         self.sizeToFit();
     }
     
+    
+}
+
+// MARK: - CycleSectionCell
+
+class CycleSectionCell : UITableViewCell {
+    
+    public static let reuseIdentifier = "cycleSectionCell";
+    
+    let settingsImageView : UIImageView = {
+        let imageView = UIImageView();
+        imageView.contentMode = .scaleAspectFit;
+        imageView.translatesAutoresizingMaskIntoConstraints = false;
+        return imageView;
+    }();
+    
+    let settingLabel : UILabel = {
+        let label = UILabel();
+        label.textColor = .white;
+        label.font = UIFont.systemFont(ofSize: 15, weight: .medium);
+        label.textAlignment = .left;
+        label.adjustsFontSizeToFitWidth = true;
+        label.translatesAutoresizingMaskIntoConstraints = false;
+        return label;
+    }();
+    
+    let attributeLabel : UILabel = {
+        let label = UILabel();
+        label.textColor = .white;
+        label.font = UIFont.systemFont(ofSize: 15, weight: .bold);
+        label.textAlignment = .right;
+        label.translatesAutoresizingMaskIntoConstraints = false;
+        return label;
+    }();
+    
+    let cycleArrowImage : UIImageView = {
+        let imageView = UIImageView(frame: CGRect(x: 0, y: 0, width: 25, height: 25));
+        imageView.image = UIImage(named: "cycle_arrow")?.withRenderingMode(.alwaysTemplate);
+        imageView.tintColor = .orange;
+        imageView.contentMode = .scaleAspectFit;
+        imageView.transform = CGAffineTransform(rotationAngle: .pi/2);
+        imageView.isUserInteractionEnabled = true;
+        imageView.translatesAutoresizingMaskIntoConstraints = false;
+        return imageView;
+    }();
+    
+    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+        super.init(style: style, reuseIdentifier: reuseIdentifier);
+        
+        self.contentView.isUserInteractionEnabled = false;
+        self.selectionStyle = .none;
+        self.backgroundColor = .clear;
+        
+        self.setupConstraints();
+    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented"); }
+    
+    private func setupConstraints() -> Void {
+        self.addSubview(self.settingsImageView);
+        self.addSubview(self.settingLabel);
+        self.addSubview(self.attributeLabel);
+        self.addSubview(self.cycleArrowImage);
+        
+        self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
+        self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+        self.settingsImageView.widthAnchor.constraint(equalToConstant: 20.0).isActive = true;
+        self.settingsImageView.heightAnchor.constraint(equalToConstant: 20.0).isActive = true;
+        
+        self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
+        self.settingLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+        
+        self.attributeLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+        self.attributeLabel.trailingAnchor.constraint(equalTo: self.cycleArrowImage.trailingAnchor, constant: -60.0).isActive = true;
+        self.attributeLabel.leadingAnchor.constraint(equalTo: self.settingLabel.trailingAnchor, constant: 5.0).isActive = true;
+        
+        
+        self.cycleArrowImage.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+        self.cycleArrowImage.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -5.0).isActive = true;
+        self.cycleArrowImage.widthAnchor.constraint(equalToConstant: 25.0).isActive = true;
+        self.cycleArrowImage.heightAnchor.constraint(equalToConstant: 25.0).isActive = true;
+        
+    }
     
 }
