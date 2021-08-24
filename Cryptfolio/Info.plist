@@ -29,6 +29,8 @@
 	<string>Cryptfolio would like to track your preferences to enbale the feature to watch advertisements. If denied, you will not be able to watch advertisements.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Cryptfolio will use the camera for Augmented Reality.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cryptfolio would like access to your photo library to save screenshots of your AR charts.</string>
 	<key>SKAdNetworkItems</key>
 	<array>
 		<dict>

@@ -213,26 +213,40 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     
     let chartButton : UIButton = {
         let button = UIButton();
-        button.setTitle("Add Chart", for: .normal)
-        button.setTitleColor(.white, for: .normal);
-        button.backgroundColor = .mainBackgroundColor;
-        button.layer.borderWidth = 1.0;
-        button.layer.borderColor = UIColor.orange.cgColor;
-        button.layer.cornerRadius = 5.0;
-        button.layer.shadowColor = UIColor(red: 0, green: 0, blue: 0, alpha: 0.25).cgColor;
-        button.layer.shadowOffset = CGSize(width: 0.0, height: 2.0);
-        button.layer.shadowOpacity = 1.0;
-        button.layer.shadowRadius = 5.0;
-        button.translatesAutoresizingMaskIntoConstraints = false;
-        return button;
+		button.frame = CGRect(x: 0, y: 0, width: 65, height: 65);
+		button.setImage(UIImage(named: "plus")?.withRenderingMode(.alwaysTemplate), for: .normal);
+		button.tintColor = .white
+		button.backgroundColor = .mainBackgroundColor;
+		button.layer.borderWidth = 1.0;
+		button.layer.borderColor = UIColor.orange.cgColor;
+		button.layer.cornerRadius = button.bounds.size.width / 2;
+		button.layer.masksToBounds = true;
+		button.clipsToBounds = true;
+		button.translatesAutoresizingMaskIntoConstraints = false;
+		return button
     }();
-    
+	
+	let screenshotButton : UIButton = {
+		let button = UIButton();
+		button.frame = CGRect(x: 0, y: 0, width: 65, height: 65);
+		button.setImage(UIImage(named: "screenshot")?.withRenderingMode(.alwaysTemplate), for: .normal);
+		button.tintColor = .white
+		button.backgroundColor = .mainBackgroundColor;
+		button.layer.borderWidth = 1.0;
+		button.layer.borderColor = UIColor.orange.cgColor;
+		button.layer.cornerRadius = button.bounds.size.width / 2;
+		button.layer.masksToBounds = true;
+		button.clipsToBounds = true;
+		button.translatesAutoresizingMaskIntoConstraints = false;
+		return button
+	}();
+	
     public var dataPoints:Array<Array<Double>>!;
     public var coin:Coin!;
     
     var barChart: ARBarChart? {
         didSet {
-            chartButton.setTitle(barChart == nil ? "Add Chart" : "Remove Chart", for: .normal)
+			self.chartButton.setImage((self.barChart == nil) ? UIImage(named: "plus")?.withRenderingMode(.alwaysTemplate) : UIImage(named: "minus")?.withRenderingMode(.alwaysTemplate), for: .normal);
         }
     }
     
@@ -260,7 +274,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         self.setupSideMenu();
         self.setupConstraints();
         self.chartButton.addTarget(self, action: #selector(self.handleTapChartButton(_:)), for: .touchUpInside);
-        
+		self.screenshotButton.addTarget(self, action: #selector(self.handleTapScreenshotButton(_:)), for: .touchUpInside);
+		
         sceneView.delegate = self
         sceneView.scene = SCNScene()
 		sceneView.showsStatistics = ARSettings.shared.showStats;
@@ -288,9 +303,6 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             camera.minimumExposure = -1
 			camera.wantsDepthOfField = ARSettings.shared.dofToggle;
         }
-        
-        chartButton.layer.cornerRadius = 5.0
-        chartButton.clipsToBounds = true
         
         setupFocusSquare()
         setupRotationGesture();
@@ -555,7 +567,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     private func setupConstraints() -> Void {
         self.view.addSubview(self.sceneView);
         self.view.addSubview(self.chartButton);
-        
+		self.view.addSubview(self.screenshotButton);
+		
         // constraiints for sceneView
         self.sceneView.topAnchor.constraint(equalTo: self.view.topAnchor).isActive = true;
         self.sceneView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor).isActive = true;
@@ -563,11 +576,16 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         self.sceneView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor).isActive = true;
         
         // constraints for chartView
-        self.chartButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -15.0).isActive = true;
-        self.chartButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true;
-        self.chartButton.widthAnchor.constraint(equalTo: self.view.widthAnchor, multiplier: 0.8).isActive = true;
-        self.chartButton.heightAnchor.constraint(equalToConstant: 60.0).isActive = true;
-        
+        self.chartButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -25.0).isActive = true;
+		self.chartButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: 45).isActive = true;
+		self.chartButton.widthAnchor.constraint(equalToConstant: 65.0).isActive = true;
+        self.chartButton.heightAnchor.constraint(equalToConstant: 65.0).isActive = true;
+		
+		// constraints for screenshotButton
+		self.screenshotButton.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -25.0).isActive = true;
+		self.screenshotButton.centerXAnchor.constraint(equalTo: self.view.centerXAnchor, constant: -45.0).isActive = true;
+		self.screenshotButton.widthAnchor.constraint(equalToConstant: 65.0).isActive = true;
+		self.screenshotButton.heightAnchor.constraint(equalToConstant: 65.0).isActive = true;
     }
         
     private func getMaxMin() -> (Double, Double) {
@@ -810,7 +828,13 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.addBarChart(at: lastPosition)
         }
     }
-    
+	
+	@objc private func handleTapScreenshotButton(_ sender:UIButton) -> Void {
+		let image = self.sceneView.snapshot();
+		let vc = UIActivityViewController(activityItems: [image], applicationActivities: []);
+		self.present(vc, animated: true);
+	}
+	
     private var startingRotation: Float = 0.0
     private var startingVectorScale: SCNVector3 = SCNVector3();
     private var startingTranslation: SCNVector3 = SCNVector3();
