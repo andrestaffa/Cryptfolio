@@ -7,14 +7,13 @@
 //
 
 /* TODO:
-     - Make graphics cycles actually work (First complete all other graphics settings).
+     - Make graphics cycles actually work (First complete all other graphics settings). √
      - Toggle users flashlight (add ability to turn on flashlight). √
-     - Add "Graphics" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted).
-     - Add pop up panels that display values of the sliders when the user is dragging along.
+     - Add "Graphics" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted). √
      - Add sensitivity slider for transformations. √
-     - Fix price not being to short.
+	 - Fix price not being to short. √
+     - Add pop up panels that display values of the sliders when the user is dragging along.
      - Share functionality
-     - Possible optimizations (change chart animation to .none after it loads).
  */
 
 import ARCharts
@@ -58,8 +57,14 @@ public class ARSettings {
     public var antiAliasingIndex:Int = 0;
     public var framerateIndex:Int = 0;
     public var numberOfBars:Int = 60;
-    
-    
+	public var motionBlurToggle:Bool = false;
+	public var filmGrainToggle:Bool = false;
+	public var hdrToggle:Bool = true;
+	public var dofToggle:Bool = false;
+	public var showLabelsToggle:Bool = true;
+	public var showStats:Bool = false;
+	
+	
     private init() {}
     
     public func resetAllSettings() -> Void {
@@ -81,6 +86,12 @@ public class ARSettings {
         self.antiAliasingIndex = 0;
         self.framerateIndex = 0;
         self.numberOfBars = 60;
+		self.motionBlurToggle = false;
+		self.filmGrainToggle = false;
+		self.hdrToggle = true;
+		self.dofToggle = false;
+		self.showLabelsToggle = true;
+		self.showStats = false;
     }
     
     public func resetTransformationSettings() -> Void {
@@ -114,9 +125,75 @@ public class ARSettings {
     public func resetGraphicsSettings() -> Void {
         self.presetIndex = 0;
         self.antiAliasingIndex = 0;
-        self.framerateIndex = 0
+		self.framerateIndex = 0;
         self.numberOfBars = 60;
+		self.motionBlurToggle = false;
+		self.filmGrainToggle = false;
+		self.hdrToggle = true;
+		self.dofToggle = false;
+		self.showLabelsToggle = true;
+		self.showStats = false;
     }
+	
+	public func lowGraphicsPreset() -> Void {
+		self.antiAliasingIndex = 1;
+		self.numberOfBars = 30;
+		self.motionBlurToggle = false;
+		self.filmGrainToggle = false;
+		self.hdrToggle = false;
+		self.dofToggle = false;
+		self.showLabelsToggle = false;
+		self.animationTypeSetting = .none;
+		self.resetViewablesSettings();
+	}
+	
+	public func mediumGraphicsPreset() -> Void {
+		self.antiAliasingIndex = 2;
+		self.numberOfBars = 60;
+		self.motionBlurToggle = true;
+		self.filmGrainToggle = false;
+		self.hdrToggle = true;
+		self.dofToggle = false;
+		self.showLabelsToggle = true;
+		self.animationTypeSetting = .grow;
+	}
+	
+	public func highGraphicsPreset() -> Void {
+		self.antiAliasingIndex = 0;
+		self.numberOfBars = 120;
+		self.motionBlurToggle = true;
+		self.filmGrainToggle = false;
+		self.hdrToggle = true;
+		self.dofToggle = false;
+		self.showLabelsToggle = true;
+		self.animationTypeSetting = .grow;
+	}
+	
+	public func ultraGraphicsPreset() -> Void {
+		self.antiAliasingIndex = 0;
+		self.numberOfBars = 240;
+		self.motionBlurToggle = true;
+		self.filmGrainToggle = true;
+		self.hdrToggle = true;
+		self.dofToggle = true;
+		self.showLabelsToggle = true;
+		self.animationTypeSetting = .grow;
+	}
+	
+	public func setGraphicsPreset() -> Void {
+		let preset:String = ARSettings.shared.graphicsCycles[0][ARSettings.shared.presetIndex];
+		if (preset == "Low") {
+			ARSettings.shared.lowGraphicsPreset();
+		} else if (preset == "Medium") {
+			ARSettings.shared.mediumGraphicsPreset();
+		} else if (preset == "High") {
+			ARSettings.shared.highGraphicsPreset();
+		} else if (preset == "Ultra") {
+			ARSettings.shared.ultraGraphicsPreset();
+		}
+	}
+	
+	
     
 }
 
@@ -186,24 +263,30 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         
         sceneView.delegate = self
         sceneView.scene = SCNScene()
-        sceneView.showsStatistics = false
-        sceneView.antialiasingMode = .multisampling4X
+		sceneView.showsStatistics = ARSettings.shared.showStats;
+		let antiAliasingMode = ARSettings.shared.graphicsCycles[1][ARSettings.shared.antiAliasingIndex];
+		if (antiAliasingMode == "MXAA 4x") {
+			self.sceneView.antialiasingMode = .multisampling4X;
+		} else if (antiAliasingMode == "MXAA 2x") {
+			self.sceneView.antialiasingMode = .multisampling2X;
+		} else if (antiAliasingMode == "None") {
+			self.sceneView.antialiasingMode = .none;
+		}
         sceneView.automaticallyUpdatesLighting = true
         sceneView.contentScaleFactor = 1.0
-        sceneView.rendersMotionBlur = false
-        sceneView.rendersCameraGrain = false;
-        sceneView.preferredFramesPerSecond = 60
+		sceneView.rendersMotionBlur = ARSettings.shared.motionBlurToggle;
+		sceneView.rendersCameraGrain = ARSettings.shared.filmGrainToggle;
+		sceneView.preferredFramesPerSecond = Int(ARSettings.shared.graphicsCycles[2][ARSettings.shared.framerateIndex])!;
         DispatchQueue.main.async {
             self.screenCenter = self.sceneView.bounds.mid
         }
         
         if let camera = sceneView.pointOfView?.camera {
-            camera.wantsHDR = true
+			camera.wantsHDR = ARSettings.shared.hdrToggle;
             camera.wantsExposureAdaptation = true
             camera.exposureOffset = -1
             camera.minimumExposure = -1
-            camera.wantsDepthOfField = false;
-            camera.motionBlurIntensity = 0.0
+			camera.wantsDepthOfField = ARSettings.shared.dofToggle;
         }
         
         chartButton.layer.cornerRadius = 5.0
@@ -277,7 +360,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             let sphere = self.addSphere(contents: UIImage(named: "Images/\(self.coin.ticker.symbol.lowercased()).png"), position: SCNVector3(0, 0.30, 0));
             sphere.scale = SCNVector3(sphere.scale.x, sphere.scale.y, sphere.scale.z / 2);
             barChart.addChildNode(sphere);
-            let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(-0.035, -0.040, 0));
+            let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price), position: SCNVector3(-0.035, -0.040, 0));
             sphere.addChildNode(priceText);
             sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
         } else if (ARSettings.shared.viewableType.count == 1) {
@@ -287,7 +370,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
                 sphere.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
                 barChart.addChildNode(sphere);
             } else if (ARSettings.shared.viewableType.contains("Coin Price")) {
-                let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price, hasSymbol: true), position: SCNVector3(0, 0.30, 0));
+                let priceText = self.add3dText(message: CryptoData.convertToDollar(price: self.coin!.ticker.price), position: SCNVector3(0, 0.30, 0));
                 priceText.eulerAngles = SCNVector3(0, -Double.pi/2, 0);
                 barChart.addChildNode(priceText);
             }
@@ -297,6 +380,31 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     private func adjustLightingSettings() -> Void {
         addLightSource(ofType: ARSettings.shared.lightingTypeSettings, intensity: ARSettings.shared.intensitySetting, temperature: ARSettings.shared.temperatureSetting);
     }
+	
+	private func adjustGraphicsSettings() -> Void {
+	
+		let antiAliasingMode = ARSettings.shared.graphicsCycles[1][ARSettings.shared.antiAliasingIndex];
+		let framerateLock = ARSettings.shared.graphicsCycles[2][ARSettings.shared.framerateIndex];
+		
+		if (antiAliasingMode == "MXAA 4x") {
+			self.sceneView.antialiasingMode = .multisampling4X;
+		} else if (antiAliasingMode == "MXAA 2x") {
+			self.sceneView.antialiasingMode = .multisampling2X;
+		} else if (antiAliasingMode == "None") {
+			self.sceneView.antialiasingMode = .none;
+		}
+		
+		self.sceneView.showsStatistics = ARSettings.shared.showStats;
+		self.sceneView.rendersMotionBlur = ARSettings.shared.motionBlurToggle;
+		self.sceneView.rendersCameraGrain = ARSettings.shared.filmGrainToggle;
+		self.sceneView.preferredFramesPerSecond = Int(framerateLock)!;
+		
+		if let camera = self.sceneView.pointOfView?.camera {
+			camera.wantsHDR = ARSettings.shared.hdrToggle;
+			camera.wantsDepthOfField = ARSettings.shared.dofToggle;
+		}
+		
+	}
     
     func sideMenuDidAppear(menu: SideMenuNavigationController, animated: Bool) {
         self.chartButton.isUserInteractionEnabled = false;
@@ -321,7 +429,6 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             
             let values = self.scaledPrices(divider: Int(ceil(Double(self.dataPoints.count) / Double(ARSettings.shared.numberOfBars))));
             let colors = self.getColors();
-            let labels = self.getSeriesLabels(values: values);
             
             let dataSeries = ARDataSeries(withValues: values.0);
             dataSeries.spaceForIndexLabels = 0.2;
@@ -329,8 +436,11 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             dataSeries.barColors = colors;
             dataSeries.barOpacity = 1;
             
-            dataSeries.seriesLabels = labels;
-            
+			if (ARSettings.shared.showLabelsToggle) {
+				let labels = self.getSeriesLabels(values: values);
+				dataSeries.seriesLabels = labels;
+			}
+			
             self.barChart!.dataSource = dataSeries
             self.barChart!.delegate = dataSeries
             self.barChart!.animationType = .none;
@@ -343,13 +453,13 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.barChart!.draw();
             self.sceneView.scene.rootNode.addChildNode(self.barChart!);
             self.adjustViewablesSettings(barChart: self.barChart!);
-            //self.barChart!.eulerAngles = SCNVector3(0, Double.pi/2, 0);
         }
         
         // external settings outside of the ARBarChart object.
         self.chartButton.isUserInteractionEnabled = true;
         self.adjustLightingSettings();
         self.adjustTransformationSettings();
+		self.adjustGraphicsSettings();
         
     }
     
@@ -377,8 +487,20 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         settingsButton.layer.masksToBounds = true;
         settingsButton.clipsToBounds = true;
         settingsButton.addTarget(self, action: #selector(self.openSettings), for: .touchUpInside);
+		
+		let flashButton = UIButton();
+		flashButton.frame = CGRect(x: 0, y: 0, width: 45, height: 50);
+		flashButton.setImage(UIImage(named: "flash_off")?.withRenderingMode(.alwaysTemplate), for: .normal);
+		flashButton.tintColor = .white
+		flashButton.backgroundColor = .mainBackgroundColor;
+		flashButton.layer.borderWidth = 1.0;
+		flashButton.layer.borderColor = UIColor.orange.cgColor;
+		flashButton.layer.cornerRadius = settingsButton.bounds.size.width / 2;
+		flashButton.layer.masksToBounds = true;
+		flashButton.clipsToBounds = true;
+		flashButton.addTarget(self, action: #selector(self.flashButtonTapped(_:)), for: .touchUpInside);
         
-        let rightBarButtons = [UIBarButtonItem(customView: settingsButton), UIBarButtonItem(image: UIImage(named: "flash_off"), landscapeImagePhone: nil, style: .plain, target: self, action: #selector(self.flashButtonTapped(_:)))];
+        let rightBarButtons = [UIBarButtonItem(customView: settingsButton), UIBarButtonItem(customView: flashButton)];
         self.navigationItem.rightBarButtonItems = rightBarButtons;
         
         // left bar item
@@ -405,8 +527,8 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         }
     }
     
-    @objc private func flashButtonTapped(_ sender:UIBarButtonItem) -> Void {
-        sender.image = (self.flashToggle) ? UIImage(named: "flash_on") : UIImage(named: "flash_off");
+    @objc private func flashButtonTapped(_ sender:UIButton) -> Void {
+		sender.setImage((self.flashToggle) ? UIImage(named: "flash_on")?.withRenderingMode(.alwaysTemplate) : UIImage(named: "flash_off")?.withRenderingMode(.alwaysTemplate), for: .normal);
         self.toggleTorch(on: self.flashToggle);
         self.flashToggle = !self.flashToggle;
     }

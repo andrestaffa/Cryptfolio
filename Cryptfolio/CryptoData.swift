@@ -392,6 +392,17 @@ public class CryptoData {
             return ("\(String(format: "%.2f", price))", 100)
         }
     }
+	
+	private static func formatPriceAR(price:Double) -> (String, Double) {
+		let stringPrice:String = String(format: "%.0f", price);
+		if (stringPrice.count >= 5) {
+			return ("\(String(format: "%.2f", price))", 100);
+		} else if (stringPrice.count == 1) {
+			return ("\(String(format: "%.7f", price))", 10000000);
+		} else {
+			return ("\(String(format: "%.5f", price))", 100000);
+		}
+	}
     
     public static func convertToDollar(price:Double, hasSymbol:Bool) -> String {
         var number: NSNumber!;
@@ -425,6 +436,32 @@ public class CryptoData {
         }
         
     }
+	
+	public static func convertToDollar(price:Double) -> String {
+		var number: NSNumber!;
+		let formatter = NumberFormatter();
+		formatter.numberStyle = .currencyAccounting;
+		formatter.currencySymbol = "$"
+		formatter.maximumFractionDigits = 7;
+		formatter.minimumFractionDigits = 2;
+		
+		let priceData = CryptoData.formatPriceAR(price: price);
+		let price = priceData.0;
+		var amountWithPrefix = price;
+
+		// remove from String: "$", ".", ","
+		let regex = try! NSRegularExpression(pattern: "[^0-9]", options: .caseInsensitive);
+		amountWithPrefix = regex.stringByReplacingMatches(in: amountWithPrefix, options: NSRegularExpression.MatchingOptions(rawValue: 0), range: NSMakeRange(0, price.count), withTemplate: "");
+
+		let double = (amountWithPrefix as NSString).doubleValue;
+		number = NSNumber(value: double / priceData.1);
+
+		guard number != 0 as NSNumber else {
+			return "$0.00";
+		}
+		return formatter.string(from: number)!
+		
+	}
     
     public static func convertToMoney(price:String) -> String {
         var number: NSNumber!;

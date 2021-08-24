@@ -632,6 +632,11 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     
     private func resetGraphicsSettings() -> Void {
         ARSettings.shared.resetGraphicsSettings();
+		var indexPaths:Array<IndexPath> = Array<IndexPath>();
+		for row in 0...9 {
+			indexPaths.append(IndexPath(row: row, section: 5));
+		}
+		self.settingsTableView.reloadRows(at: indexPaths, with: .none);
     }
     
     private func initGraphicsCell(tableView:UITableView, indexPath:IndexPath) -> UITableViewCell {
@@ -658,7 +663,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.settingsImageView.image = nil;
             cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
             cell.slider.tag = indexPath.row;
-            cell.slider.maximumValue = 250.0;
+            cell.slider.maximumValue = 300.0;
             cell.slider.minimumValue = 25.0;
             cell.slider.setValue(Float(ARSettings.shared.numberOfBars), animated: false);
             cell.setSlider(slider: cell.slider, colors: nil, stillColor: .purple);
@@ -674,10 +679,15 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.cycleArrowImage.addGestureRecognizer(tapGesture);
             return cell;
         } else {
-            let cell = UITableViewCell();
-            cell.backgroundColor = .clear;
-            return cell;
-        }
+			let cell = ToggleSectionCell(style: .default, reuseIdentifier: ToggleSectionCell.reuseIdentifier);
+			cell.settingsImageView.image = nil;
+			cell.settingLabel.text = self.settings[indexPath.section][indexPath.row].cellTitle;
+			cell.toggleSwitch.tag = indexPath.row;
+			let toggleArray:Array<Bool> = [ARSettings.shared.motionBlurToggle, ARSettings.shared.filmGrainToggle, ARSettings.shared.hdrToggle, ARSettings.shared.dofToggle, ARSettings.shared.showLabelsToggle, ARSettings.shared.showStats];
+			cell.toggleSwitch.setOn(toggleArray[indexPath.row - 4], animated: false);
+			cell.toggleSwitch.addTarget(self, action: #selector(self.toggleChanged(_:)), for: .valueChanged);
+			return cell;
+		}
     }
     
     @objc private func cycleImageTapped(_ sender:UITapGestureRecognizer) -> Void {
@@ -689,12 +699,21 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         if (row == 0) {
             if (ARSettings.shared.presetIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
                 ARSettings.shared.presetIndex = 0;
+				ARSettings.shared.setGraphicsPreset();
                 self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
                 return;
             }
             ARSettings.shared.presetIndex += 1;
+			ARSettings.shared.setGraphicsPreset();
+			var indexPaths:Array<IndexPath> = Array<IndexPath>();
+			for row in 0...9 {
+				indexPaths.append(IndexPath(row: row, section: section));
+			}
+			self.settingsTableView.reloadRows(at: indexPaths, with: .none);
             self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
         } else if (row == 1) {
+			ARSettings.shared.presetIndex = 3;
+			self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: 5)], with: .none);
             if (ARSettings.shared.antiAliasingIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
                 ARSettings.shared.antiAliasingIndex = 0;
                 self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
@@ -714,12 +733,31 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     }
     
     @objc private func graphicsSliderChanged(_ sender:UISlider) -> Void {
+		ARSettings.shared.presetIndex = 3;
+		self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: 5)], with: .none);
         if (sender.tag == 2) {
             ARSettings.shared.numberOfBars = Int(sender.value);
         }
     }
-    
-    
+	
+	@objc private func toggleChanged(_ sender:UISwitch) {
+		ARSettings.shared.presetIndex = 3;
+		self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: 5)], with: .none);
+		if (sender.tag == 4) {
+			ARSettings.shared.motionBlurToggle = !ARSettings.shared.motionBlurToggle;
+		} else if (sender.tag == 5) {
+			ARSettings.shared.filmGrainToggle = !ARSettings.shared.filmGrainToggle;
+		} else if (sender.tag == 6) {
+			ARSettings.shared.hdrToggle = !ARSettings.shared.hdrToggle;
+		} else if (sender.tag == 7) {
+			ARSettings.shared.dofToggle = !ARSettings.shared.dofToggle;
+		} else if (sender.tag == 8) {
+			ARSettings.shared.showLabelsToggle = !ARSettings.shared.showLabelsToggle;
+		} else if (sender.tag == 9) {
+			ARSettings.shared.showStats = !ARSettings.shared.showStats;
+		}
+	}
+	
     
 }
 
@@ -969,5 +1007,68 @@ class CycleSectionCell : UITableViewCell {
         self.cycleArrowImage.heightAnchor.constraint(equalToConstant: 25.0).isActive = true;
         
     }
-    
+	
+}
+
+// MARK: - ToggleSectionCell
+
+class ToggleSectionCell : UITableViewCell {
+	
+	public static let reuseIdentifier = "toggleSectionCell"
+	
+	let settingsImageView : UIImageView = {
+		let imageView = UIImageView();
+		imageView.contentMode = .scaleAspectFit;
+		imageView.translatesAutoresizingMaskIntoConstraints = false;
+		return imageView;
+	}();
+	
+	let settingLabel : UILabel = {
+		let label = UILabel();
+		label.textColor = .white;
+		label.font = UIFont.systemFont(ofSize: 15, weight: .medium);
+		label.textAlignment = .left;
+		label.adjustsFontSizeToFitWidth = true;
+		label.translatesAutoresizingMaskIntoConstraints = false;
+		return label;
+	}();
+	
+	let toggleSwitch : UISwitch = {
+		let toggle = UISwitch();
+		toggle.onTintColor = .orange;
+		toggle.translatesAutoresizingMaskIntoConstraints = false;
+		return toggle;
+	}();
+	
+	
+	override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
+		super.init(style: style, reuseIdentifier: reuseIdentifier);
+		
+		self.contentView.isUserInteractionEnabled = false;
+		self.selectionStyle = .none;
+		self.backgroundColor = .clear;
+	
+		self.setupConstraints();
+	}
+	
+	required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented"); }
+	
+	private func setupConstraints() -> Void {
+		self.addSubview(self.settingsImageView);
+		self.addSubview(self.settingLabel);
+		self.addSubview(self.toggleSwitch);
+		
+		self.settingsImageView.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true;
+		self.settingsImageView.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+		self.settingsImageView.widthAnchor.constraint(equalToConstant: 20.0).isActive = true;
+		self.settingsImageView.heightAnchor.constraint(equalToConstant: 20.0).isActive = true;
+		
+		self.settingLabel.leadingAnchor.constraint(equalTo: self.settingsImageView.trailingAnchor, constant: 5.0).isActive = true;
+		self.settingLabel.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+		
+		self.toggleSwitch.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+		self.toggleSwitch.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -20).isActive = true;
+		
+	}
+	
 }
