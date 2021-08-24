@@ -12,8 +12,8 @@
      - Add "Graphics" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted). √
      - Add sensitivity slider for transformations. √
 	 - Fix price not being to short. √
+     - Share functionality √
      - Add pop up panels that display values of the sliders when the user is dragging along.
-     - Share functionality
  */
 
 import ARCharts
@@ -830,9 +830,12 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     }
 	
 	@objc private func handleTapScreenshotButton(_ sender:UIButton) -> Void {
+		let impact = UIImpactFeedbackGenerator(style: .light);
+		impact.prepare();
+		impact.impactOccurred();
 		let image = self.sceneView.snapshot();
-		let vc = UIActivityViewController(activityItems: [image], applicationActivities: []);
-		self.present(vc, animated: true);
+		let screenshotView = ScreenshotView(viewController: self, image: image);
+		screenshotView.show();
 	}
 	
     private var startingRotation: Float = 0.0

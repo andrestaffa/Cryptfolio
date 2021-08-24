@@ -126,7 +126,7 @@ public class AAlertView : UIView {
     
     private func setupContraints() -> Void {
         self.containingViewController.view.addSubview(self.backgroundView);
-        self.backgroundView.addSubview(self);
+		self.containingViewController.view.addSubview(self);
         self.addSubview(self.exitButton);
         self.addSubview(self.titleLabel);
         self.addSubview(self.messageLabel);
@@ -201,11 +201,7 @@ public class AAlertView : UIView {
     // MARK: Public Methods
     
     public func show() -> Void {
-        if let backgroundColor = self.containingViewController.view.backgroundColor {
-            self.backgroundView.backgroundColor = backgroundColor.withAlphaComponent(0.45);
-        } else {
-            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0.45);
-        }
+		self.backgroundView.backgroundColor = self.containingViewController.view.backgroundColor?.withAlphaComponent(0.45);
         UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             self.transform = .identity;
         }, completion: nil);
@@ -313,17 +309,11 @@ public class AAlertView : UIView {
     }
     
     private func closeInfoView() -> Void {
-        if let backgroundColor = self.containingViewController.view.backgroundColor {
-            self.backgroundView.backgroundColor = backgroundColor.withAlphaComponent(0);
-        } else {
-            self.backgroundView.backgroundColor = UIColor.black.withAlphaComponent(0);
-        }
-        self.backgroundView.backgroundColor = self.containingViewController.view.backgroundColor?.withAlphaComponent(0);
+		self.backgroundView.removeFromSuperview();
         UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
             self.transform = CGAffineTransform(translationX: 0, y: self.containingViewController.view.frame.size.height);
         }) { (done) in
             self.removeFromSuperview();
-            self.backgroundView.removeFromSuperview();
         };
     }
     

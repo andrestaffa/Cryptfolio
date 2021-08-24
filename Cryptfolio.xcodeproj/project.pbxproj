@@ -45,6 +45,7 @@
 		20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE1D132486D1C300A68054 /* AboutVC.swift */; };
 		20AF258424633AC4000265A5 /* TradeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF258324633AC4000265A5 /* TradeVC.swift */; };
 		20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF2585246375E1000265A5 /* UserDefaultKeys.swift */; };
+		20B8862726D5887B008C1C6D /* ScreenshotView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20B8862626D5887B008C1C6D /* ScreenshotView.swift */; };
 		20C4C05B24ECDB1C0096B31E /* InvestingTipsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */; };
 		20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */; };
 		20D0F0BD25002D7500C458E4 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */; };
@@ -110,6 +111,7 @@
 		20AE1D132486D1C300A68054 /* AboutVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutVC.swift; sourceTree = "<group>"; };
 		20AF258324633AC4000265A5 /* TradeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeVC.swift; sourceTree = "<group>"; };
 		20AF2585246375E1000265A5 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
+		20B8862626D5887B008C1C6D /* ScreenshotView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScreenshotView.swift; sourceTree = "<group>"; };
 		20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipsVC.swift; sourceTree = "<group>"; };
 		20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipCell.swift; sourceTree = "<group>"; };
 		20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
@@ -162,10 +164,10 @@
 		2010F1D923FE113C007B4343 /* Cryptfolio */ = {
 			isa = PBXGroup;
 			children = (
+				20B8862526D5885D008C1C6D /* Views */,
 				20462FDC26B5F200005E0AF0 /* ARGraphs */,
 				200D7B5B2592635400DAF8B5 /* Cryptfolio.entitlements */,
 				2078010B24EC8554001BDC81 /* GoogleService-Info.plist */,
-				2088E8BA268E963A0091FBB0 /* AAlertView.swift */,
 				2010F1DA23FE113C007B4343 /* AppDelegate.swift */,
 				2010F1F123FE1202007B4343 /* HomeTBVC.swift */,
 				206ABFBE23FE346F00198C12 /* InfoVC.swift */,
@@ -253,6 +255,15 @@
 				20E998E326B737D900AF96E9 /* ARSettingsVC.swift */,
 			);
 			path = Main;
+			sourceTree = "<group>";
+		};
+		20B8862526D5885D008C1C6D /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				2088E8BA268E963A0091FBB0 /* AAlertView.swift */,
+				20B8862626D5887B008C1C6D /* ScreenshotView.swift */,
+			);
+			path = Views;
 			sourceTree = "<group>";
 		};
 		56C97AABF7FEEF18D4DEF7EB /* Pods */ = {
@@ -417,6 +428,7 @@
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				2046301626B5F21F005E0AF0 /* ARChartLabel.swift in Sources */,
 				2035B587247852FE00626463 /* NewsTBVCCustomCell.swift in Sources */,
+				20B8862726D5887B008C1C6D /* ScreenshotView.swift in Sources */,
 				20E998E426B737D900AF96E9 /* ARSettingsVC.swift in Sources */,
 				20437EB4258C0355005479C7 /* NotificationManager.swift in Sources */,
 				20E9250024494FC8002B59B1 /* CryptoData.swift in Sources */,
