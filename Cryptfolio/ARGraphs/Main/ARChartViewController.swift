@@ -6,16 +6,6 @@
 //  Copyright © 2017 Boris Emorine. All rights reserved.
 //
 
-/* TODO:
-     - Make graphics cycles actually work (First complete all other graphics settings). √
-     - Toggle users flashlight (add ability to turn on flashlight). √
-     - Add "Graphics" setting section (includes number of datapoints on graph and other fine tunning settings that can be adjusted). √
-     - Add sensitivity slider for transformations. √
-	 - Fix price not being to short. √
-     - Share functionality √
-     - Add pop up panels that display values of the sliders when the user is dragging along.
- */
-
 import ARCharts
 import ARKit
 import SceneKit
@@ -834,7 +824,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
 		impact.prepare();
 		impact.impactOccurred();
 		let image = self.sceneView.snapshot();
-		let screenshotView = ScreenshotView(viewController: self, image: image);
+		let screenshotView = AScreenshotView(viewController: self, image: image);
 		screenshotView.show();
 	}
 	

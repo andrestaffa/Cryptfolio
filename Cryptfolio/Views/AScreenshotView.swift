@@ -1,5 +1,5 @@
 //
-//  ScreenshotView.swift
+//  AScreenshotView.swift
 //  Cryptfolio
 //
 //  Created by Andre Staffa on 2021-08-24.
@@ -9,7 +9,7 @@
 import Foundation;
 import UIKit;
 
-class ScreenshotView : UIView {
+class AScreenshotView : UIView {
 	
 	let backgroundView : UIView = {
 		let view = UIView();
@@ -21,7 +21,7 @@ class ScreenshotView : UIView {
 	let imageView : UIImageView = {
 		let imageView = UIImageView();
 		imageView.contentMode = .scaleAspectFit;
-		imageView.layer.cornerRadius = 5;
+		imageView.layer.cornerRadius = 15;
 		imageView.layer.masksToBounds = true;
 		imageView.clipsToBounds = true;
 		imageView.translatesAutoresizingMaskIntoConstraints = false;
@@ -101,6 +101,8 @@ class ScreenshotView : UIView {
 		impact.prepare();
 		impact.impactOccurred();
 		let vc = UIActivityViewController(activityItems: [self.imageView.image!], applicationActivities: []);
+		vc.popoverPresentationController?.sourceView = self.viewController.view;
+		vc.popoverPresentationController?.sourceRect = CGRect(x: self.viewController.view.bounds.midX, y: self.viewController.view.bounds.midY,width: 0, height: 0);
 		self.viewController.present(vc, animated: true);
 	}
 	
@@ -138,8 +140,8 @@ class ScreenshotView : UIView {
 		// constraints for self (view)
 		self.centerYAnchor.constraint(equalTo: self.viewController.view.centerYAnchor, constant: -50.0).isActive = true;
 		self.centerXAnchor.constraint(equalTo: self.viewController.view.centerXAnchor).isActive = true;
-		self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.75).isActive = true;
-		self.heightAnchor.constraint(equalToConstant: UIScreen.main.bounds.height * 0.73).isActive = true;
+		self.widthAnchor.constraint(equalToConstant: UIScreen.main.bounds.width * 0.7).isActive = true;
+		self.heightAnchor.constraint(equalToConstant: UIScreen.main.bounds.height * 0.7).isActive = true;
 		
 	}
 	
@@ -159,3 +161,4 @@ class ScreenshotView : UIView {
 	
 	
 }
+

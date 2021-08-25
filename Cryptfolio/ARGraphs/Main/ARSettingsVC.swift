@@ -18,6 +18,8 @@ class ARSettingsVC: UIViewController {
     // MARK: - Member Fields
 
     private var settings:Array<Array<ARSettingSection>> = Array<Array<ARSettingSection>>();
+	
+	private var startingYPos:CGFloat = 0.0;
 
     
     // Lighting section member fields
@@ -31,6 +33,14 @@ class ARSettingsVC: UIViewController {
         tableView.translatesAutoresizingMaskIntoConstraints = false;
         return tableView;
     }();
+	
+	let labelView : UILabel = {
+		let label = UILabel(frame: CGRect(x: 0, y: 0, width: 50, height: 50));
+		label.font = UIFont.systemFont(ofSize: 15, weight: .medium);
+		label.textAlignment = .center;
+		label.adjustsFontSizeToFitWidth = true;
+		return label
+	}();
     
     // MARK: - Constructor
     
@@ -52,6 +62,23 @@ class ARSettingsVC: UIViewController {
     }
     
     // MARK: - Setting Up Constraints
+	
+	private func handleSliderLabel(sender:UISlider, view:UILabel, event:UIEvent, format:(String, Float)) -> Void {
+		if let touchEvent = event.allTouches?.first {
+			if (touchEvent.phase == .began) {
+				let point = touchEvent.location(in: self.view);
+				self.startingYPos = point.y;
+				self.view.addSubview(view);
+			} else if (touchEvent.phase == .moved) {
+				view.text = String(format: format.0, format.1);
+				let point = touchEvent.location(in: sender);
+				if (point.x <= 16 || point.x >= sender.frame.size.width - 16) { return; }
+				view.frame = CGRect(x: (sender.frame.origin.x + point.x) - 14.0, y: self.startingYPos - 60, width: 50, height: 50);
+			} else if (touchEvent.phase == .ended) {
+				view.removeFromSuperview();
+			}
+		}
+	}
     
     private func setupConstraints() -> Void {
         self.view.addSubview(self.settingsTableView);
@@ -168,11 +195,19 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+		let section = indexPath.section;
+		let row = indexPath.row;
+		let sliderCondition:Bool = (section == 0 && row == 3) || (section == 1 && (row == 2 || row == 3)) || (section == 2 && (row == 0 || row == 1 || row == 2 || row == 3)) || (section == 3 && row == 3) || (section == 5 && row == 2);
+		if (sliderCondition) { return 80.0; }
         return 60.0;
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 60.0;
+		let section = indexPath.section;
+		let row = indexPath.row;
+		let sliderCondition:Bool = (section == 0 && row == 3) || (section == 1 && (row == 2 || row == 3)) || (section == 2 && (row == 0 || row == 1 || row == 2 || row == 3)) || (section == 3 && row == 3) || (section == 5 && row == 2);
+		if (sliderCondition) { return 80.0; }
+		return 60.0;
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -252,7 +287,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.slider.minimumValue = 0.001;
             cell.slider.setValue(ARSettings.shared.transformationSensitivity, animated: false);
             cell.setSlider(slider: cell.slider, colors: nil, stillColor: .cyan);
-            cell.slider.addTarget(self, action: #selector(self.sensitivityChanged(_:)), for: .valueChanged)
+			cell.slider.addTarget(self, action: #selector(self.sensitivityChanged(sender:event:)), for: .valueChanged)
             return cell;
         }
     }
@@ -339,7 +374,8 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         cell.settingLabel.highlightedTextColor = .white;
     }
     
-    @objc private func sensitivityChanged(_ sender:UISlider) -> Void {
+	@objc private func sensitivityChanged(sender:UISlider, event:UIEvent) -> Void {
+		self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.2f", sender.value * 1000));
         ARSettings.shared.transformationSensitivity = sender.value;
     }
     
@@ -382,7 +418,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
                 cell.setSlider(slider: cell.slider, colors: [UIColor.blue.cgColor, UIColor.green.cgColor, UIColor.yellow.cgColor, UIColor.orange.cgColor, UIColor.red.cgColor]);
                 cell.settingsImageView.image = UIImage(named: "temp_color");
             }
-            cell.slider.addTarget(self, action: #selector(self.lightingSliderChanged(_:)), for: .valueChanged);
+			cell.slider.addTarget(self, action: #selector(self.lightingSliderChanged(sender:event:)), for: .valueChanged);
             return cell;
         }
     }
@@ -409,10 +445,12 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         tableView.reloadRows(at: [IndexPath(row: 0, section: indexPath.section), IndexPath(row: 1, section: indexPath.section)], with: .none);
     }
     
-    @objc private func lightingSliderChanged(_ sender:UISlider) -> Void {
+	@objc private func lightingSliderChanged(sender:UISlider, event:UIEvent) -> Void {
         if (sender.tag == 2) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.intensitySetting = CGFloat(sender.value);
         } else if (sender.tag == 3) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.temperatureSetting = 40_000 - CGFloat(sender.value);
         }
     }
@@ -456,20 +494,24 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.randomButton.setAttributedTitle(NSAttributedString(string: "Random Color", attributes: [NSAttributedString.Key.font : UIFont.systemFont(ofSize: 15.0, weight: .bold)]), for: .normal);
             cell.randomButton.addTarget(self, action: #selector(self.randomButtonTapped(_:)), for: .touchUpInside);
         }
-        cell.slider.addTarget(self, action: #selector(self.colorSliderChanged(_:)), for: .valueChanged);
+		cell.slider.addTarget(self, action: #selector(self.colorSliderChanged(sender:event:)), for: .valueChanged);
         return cell;
     }
     
-    @objc private func colorSliderChanged(_ sender:UISlider) -> Void {
+	@objc private func colorSliderChanged(sender:UISlider, event:UIEvent) -> Void {
         if (sender.tag == 0) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.brightnessPrecentage = CGFloat(sender.value);
         } else if (sender.tag == 1) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.adjustedColor = true;
             ARSettings.shared.redValue = CGFloat(sender.value);
         } else if (sender.tag == 2) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.adjustedColor = true;
             ARSettings.shared.greenValue = CGFloat(sender.value);
         } else if (sender.tag == 3) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.adjustedColor = true;
             ARSettings.shared.blueValue = CGFloat(sender.value);
         }
@@ -517,7 +559,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.slider.minimumValue = 1;
             cell.slider.setValue(Float(ARSettings.shared.animationDuration), animated: false);
             cell.setSlider(slider: cell.slider, colors: [UIColor.blue.cgColor, UIColor.green.cgColor, UIColor.yellow.cgColor, UIColor.orange.cgColor, UIColor.red.cgColor]);
-            cell.slider.addTarget(self, action: #selector(self.animationSliderChanged(_:)), for: .valueChanged);
+			cell.slider.addTarget(self, action: #selector(self.animationSliderChanged(sender:event:)), for: .valueChanged);
             return cell;
         }
     }
@@ -549,8 +591,9 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         tableView.reloadRows(at: [IndexPath(row: 0, section: indexPath.section), IndexPath(row: 1, section: indexPath.section), IndexPath(row: 2, section: indexPath.section)], with: .none);
     }
     
-    @objc private func animationSliderChanged(_ sender:UISlider) -> Void {
-        ARSettings.shared.animationDuration = Double(sender.value);
+	@objc private func animationSliderChanged(sender:UISlider, event:UIEvent) -> Void {
+		self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.2f", sender.value));
+		ARSettings.shared.animationDuration = Double(sender.value);
     }
     
     // MARK: - Viewables Cell Methods
@@ -667,7 +710,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             cell.slider.minimumValue = 25.0;
             cell.slider.setValue(Float(ARSettings.shared.numberOfBars), animated: false);
             cell.setSlider(slider: cell.slider, colors: nil, stillColor: .purple);
-            cell.slider.addTarget(self, action: #selector(self.graphicsSliderChanged), for: .valueChanged);
+			cell.slider.addTarget(self, action: #selector(self.graphicsSliderChanged(sender:event:)), for: .valueChanged);
             return cell;
         } else if (indexPath.row == 3) {
             let cell = CycleSectionCell(style: .default, reuseIdentifier: CycleSectionCell.reuseIdentifier);
@@ -732,10 +775,11 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         }
     }
     
-    @objc private func graphicsSliderChanged(_ sender:UISlider) -> Void {
+	@objc private func graphicsSliderChanged(sender:UISlider, event:UIEvent) -> Void {
 		ARSettings.shared.presetIndex = 3;
 		self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: 5)], with: .none);
         if (sender.tag == 2) {
+			self.handleSliderLabel(sender: sender, view: self.labelView, event: event, format: ("%.0f", sender.value));
             ARSettings.shared.numberOfBars = Int(sender.value);
         }
     }
