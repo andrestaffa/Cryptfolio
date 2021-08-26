@@ -60,7 +60,6 @@ class AScreenshotView : UIView {
 	
 	private var viewController:ARChartViewController!;
 	
-	
 	public init(viewController:ARChartViewController, image:UIImage) {
 		super.init(frame: .zero);
 		self.viewController = viewController;
@@ -85,6 +84,7 @@ class AScreenshotView : UIView {
 		self.viewController.chartButton.isHidden = true;
 		self.viewController.screenshotButton.isHidden = true;
 		self.viewController.navigationController?.navigationBar.isHidden = true;
+		self.viewController.showingScreenshot = true;
 		UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
 			self.transform = .identity;
 			self.exitButton.transform = .identity;
@@ -149,6 +149,7 @@ class AScreenshotView : UIView {
 		self.viewController.chartButton.isHidden = false;
 		self.viewController.screenshotButton.isHidden = false;
 		self.viewController.navigationController?.navigationBar.isHidden = false;
+		self.viewController.showingScreenshot = false;
 		self.backgroundView.removeFromSuperview();
 		UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
 			self.transform = CGAffineTransform(translationX: 0, y: -self.viewController.view.frame.size.height);

@@ -23,6 +23,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
     
     // Public member variables
     public var isAdding = false;
+	public var isARSelection:Bool = false;
     public var portfolioVC:PortfolioVC?;
     
     // Define scroll view properties
@@ -49,7 +50,12 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             self.navigationItem.rightBarButtonItem = nil;
             self.navigationController?.navigationBar.backItem?.title = "Back"
             self.title = "Add Coin";
-        } else {
+		} else if (self.isARSelection) {
+			//self.navigationController?.navigationBar.prefersLargeTitles = false;
+			self.navigationItem.rightBarButtonItem = nil;
+			self.navigationController?.navigationBar.backItem?.title = "Back"
+			self.title = "Select Coin";
+		} else {
             self.navigationController?.navigationBar.prefersLargeTitles = true;
             self.navigationController?.navigationBar.isHidden = false;
             //let refreshButton = UIBarButtonItem(barButtonSystemItem:UIBarButtonItem.SystemItem.refresh, target: self, action:#selector(refresh));
@@ -141,7 +147,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return self.isAdding ? 50.0 : 80.0;
+		return (self.isAdding || self.isARSelection) ? 50.0 : 80.0;
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -168,7 +174,11 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 cell.container.isHidden = false;
                 cell.percentChangeTxt.isHidden = false;
                 cell.addSymbolImg.isHidden = true;
-                if (self.isAdding) { self.displayAddingVC(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row); }
+				if (self.isAdding) {
+					self.displayAddingVC(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
+				} else if (self.isARSelection) {
+					self.displayARSelectionCoins(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
+				}
                 cell.symbolLbl.text = self.filterCoins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
@@ -190,7 +200,11 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 cell.container.isHidden = false;
                 cell.percentChangeTxt.isHidden = false;
                 cell.addSymbolImg.isHidden = true;
-                if (self.isAdding) { self.displayAddingVC(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row); }
+				if (self.isAdding) {
+					self.displayAddingVC(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
+				} else if (self.isARSelection) {
+					self.displayARSelectionCoins(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
+				}
                 cell.symbolLbl.text = self.coins[indexPath.row].ticker.symbol.uppercased();
                 cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
                 cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
@@ -222,7 +236,14 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 DataStorageHandler.saveObject(type: self.filterCoins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;
-            }
+			} else if (self.isARSelection) {
+				self.searchController.searchBar.endEditing(true);
+				if let tabbar = self.tabBarController {
+					let timestampView = ATimestampSelectionView(viewController: self, containingView: tabbar.view, coin: self.filterCoins[indexPath.row]);
+					timestampView.show();
+				}
+				return;
+			}
             infoVC.coin = self.filterCoins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         } else {
@@ -234,7 +255,14 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 DataStorageHandler.saveObject(type: self.coins[indexPath.row], forKey: UserDefaultKeys.coinKey);
                 self.navigationController?.popViewController(animated: true);
                 return;
-            }
+			} else if (self.isARSelection) {
+				self.searchController.searchBar.endEditing(true);
+				if let tabbar = self.tabBarController {
+					let timestampView = ATimestampSelectionView(viewController: self, containingView: tabbar.view, coin: self.coins[indexPath.row]);
+					timestampView.show();
+				}
+				return;
+			}
             infoVC.coin = self.coins[indexPath.row];
             self.navigationController?.pushViewController(infoVC, animated: true);
         }
@@ -305,6 +333,14 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             cell.addSymbolImg.image = #imageLiteral(resourceName: "plus");
         }
     }
+	
+	private func displayARSelectionCoins(cell:CustomCell, coinSet:Array<Coin>, indexPathRow:Int) -> Void {
+		cell.addSymbolImg.isHidden = true;
+		cell.chartView.isHidden = true;
+		cell.priceTxt.isHidden = true;
+		cell.container.isHidden = true;
+		cell.percentChangeTxt.isHidden = true;
+	}
     
     private func userHasCoin(coinSet:Array<Coin>, indexPathRow:Int) -> Bool {
         if let loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey) {

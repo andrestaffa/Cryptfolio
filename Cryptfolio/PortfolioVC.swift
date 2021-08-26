@@ -17,6 +17,13 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     @IBOutlet weak var subtitleLbl: UILabel!;
     @IBOutlet weak var mainTitleLbl: UILabel!;
     @IBOutlet weak var leaderboard_btn: UIButton!
+	
+	let arButton : UIButton = {
+		let button = UIButton();
+		button.setImage(UIImage(named: "ARCube")?.withRenderingMode(.alwaysOriginal), for: .normal);
+		button.translatesAutoresizingMaskIntoConstraints = false;
+		return button;
+	}();
     
     private var isSubmitLogin:Bool = true;
     private var alert:UIAlertController = UIAlertController();
@@ -201,8 +208,30 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.animateCollectionViewAndTitles();
         self.animateStartScreen();
         
-        
+		self.arButton.addTarget(self, action: #selector(self.arButtonTapped(_:)), for: .touchUpInside);
+		
+		self.setupConstraints();
     }
+	
+	private func setupConstraints() -> Void {
+		self.view.addSubview(self.arButton);
+		
+		self.arButton.bottomAnchor.constraint(equalTo: self.leaderboard_btn.topAnchor, constant: -10).isActive = true;
+		self.arButton.trailingAnchor.constraint(equalTo: self.leaderboard_btn.trailingAnchor).isActive = true;
+		self.arButton.widthAnchor.constraint(equalTo: self.leaderboard_btn.widthAnchor).isActive = true;
+		self.arButton.heightAnchor.constraint(equalTo: self.leaderboard_btn.widthAnchor).isActive = true;
+		
+	}
+	
+	@objc private func arButtonTapped(_ sender:UIButton) -> Void {
+		let impact = UIImpactFeedbackGenerator(style: .light);
+		impact.prepare();
+		impact.impactOccurred();
+		let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
+		homeVC.isARSelection = true;
+		self.navigationController?.pushViewController(homeVC, animated: true);
+		self.navigationController?.navigationBar.isHidden = false;
+	}
     
     @objc private func reloadData() -> Void {
         self.usingPullRefresh = true;
@@ -1377,6 +1406,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.mainTitleLbl.isHidden = hidden;
         self.collectionView.isHidden = hidden;
         self.leaderboard_btn.isHidden = hidden;
+		self.arButton.isHidden = hidden;
         self.navigationItem.titleView?.isHidden = hidden;
         self.navigationController?.navigationBar.isHidden = hidden;
         self.tabBarController?.tabBar.isHidden = hidden;

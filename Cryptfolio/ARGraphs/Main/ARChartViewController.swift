@@ -35,6 +35,7 @@ public class ARSettings {
     
     // Animation settings
     public var animationTypeSetting:Optional<ARChartPresenter.AnimationType> = .grow;
+	public var animationSelectedIndex:Int = 0;
     public var animationDuration:Double = 2.0;
     
     // Viewables settings
@@ -69,6 +70,7 @@ public class ARSettings {
         self.greenValue = 0.0;
         self.blueValue = 0.0;
         self.animationTypeSetting = .grow;
+		self.animationSelectedIndex = 0;
         self.animationDuration = 2.0;
         self.viewableType = Set<String>();
         self.viewableCoinImage = nil;
@@ -105,6 +107,7 @@ public class ARSettings {
     
     public func resetAnimationSettings() -> Void {
         self.animationTypeSetting = .grow;
+		self.animationSelectedIndex = 0;
         self.animationDuration = 2.0;
     }
     
@@ -134,6 +137,7 @@ public class ARSettings {
 		self.dofToggle = false;
 		self.showLabelsToggle = false;
 		self.animationTypeSetting = .none;
+		self.animationSelectedIndex = 2;
 		self.resetViewablesSettings();
 	}
 	
@@ -146,6 +150,7 @@ public class ARSettings {
 		self.dofToggle = false;
 		self.showLabelsToggle = true;
 		self.animationTypeSetting = .grow;
+		self.animationSelectedIndex = 0;
 	}
 	
 	public func highGraphicsPreset() -> Void {
@@ -157,6 +162,7 @@ public class ARSettings {
 		self.dofToggle = false;
 		self.showLabelsToggle = true;
 		self.animationTypeSetting = .grow;
+		self.animationSelectedIndex = 0;
 	}
 	
 	public func ultraGraphicsPreset() -> Void {
@@ -168,6 +174,7 @@ public class ARSettings {
 		self.dofToggle = true;
 		self.showLabelsToggle = true;
 		self.animationTypeSetting = .grow;
+		self.animationSelectedIndex = 0;
 	}
 	
 	public func setGraphicsPreset() -> Void {
@@ -189,11 +196,10 @@ public class ARSettings {
 
 class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNavigationControllerDelegate, UINavigationControllerDelegate {
     
-    override var prefersStatusBarHidden: Bool { return true; }
-    
     private var sideMenu : SideMenuNavigationController?
     
     private var flashToggle:Bool = true;
+	public var showingScreenshot:Bool = false;
     
     let sceneView : ARSCNView = {
         let sceneView = ARSCNView();
@@ -455,6 +461,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
             self.barChart!.draw();
             self.sceneView.scene.rootNode.addChildNode(self.barChart!);
             self.adjustViewablesSettings(barChart: self.barChart!);
+			self.barChart!.eulerAngles = SCNVector3(0, Double.pi/2, 0);
         }
         
         // external settings outside of the ARBarChart object.
@@ -833,6 +840,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     private var startingTranslation: SCNVector3 = SCNVector3();
     
     @objc func handleRotation(rotationGestureRecognizer: UIRotationGestureRecognizer) {
+		if (self.showingScreenshot) { return; }
         guard let barChart = barChart,
             let pointOfView = sceneView.pointOfView,
             sceneView.isNode(barChart, insideFrustumOf: pointOfView) == true else {
@@ -847,6 +855,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     }
     
     @objc func handleTranslation(_ gesture: UIPanGestureRecognizer) {
+		if (self.showingScreenshot) { return; }
         guard let barChart = self.barChart, let pointOfView = self.sceneView.pointOfView, self.sceneView.isNode(barChart, insideFrustumOf: pointOfView) else { return; }
         if (gesture.state == .began) {
             startingTranslation = barChart.position;
@@ -858,6 +867,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
 
     
     @objc func handlePinch(_ gesture: UIPinchGestureRecognizer) {
+		if (self.showingScreenshot) { return; }
         guard let barChart = self.barChart, let pointOfView = self.sceneView.pointOfView, self.sceneView.isNode(barChart, insideFrustumOf: pointOfView) else { return; }
         if (gesture.state == .began) {
             self.startingVectorScale = barChart.scale;
@@ -868,6 +878,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
     }
     
     @objc func handleLongPress(_ gestureRecognizer: UITapGestureRecognizer) {
+		if (self.showingScreenshot) { return; }
         guard gestureRecognizer.state == .began else { return }
         var labelToHighlight: ARChartLabel?
         

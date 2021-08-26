@@ -25,9 +25,6 @@ class ARSettingsVC: UIViewController {
     // Lighting section member fields
     private var lightingSelectedIndex:Int = 0;
     
-    // Animation section member fields
-    private var animationSelectedIndex:Int = 0;
-    
     let settingsTableView : UITableView = {
         let tableView = UITableView(frame: .zero, style: .insetGrouped);
         tableView.translatesAutoresizingMaskIntoConstraints = false;
@@ -148,7 +145,6 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             self.settingsTableView.reloadRows(at: indexPaths, with: .none);
         } else if (sender.tag == 3) {
             ARSettings.shared.resetAnimationSettings();
-            self.animationSelectedIndex = 0;
             var indexPaths:Array<IndexPath> = Array<IndexPath>();
             for row in 0...2 {
                 indexPaths.append(IndexPath(row: row, section: 3));
@@ -542,7 +538,7 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             }
             cell.tintColor = .orange;
             cell.backgroundColor = .clear;
-            if (indexPath.row == self.animationSelectedIndex) {
+            if (indexPath.row == ARSettings.shared.animationSelectedIndex) {
                 cell.accessoryType = .checkmark;
                 cell.settingLabel.textColor = .orange;
             } else {
@@ -570,24 +566,24 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
         cell.settingLabel.highlightedTextColor = .orange;
         switch (indexPath.row) {
             case 0:
-                if (self.animationSelectedIndex == indexPath.row) { break; }
-                self.animationSelectedIndex = 0;
+                if (ARSettings.shared.animationSelectedIndex == indexPath.row) { break; }
+				ARSettings.shared.animationSelectedIndex = 0;
                 ARSettings.shared.animationTypeSetting = .grow;
                 break;
             case 1:
-                if (self.animationSelectedIndex == indexPath.row) { break; }
-                self.animationSelectedIndex = 1;
+                if (ARSettings.shared.animationSelectedIndex == indexPath.row) { break; }
+				ARSettings.shared.animationSelectedIndex = 1;
                 ARSettings.shared.animationTypeSetting = .fade;
                 break;
             case 2:
-                if (self.animationSelectedIndex == indexPath.row) { break; }
-                self.animationSelectedIndex = 2;
+                if (ARSettings.shared.animationSelectedIndex == indexPath.row) { break; }
+				ARSettings.shared.animationSelectedIndex = 2;
                 ARSettings.shared.animationTypeSetting = .none;
                 break;
             default:
                 break;
         }
-        self.animationSelectedIndex = indexPath.row;
+		ARSettings.shared.animationSelectedIndex = indexPath.row;
         tableView.reloadRows(at: [IndexPath(row: 0, section: indexPath.section), IndexPath(row: 1, section: indexPath.section), IndexPath(row: 2, section: indexPath.section)], with: .none);
     }
     
@@ -743,20 +739,15 @@ extension ARSettingsVC : UITableViewDelegate, UITableViewDataSource {
             if (ARSettings.shared.presetIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
                 ARSettings.shared.presetIndex = 0;
 				ARSettings.shared.setGraphicsPreset();
-                self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+				self.settingsTableView.reloadData();
                 return;
             }
             ARSettings.shared.presetIndex += 1;
 			ARSettings.shared.setGraphicsPreset();
-			var indexPaths:Array<IndexPath> = Array<IndexPath>();
-			for row in 0...9 {
-				indexPaths.append(IndexPath(row: row, section: section));
-			}
-			self.settingsTableView.reloadRows(at: indexPaths, with: .none);
-            self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);
+			self.settingsTableView.reloadData();
         } else if (row == 1) {
 			ARSettings.shared.presetIndex = 3;
-			self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: 5)], with: .none);
+			self.settingsTableView.reloadRows(at: [IndexPath(row: 0, section: section)], with: .none);
             if (ARSettings.shared.antiAliasingIndex == ARSettings.shared.graphicsCycles[row].count - 1) {
                 ARSettings.shared.antiAliasingIndex = 0;
                 self.settingsTableView.reloadRows(at: [IndexPath(row: row, section: section)], with: .none);

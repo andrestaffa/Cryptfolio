@@ -59,6 +59,7 @@
 		20F218FA2506F82A002A01AC /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F218F92506F82A002A01AC /* SignUpVC.swift */; };
 		20F218FC25070DAF002A01AC /* Forgot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F218FB25070DAF002A01AC /* Forgot.swift */; };
 		20F340CA244FA15A009A0E4D /* InfoVCCustomCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */; };
+		20F9EA1426D7294F00779D89 /* ATimestampSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20F9EA1326D7294F00779D89 /* ATimestampSelectionView.swift */; };
 		20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */; };
 		20FEBAC424818DC200EE1263 /* NewsRefTBVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20FEBAC324818DC200EE1263 /* NewsRefTBVC.swift */; };
 		484E81B95CE56F92844988CD /* Pods_Cryptfolio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6FBC762C4C7AFBE7E8DBA5AC /* Pods_Cryptfolio.framework */; };
@@ -125,6 +126,7 @@
 		20F218F92506F82A002A01AC /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		20F218FB25070DAF002A01AC /* Forgot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Forgot.swift; sourceTree = "<group>"; };
 		20F340C9244FA15A009A0E4D /* InfoVCCustomCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InfoVCCustomCell.swift; sourceTree = "<group>"; };
+		20F9EA1326D7294F00779D89 /* ATimestampSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ATimestampSelectionView.swift; sourceTree = "<group>"; };
 		20FAEE94246CA8D800C8FA0B /* DataStorageHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataStorageHandler.swift; sourceTree = "<group>"; };
 		20FEBAC324818DC200EE1263 /* NewsRefTBVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsRefTBVC.swift; sourceTree = "<group>"; };
 		39D85362DB734E2CDC80994D /* Pods-Cryptfolio.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Cryptfolio.debug.xcconfig"; path = "Target Support Files/Pods-Cryptfolio/Pods-Cryptfolio.debug.xcconfig"; sourceTree = "<group>"; };
@@ -262,6 +264,7 @@
 			children = (
 				2088E8BA268E963A0091FBB0 /* AAlertView.swift */,
 				201A886326D5A9190012A4C6 /* AScreenshotView.swift */,
+				20F9EA1326D7294F00779D89 /* ATimestampSelectionView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -452,6 +455,7 @@
 				209965C124EEE8020091F0F1 /* TipVC.swift in Sources */,
 				2046301226B5F21F005E0AF0 /* ARChartPresenter.swift in Sources */,
 				206ABFBF23FE346F00198C12 /* InfoVC.swift in Sources */,
+				20F9EA1426D7294F00779D89 /* ATimestampSelectionView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
