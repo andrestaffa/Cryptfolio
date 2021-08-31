@@ -12,7 +12,7 @@ import SwiftChart;
 
 class HomeTBVC: UITableViewController, HomeCellDelgate {
     
-    // Private member vairables
+    // Private member variables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
     private var loading = true;
@@ -68,8 +68,6 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             self.title = "Explore";
         }
 
-        
-        
         // Configure navigation controller
         self.clearsSelectionOnViewWillAppear = false;
         self.navigationController?.navigationBar.isTranslucent = true;
@@ -81,27 +79,29 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         navigationItem.searchController = searchController;
         definesPresentationContext = true;
         
-        self.getData();
+        self.getData(loadingIndicator: true);
 
     }
 
     // MARK: - Refresh data
     
     @objc private func refresh() {
-        self.getData();
+        self.getData(loadingIndicator: false);
         self.tableView.reloadData();
     }
     
     // MARK: - Data gathering
     
-    private func getData() {
+	private func getData(loadingIndicator:Bool) {
         self.counter += 1;
         if (!self.loading) {
             self.loading = true;
         }
+		if (loadingIndicator) { SVProgressHUD.show(withStatus: "Loading..."); }
         CryptoData.getCryptoData { [weak self] (tickerList, error) in
             if let error = error {
-                print(error.localizedDescription)
+				print(error.localizedDescription);
+				SVProgressHUD.dismiss();
             } else {
                 if let tickerList = tickerList {
                     for ticker in tickerList {
@@ -123,6 +123,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
                 refresh.endRefreshing();
             }
             self?.tableView.reloadData();
+			SVProgressHUD.dismiss();
         }
     }
     
@@ -154,7 +155,6 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! CustomCell;
         cell.delegate = self;
         if (self.loading) {
-            SVProgressHUD.show(withStatus: "Loading...")
             cell.chartView.isHidden = true;
             cell.symbolLbl.isHidden = true;
             cell.name_lbl.isHidden = true;
@@ -164,7 +164,6 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
             cell.container.isHidden = true;
             cell.percentChangeTxt.isHidden = true;
         } else {
-            SVProgressHUD.dismiss();
             if (self.isFiltering) {
                 cell.chartView.isHidden = false;
                 cell.symbolLbl.isHidden = false;

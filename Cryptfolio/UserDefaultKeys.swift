@@ -37,6 +37,7 @@ public class UserDefaultKeys {
     public static let isNotFirstTime = "isNotFirstTime";
     public static let didAnimateWithOneCoin = "didAnimateWithOneCoin";
     public static let prevSignedInUser = "prevSignedInUser";
+	public static let arButtonTapped = "arButtonTapped";
     
     // User Notifications keys
     public static let dailyReminder = "dailyReminder";

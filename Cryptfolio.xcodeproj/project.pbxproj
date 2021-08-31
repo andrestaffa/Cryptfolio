@@ -46,6 +46,7 @@
 		20AE1D142486D1C300A68054 /* AboutVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE1D132486D1C300A68054 /* AboutVC.swift */; };
 		20AF258424633AC4000265A5 /* TradeVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF258324633AC4000265A5 /* TradeVC.swift */; };
 		20AF2586246375E1000265A5 /* UserDefaultKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AF2585246375E1000265A5 /* UserDefaultKeys.swift */; };
+		20BF25DD26DC136500B247B6 /* APulseAnimation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20BF25DC26DC136500B247B6 /* APulseAnimation.swift */; };
 		20C4C05B24ECDB1C0096B31E /* InvestingTipsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */; };
 		20C4C05D24ECDC560096B31E /* InvestingTipCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */; };
 		20D0F0BD25002D7500C458E4 /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */; };
@@ -113,6 +114,7 @@
 		20AE1D132486D1C300A68054 /* AboutVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutVC.swift; sourceTree = "<group>"; };
 		20AF258324633AC4000265A5 /* TradeVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TradeVC.swift; sourceTree = "<group>"; };
 		20AF2585246375E1000265A5 /* UserDefaultKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultKeys.swift; sourceTree = "<group>"; };
+		20BF25DC26DC136500B247B6 /* APulseAnimation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APulseAnimation.swift; sourceTree = "<group>"; };
 		20C4C05A24ECDB1C0096B31E /* InvestingTipsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipsVC.swift; sourceTree = "<group>"; };
 		20C4C05C24ECDC560096B31E /* InvestingTipCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvestingTipCell.swift; sourceTree = "<group>"; };
 		20D0F0BC25002D7500C458E4 /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
@@ -265,6 +267,7 @@
 				2088E8BA268E963A0091FBB0 /* AAlertView.swift */,
 				201A886326D5A9190012A4C6 /* AScreenshotView.swift */,
 				20F9EA1326D7294F00779D89 /* ATimestampSelectionView.swift */,
+				20BF25DC26DC136500B247B6 /* APulseAnimation.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -427,6 +430,7 @@
 				20FAEE95246CA8D800C8FA0B /* DataStorageHandler.swift in Sources */,
 				2007D42C2464E5D200D422E6 /* Holding.swift in Sources */,
 				20DAB4D1247EF3DB00DD57CC /* SettingsTBVC.swift in Sources */,
+				20BF25DD26DC136500B247B6 /* APulseAnimation.swift in Sources */,
 				2046300E26B5F21F005E0AF0 /* ARDataSeries.swift in Sources */,
 				204CF6BA245F56C200FCE6DA /* PortfolioVC.swift in Sources */,
 				2046301626B5F21F005E0AF0 /* ARChartLabel.swift in Sources */,

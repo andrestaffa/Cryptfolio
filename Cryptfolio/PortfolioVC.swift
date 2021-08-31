@@ -67,6 +67,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     private static var runOnce:Bool = false;
     private var refreshPortfolioTimer:Timer? = nil;
     private var refreshCount:Int = 0;
+	
+	private var ranPulseOnce:Bool = false;
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -220,17 +222,28 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 		self.arButton.trailingAnchor.constraint(equalTo: self.leaderboard_btn.trailingAnchor).isActive = true;
 		self.arButton.widthAnchor.constraint(equalTo: self.leaderboard_btn.widthAnchor).isActive = true;
 		self.arButton.heightAnchor.constraint(equalTo: self.leaderboard_btn.widthAnchor).isActive = true;
-		
 	}
 	
+	private func setupARButton() -> Void {
+		if (!self.ranPulseOnce && !UserDefaults.standard.bool(forKey: UserDefaultKeys.arButtonTapped)) {
+			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+				let pulseAnimation = APulseAnimation(radius: 31.25, position: self.arButton.center + CGPoint(x: 0, y: 3.5));
+				pulseAnimation.backgroundColor = UIColor(red: 0, green: 201/255, blue: 223/255, alpha: 1).cgColor;
+				self.view.layer.insertSublayer(pulseAnimation, below: self.view.layer);
+			}
+			self.ranPulseOnce = true;
+		}
+	}
+
 	@objc private func arButtonTapped(_ sender:UIButton) -> Void {
-		let impact = UIImpactFeedbackGenerator(style: .light);
-		impact.prepare();
-		impact.impactOccurred();
-		let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
-		homeVC.isARSelection = true;
-		self.navigationController?.pushViewController(homeVC, animated: true);
-		self.navigationController?.navigationBar.isHidden = false;
+		self.vibrate(style: .light);
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+			let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
+			homeVC.isARSelection = true;
+			self.navigationController?.pushViewController(homeVC, animated: true);
+			self.navigationController?.navigationBar.isHidden = false;
+		}
+		UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 	}
     
     @objc private func reloadData() -> Void {
@@ -292,6 +305,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.viewDisappeared = true;
         self.refreshPortfolioTimer!.invalidate();
         self.refreshPortfolioTimer = nil;
+		self.ranPulseOnce = false;
     }
     
     // MARK: - CollecitonView Methods
@@ -1407,6 +1421,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.collectionView.isHidden = hidden;
         self.leaderboard_btn.isHidden = hidden;
 		self.arButton.isHidden = hidden;
+		if (!self.arButton.isHidden) { self.setupARButton(); }
         self.navigationItem.titleView?.isHidden = hidden;
         self.navigationController?.navigationBar.isHidden = hidden;
         self.tabBarController?.tabBar.isHidden = hidden;

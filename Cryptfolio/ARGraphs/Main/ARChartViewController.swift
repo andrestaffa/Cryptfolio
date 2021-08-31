@@ -196,6 +196,8 @@ public class ARSettings {
 
 class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNavigationControllerDelegate, UINavigationControllerDelegate {
     
+	override var prefersStatusBarHidden: Bool { return true; }
+	
     private var sideMenu : SideMenuNavigationController?
     
     private var flashToggle:Bool = true;
@@ -472,9 +474,7 @@ class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNaviga
         
     }
     
-    func sideMenuWillDisappear(menu: SideMenuNavigationController, animated: Bool) {
-        // MAYBE HERE
-    }
+    func sideMenuWillDisappear(menu: SideMenuNavigationController, animated: Bool) {}
     
     private func setupSideMenu() -> Void {
         self.sideMenu = SideMenuNavigationController(rootViewController: ARSettingsVC());

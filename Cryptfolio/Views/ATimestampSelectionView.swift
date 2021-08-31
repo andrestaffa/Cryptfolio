@@ -220,6 +220,8 @@ public class ATimestampSelectionView : UIView {
 	
 	@objc private func continueButtonTapped() -> Void {
 		self.vibrate();
+		self.continueButton.isUserInteractionEnabled = false;
+		self.cancelButton.isUserInteractionEnabled = false;
 		self.continueButton.alpha = 0.5;
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1 ) {
 			self.continueButton.alpha = 1.0;
