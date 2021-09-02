@@ -617,30 +617,31 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
                 if let error = error {
                     print(error.localizedDescription);
                 } else {
-                    self?.chart_view.isHidden = false;
-                    self?.ARCube.isUserInteractionEnabled = true;
-                    self?.activityIndicator.stopAnimating();
+					guard let strongSelf = self else { return; }
+                    strongSelf.chart_view.isHidden = false;
+                    strongSelf.ARCube.isUserInteractionEnabled = true;
+                    strongSelf.activityIndicator.stopAnimating();
                     if let history = history {
-                        self?.dataPoints = history.prices;
-                        self?.timestamps = history.timestamps;
+                        strongSelf.dataPoints = history.prices;
+                        strongSelf.timestamps = history.timestamps;
                     }
-                    self?.chartSetup(data: self!.dataPoints, isDay: false);
+                    strongSelf.chartSetup(data: strongSelf.dataPoints, isDay: false);
                     if (timeFrame != "24h") {
-                        self?.change_lbl.text = self!.updatePercentChangeWithGraph(data: &self!.dataPoints);
-                        self?.setChange(change: self!.change_lbl);
+                        strongSelf.change_lbl.text = strongSelf.updatePercentChangeWithGraph(data: &strongSelf.dataPoints);
+                        strongSelf.setChange(change: strongSelf.change_lbl);
                     } else {
-                        self?.change_lbl.text = self?.setChange(change: String(format: "%.2f", self!.coin!.ticker.changePrecent24H));
-                        self?.setChange(change: self!.change_lbl);
+                        strongSelf.change_lbl.text = strongSelf.setChange(change: String(format: "%.2f", strongSelf.coin!.ticker.changePrecent24H));
+                        strongSelf.setChange(change: strongSelf.change_lbl);
                     }
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                        if let max = self!.dataPoints.max() {
-                            self!.allTimeHigh_lbl.text = CryptoData.convertToDollar(price: max, hasSymbol: false);
-                            self!.allTimeHigh_lbl.text = self?.formatAllTimeHighRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
-                            self!.allTimeHigh_lbl.text = CryptoData.convertToDollar(price:  self!.dataPoints.max()!, hasSymbol: false);
-                            self!.daysRange_lbl.text = self?.formatDaysRange(ticker: self!.coin!.ticker, data: &self!.dataPoints);
+                        if let max = strongSelf.dataPoints.max() {
+							strongSelf.allTimeHigh_lbl.text = CryptoData.convertToDollar(price: max, hasSymbol: false);
+							strongSelf.allTimeHigh_lbl.text = strongSelf.formatAllTimeHighRange(ticker: strongSelf.coin!.ticker, data: &strongSelf.dataPoints);
+							strongSelf.allTimeHigh_lbl.text = CryptoData.convertToDollar(price:  strongSelf.dataPoints.max()!, hasSymbol: false);
+							strongSelf.daysRange_lbl.text = strongSelf.formatDaysRange(ticker: strongSelf.coin!.ticker, data: &strongSelf.dataPoints);
                         }
-                        self!.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
-                        self!.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
+						strongSelf.allTimeHighStatic_lbl.text = "All Time High (\(timeFrame.uppercased()))";
+						strongSelf.daysRangeStatic_lbl.text = "(\(timeFrame.uppercased())) Range";
                     }
                 }
             }
