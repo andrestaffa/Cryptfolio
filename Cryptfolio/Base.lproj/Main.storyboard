@@ -1313,7 +1313,7 @@
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="89"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
-                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" text="MRNA Stock Up 2.69%, Is Coronavirus Vaccine Just Tip of the Iceberg for Moderna?" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RIq-Pz-01Z">
+                                        <textView clipsSubviews="YES" multipleTouchEnabled="YES" userInteractionEnabled="NO" contentMode="scaleToFill" editable="NO" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RIq-Pz-01Z">
                                             <rect key="frame" x="10" y="0.0" width="343" height="59"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="59" id="Mtk-hH-epU"/>
@@ -1322,7 +1322,7 @@
                                             <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                             <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                                         </textView>
-                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="CoinTelegraph - 59 minutes ago" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzK-ia-urz">
+                                        <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wzK-ia-urz">
                                             <rect key="frame" x="16" y="67" width="343" height="16"/>
                                             <constraints>
                                                 <constraint firstAttribute="height" constant="16" id="8B0-Rh-rJF"/>

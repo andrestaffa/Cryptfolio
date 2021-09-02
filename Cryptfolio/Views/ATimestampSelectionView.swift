@@ -228,12 +228,12 @@ public class ATimestampSelectionView : UIView {
 		}
 		SVProgressHUD.show(withStatus: "Loading...");
 		CryptoData.getCryptoID(coinSymbol: self.coin.ticker.symbol.lowercased()) { (uuid, error) in
-			if let error = error { print(error.localizedDescription); self.closeInfoView(); return; }
+			if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: self.viewController); self.closeInfoView(); return; }
 			guard let uuid = uuid else {  self.closeInfoView(); return; }
 			CryptoData.getCoinHistory(id: uuid, timeFrame: self.timestamp) { [weak self] (history, error) in
 				SVProgressHUD.dismiss();
 				if let strongSelf = self {
-					if let error = error { print(error.localizedDescription); strongSelf.closeInfoView(); return; }
+					if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: strongSelf.viewController); strongSelf.closeInfoView(); return; }
 					if let history = history {
 						let dataPoints = history.prices;
 						if (!dataPoints.isEmpty) {

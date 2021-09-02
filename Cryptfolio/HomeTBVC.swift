@@ -15,7 +15,6 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
     // Private member variables
     private var coins = Array<Coin>();
     private var filterCoins = Array<Coin>();
-    private var loading = true;
     private var maxCoins = 20;
     private var counter = 0;
     private var prevLength = 0;
@@ -87,54 +86,50 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
     
     @objc private func refresh() {
         self.getData(loadingIndicator: false);
-        self.tableView.reloadData();
     }
     
     // MARK: - Data gathering
     
 	private func getData(loadingIndicator:Bool) {
         self.counter += 1;
-        if (!self.loading) {
-            self.loading = true;
-        }
-		if (loadingIndicator) { SVProgressHUD.show(withStatus: "Loading..."); }
+		if (loadingIndicator) { SVProgressHUD.show(withStatus: "Loading..."); self.tableView.separatorStyle = .none; }
         CryptoData.getCryptoData { [weak self] (tickerList, error) in
-            if let error = error {
-				print(error.localizedDescription);
-				SVProgressHUD.dismiss();
-            } else {
-                if let tickerList = tickerList {
-                    for ticker in tickerList {
-                        if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
-                            let image = Image(withImage: imageUI);
-                            self?.coins.append(Coin(ticker: ticker, image: image));
-                            if (self!.counter < 2) {
-                                self?.prevLength = (self!.coins.count);
-                            }
-                            if ((self!.coins.count) > self!.prevLength) {
-                                self?.coins.removeSubrange((0...self!.prevLength - 1));
-                            }
-                        }
-                    }
-                }
-            }
-            self?.loading = false;
-            if let refresh = self?.tableView.refreshControl {
-                refresh.endRefreshing();
-            }
-            self?.tableView.reloadData();
+			if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: self); SVProgressHUD.dismiss(); return; }
+			if let tickerList = tickerList {
+				for ticker in tickerList {
+					if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
+						let image = Image(withImage: imageUI);
+						self?.coins.append(Coin(ticker: ticker, image: image));
+						if (self!.counter < 2) {
+							self?.prevLength = (self!.coins.count);
+						}
+						if ((self!.coins.count) > self!.prevLength) {
+							self?.coins.removeSubrange((0...self!.prevLength - 1));
+						}
+					}
+				}
+			}
+            if let refresh = self?.tableView.refreshControl { refresh.endRefreshing(); }
 			SVProgressHUD.dismiss();
+			self?.tableView.separatorStyle = .singleLine;
+			if (loadingIndicator) {
+				self?.tableView.beginUpdates();
+				self?.tableView.reloadSections(IndexSet(integer: 0), with: .middle);
+				self?.tableView.endUpdates();
+			} else {
+				self?.tableView.reloadData();
+			}
         }
     }
     
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (self.loading) {
+		if (self.coins.isEmpty) {
             if let navBarItem = self.navigationItem.rightBarButtonItem {
                 navBarItem.isEnabled = false;
             }
-            return 1;
+            return 0;
         } else {
             if let navBarItem = self.navigationItem.rightBarButtonItem {
                 navBarItem.isEnabled = true;
@@ -147,6 +142,10 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
         }
     }
     
+	override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+		return (self.isAdding || self.isARSelection) ? 50.0 : 80.0;
+	}
+	
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
 		return (self.isAdding || self.isARSelection) ? 50.0 : 80.0;
     }
@@ -154,72 +153,58 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell") as! CustomCell;
         cell.delegate = self;
-        if (self.loading) {
-            cell.chartView.isHidden = true;
-            cell.symbolLbl.isHidden = true;
-            cell.name_lbl.isHidden = true;
-            cell.crypto_img.isHidden = true;
-            cell.symbolLbl.isHidden = true;
-            cell.priceTxt.isHidden = true;
-            cell.container.isHidden = true;
-            cell.percentChangeTxt.isHidden = true;
-        } else {
-            if (self.isFiltering) {
-                cell.chartView.isHidden = false;
-                cell.symbolLbl.isHidden = false;
-                cell.name_lbl.isHidden = false;
-                cell.crypto_img.isHidden = false;
-                cell.priceTxt.isHidden = false;
-                cell.container.isHidden = false;
-                cell.percentChangeTxt.isHidden = false;
-                cell.addSymbolImg.isHidden = true;
-				if (self.isAdding) {
-					self.displayAddingVC(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
-				} else if (self.isARSelection) {
-					self.displayARSelectionCoins(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
-				}
-                cell.symbolLbl.text = self.filterCoins[indexPath.row].ticker.symbol.uppercased();
-                cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
-                cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
-                cell.priceTxt.text = CryptoData.convertToDollar(price: self.filterCoins[indexPath.row].ticker.price, hasSymbol: false);
-                cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath.row].ticker.changePrecent24H), cell: cell);
-                let series = ChartSeries(self.filterCoins[indexPath.row].ticker.history24h);
-                if (!((self.filterCoins[indexPath.row].ticker.history24h.first?.isLess(than: self.filterCoins[indexPath.row].ticker.history24h.last!))!)) {
-                    series.color = ChartColors.redColor();
-                } else {
-                    series.color = ChartColors.greenColor();
-                }
-                cell.chartView.add(series);
-            } else {
-                cell.chartView.isHidden = false;
-                cell.symbolLbl.isHidden = false;
-                cell.name_lbl.isHidden = false;
-                cell.crypto_img.isHidden = false;
-                cell.priceTxt.isHidden = false;
-                cell.container.isHidden = false;
-                cell.percentChangeTxt.isHidden = false;
-                cell.addSymbolImg.isHidden = true;
-				if (self.isAdding) {
-					self.displayAddingVC(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
-				} else if (self.isARSelection) {
-					self.displayARSelectionCoins(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
-				}
-                cell.symbolLbl.text = self.coins[indexPath.row].ticker.symbol.uppercased();
-                cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
-                cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
-                cell.priceTxt.text = CryptoData.convertToDollar(price: self.coins[indexPath.row].ticker.price, hasSymbol: false);
-                cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H), cell: cell);
-                let series = ChartSeries(self.coins[indexPath.row].ticker.history24h);
-                series.area = true;
-                if (!((self.coins[indexPath.row].ticker.history24h.first?.isLess(than: self.coins[indexPath.row].ticker.history24h.last!))!)) {
-                    series.color = ChartColors.redColor();
-                } else {
-                    series.color = ChartColors.greenColor();
-                }
-                cell.chartView.add(series);
-            }
-            
-        }
+		if (self.isFiltering) {
+			if (self.filterCoins.isEmpty) {
+				let cell = UITableViewCell();
+				cell.backgroundColor = .clear;
+				cell.contentView.backgroundColor = .clear;
+				return cell;
+			}
+			cell.addSymbolImg.isHidden = true;
+			if (self.isAdding) {
+				self.displayAddingVC(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
+			} else if (self.isARSelection) {
+				self.displayARSelectionCoins(cell: cell, coinSet: self.filterCoins, indexPathRow: indexPath.row);
+			}
+			cell.symbolLbl.text = self.filterCoins[indexPath.row].ticker.symbol.uppercased();
+			cell.name_lbl.text = self.filterCoins[indexPath.row].ticker.name;
+			cell.crypto_img.image = self.filterCoins[indexPath.row].image.getImage();
+			cell.priceTxt.text = CryptoData.convertToDollar(price: self.filterCoins[indexPath.row].ticker.price, hasSymbol: false);
+			cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.filterCoins[indexPath.row].ticker.changePrecent24H), cell: cell);
+			let series = ChartSeries(self.filterCoins[indexPath.row].ticker.history24h);
+			if (!((self.filterCoins[indexPath.row].ticker.history24h.first?.isLess(than: self.filterCoins[indexPath.row].ticker.history24h.last!))!)) {
+				series.color = ChartColors.redColor();
+			} else {
+				series.color = ChartColors.greenColor();
+			}
+			cell.chartView.add(series);
+		} else {
+			if (self.coins.isEmpty) {
+				let cell = UITableViewCell();
+				cell.backgroundColor = .clear;
+				cell.contentView.backgroundColor = .clear;
+				return cell;
+			}
+			cell.addSymbolImg.isHidden = true;
+			if (self.isAdding) {
+				self.displayAddingVC(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
+			} else if (self.isARSelection) {
+				self.displayARSelectionCoins(cell: cell, coinSet: self.coins, indexPathRow: indexPath.row);
+			}
+			cell.symbolLbl.text = self.coins[indexPath.row].ticker.symbol.uppercased();
+			cell.name_lbl.text = self.coins[indexPath.row].ticker.name;
+			cell.crypto_img.image = self.coins[indexPath.row].image.getImage();
+			cell.priceTxt.text = CryptoData.convertToDollar(price: self.coins[indexPath.row].ticker.price, hasSymbol: false);
+			cell.percentChangeTxt.text = self.setChange(change: String(format: "%.2f", self.coins[indexPath.row].ticker.changePrecent24H), cell: cell);
+			let series = ChartSeries(self.coins[indexPath.row].ticker.history24h);
+			series.area = true;
+			if (!((self.coins[indexPath.row].ticker.history24h.first?.isLess(than: self.coins[indexPath.row].ticker.history24h.last!))!)) {
+				series.color = ChartColors.redColor();
+			} else {
+				series.color = ChartColors.greenColor();
+			}
+			cell.chartView.add(series);
+		}
         return cell;
     }
     
@@ -339,6 +324,7 @@ class HomeTBVC: UITableViewController, HomeCellDelgate {
 		cell.priceTxt.isHidden = true;
 		cell.container.isHidden = true;
 		cell.percentChangeTxt.isHidden = true;
+		cell.selectionImg.isHidden = false;
 	}
     
     private func userHasCoin(coinSet:Array<Coin>, indexPathRow:Int) -> Bool {

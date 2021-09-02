@@ -190,14 +190,10 @@ public class ARSettings {
 		}
 	}
 	
-	
-    
 }
 
 class ARChartViewController: UIViewController, ARSCNViewDelegate, SideMenuNavigationControllerDelegate, UINavigationControllerDelegate {
     
-	override var prefersStatusBarHidden: Bool { return true; }
-	
     private var sideMenu : SideMenuNavigationController?
     
     private var flashToggle:Bool = true;

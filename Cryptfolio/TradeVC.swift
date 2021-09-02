@@ -370,11 +370,11 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         if (doubleAmount != nil && self.ticker != nil) {
             let resultingCost = self.isUSDAmount ? tempCalc * self.ticker!.price : doubleAmount! * self.ticker!.price;
             CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { [weak self] (uuid, error)  in
-                if let error = error { print(error.localizedDescription); return; }
+				if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: self);  return; }
                 guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again."); return; }
                 CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
-                    if let error = error {
-                        print(error.localizedDescription);
+                    if let _ = error {
+						CryptoData.DisplayNetworkErrorAlert(vc: self);
                     } else {
                         if let ticker = ticker {
                             let affectedAmountOfCoin:Double = resultingCost / ticker.price;
@@ -446,11 +446,11 @@ class TradeVC: UIViewController, UITextFieldDelegate {
         // sell the specified coin
         if (doubleAmount != nil && self.ticker != nil) {
             CryptoData.getCryptoID(coinSymbol: self.ticker!.symbol.lowercased()) { [weak self] (uuid, error) in
-                if let error = error { print(error.localizedDescription); return; }
+				if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: self); return; }
                 guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again."); return; }
                 CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
-                    if let error = error {
-                        print(error.localizedDescription);
+                    if let _ = error {
+						CryptoData.DisplayNetworkErrorAlert(vc: self);
                     } else {
                         if let ticker = ticker {
                             let amountCost = tempCalc * ticker.price;

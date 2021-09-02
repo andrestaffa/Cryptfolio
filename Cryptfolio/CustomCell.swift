@@ -73,6 +73,17 @@ class CustomCell: UITableViewCell, ChartDelegate {
         image.translatesAutoresizingMaskIntoConstraints = false;
         return image;
     }();
+	
+	let selectionImg: UIImageView = {
+		let imageView = UIImageView();
+		imageView.isHidden = true;
+		imageView.image = UIImage(named: "cycle_arrow")?.withRenderingMode(.alwaysTemplate);
+		imageView.contentMode = .scaleAspectFit;
+		imageView.tintColor = .orange;
+		imageView.transform = CGAffineTransform(rotationAngle: .pi/2);
+		imageView.translatesAutoresizingMaskIntoConstraints = false;
+		return imageView;
+	}();
     
     
     override func awakeFromNib() {
@@ -85,6 +96,7 @@ class CustomCell: UITableViewCell, ChartDelegate {
         self.addSubview(self.priceTxt);
         self.addSubview(self.container);
         self.addSubview(self.addSymbolImg);
+		self.addSubview(self.selectionImg);
         self.container.addSubview(self.percentChangeTxt);
         
         let con:CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? -10.0 : -5.0;
@@ -141,12 +153,18 @@ class CustomCell: UITableViewCell, ChartDelegate {
         self.addSymbolImg.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15).isActive = true;
         self.addSymbolImg.widthAnchor.constraint(equalToConstant: 17.5).isActive = true;
         self.addSymbolImg.heightAnchor.constraint(equalToConstant: 17.5).isActive = true;
+		
+		self.selectionImg.centerYAnchor.constraint(equalTo: self.centerYAnchor).isActive = true;
+		self.selectionImg.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -15).isActive = true;
+		self.selectionImg.widthAnchor.constraint(equalToConstant: 17.5).isActive = true;
+		self.selectionImg.heightAnchor.constraint(equalToConstant: 17.5).isActive = true;
         
     }
     
     override func prepareForReuse() {
         super.prepareForReuse();
         self.addSymbolImg.isHidden = true;
+		self.selectionImg.isHidden = true;
         self.chartView.removeAllSeries();
     }
     

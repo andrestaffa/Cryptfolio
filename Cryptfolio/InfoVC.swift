@@ -218,19 +218,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     // MARK: - AR Cube Methods
     
     @objc private func ARButtonTapped() -> Void {
-        if let coin = self.coin {
-            if (!self.dataPoints.isEmpty) {
-                var series:Array<Array<Double>> = Array<Array<Double>>();
-                for dataPoint in self.dataPoints {
-                    series.append([dataPoint]);
-                }
-                let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
-                chartVC.dataPoints = series;
-                chartVC.coin = coin;
-                chartVC.hidesBottomBarWhenPushed = true;
-                self.navigationController?.pushViewController(chartVC, animated: true);
-            }
-        }
+		self.vibrate(style: .light);
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+			if let coin = self.coin {
+				if (!self.dataPoints.isEmpty) {
+					var series:Array<Array<Double>> = Array<Array<Double>>();
+					for dataPoint in self.dataPoints {
+						series.append([dataPoint]);
+					}
+					let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
+					chartVC.dataPoints = series;
+					chartVC.coin = coin;
+					chartVC.hidesBottomBarWhenPushed = true;
+					self.navigationController?.pushViewController(chartVC, animated: true);
+					UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
+				}
+			}
+		}
     }
     
     private var currentARCubeTransform:CGAffineTransform = CGAffineTransform.identity;

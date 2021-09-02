@@ -458,17 +458,18 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
        
     private func getTickerData() -> Void {
         CryptoData.getCryptoData { [weak self] (tickerList, error) in
-            if let error = error {
-                print(error.localizedDescription);
+            if let _ = error {
+				CryptoData.DisplayNetworkErrorAlert(vc: self);
             } else {
                 if let tickerList = tickerList {
                     for ticker in tickerList {
                         if let imageUI = UIImage(named: "Images/" + "\(ticker.symbol.lowercased())" + ".png") {
                             self?.tickers.append(Coin(ticker: ticker, image: Image(withImage: imageUI)));
-                            self?.collectionView.reloadData();
                         }
                     }
+					self?.collectionView.reloadData();
                 } else {
+					CryptoData.DisplayNetworkErrorAlert(vc: self);
                     self?.collectionView.reloadData();
                 }
             }
@@ -1040,8 +1041,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     if let error = error { print(error.localizedDescription); return; }
                     guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Buy order unsuccessful, please try again."); return; }
                     CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
-                        if let error = error {
-                            print(error.localizedDescription);
+                        if let _ = error {
+							CryptoData.DisplayNetworkErrorAlert(vc: self);
                         } else {
                             if let ticker = ticker {
                                 let amountCoin = currentFunds! / ticker.price;
@@ -1089,8 +1090,8 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 if let error = error { print(error.localizedDescription); return; }
                 guard let uuid = uuid else { self?.displayAlert(title: "Error", message: "Sell order unsucessful, please try again."); return; }
                 CryptoData.getCoinData(id: uuid) { [weak self] (ticker, error) in
-                    if let error = error {
-                        print(error.localizedDescription);
+                    if let _ = error {
+						CryptoData.DisplayNetworkErrorAlert(vc: self);
                     } else {
                         if let ticker = ticker {
                             let amountCost = currentHoldings!.amountOfCoin * ticker.price;
@@ -1277,14 +1278,16 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     // MARK: - Button Methods
     
     @IBAction func pressAddCoinBtn(_ sender: Any) {
-        self.vibrate(style: .light);
-        NotificationManager.askPermission();
-        self.addCoin_btn.isUserInteractionEnabled = false;
-        let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
-        homeTBVC.isAdding = true;
-        homeTBVC.portfolioVC = self;
-        self.navigationController?.pushViewController(homeTBVC, animated: true);
-        self.navigationController?.navigationBar.isHidden = false;
+		self.vibrate(style: .light);
+		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+			NotificationManager.askPermission();
+			self.addCoin_btn.isUserInteractionEnabled = false;
+			let homeTBVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
+			homeTBVC.isAdding = true;
+			homeTBVC.portfolioVC = self;
+			self.navigationController?.pushViewController(homeTBVC, animated: true);
+			self.navigationController?.navigationBar.isHidden = false;
+		}
     }
     
     func didTap(_ cell: PortfolioVCCustomCell) {

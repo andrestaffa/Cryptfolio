@@ -30,9 +30,9 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     override func viewWillAppear(_ animated: Bool) {
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
             self.accountItems.removeAll();
-            self.accountItems.append(Section(title: "Change username", image: UIImage(named: "Images/btc.png")!));
-            self.accountItems.append(Section(title: "Logout", image: UIImage(named: "Images/btc.png")!));
-            self.accountItems.append(Section(title: "Delete account", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Change Username", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Sign Out", image: UIImage(named: "Images/btc.png")!));
+            self.accountItems.append(Section(title: "Delete Account", image: UIImage(named: "Images/btc.png")!));
             self.tableView.reloadData();
         }
         
@@ -79,20 +79,20 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         
         // section 1 - General
         if (NotificationManager.isAppTrackingAuthorized()) {
-            self.generalItems.append(Section(title: "Watch a video for bonus cash", image: UIImage(named: "Images/neo.png")!));
-            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+            self.generalItems.append(Section(title: "Watch Reward Video", image: UIImage(named: "Images/neo.png")!));
+            self.generalItems.append(Section(title: "View Investing Tips", image: UIImage(named: "Images/dash.png")!));
         } else {
-            self.generalItems.append(Section(title: "View investing tips", image: UIImage(named: "Images/dash.png")!));
+            self.generalItems.append(Section(title: "View Investing Tips", image: UIImage(named: "Images/dash.png")!));
         }
         
         // section 2 - Feedback and Support
-        self.feedbackItems.append(Section(title: "More info", image: UIImage(named: "Images/btc.png")!));
+        self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
         self.feedbackItems.append(Section(title: "Share Cryptfolio", image: UIImage(named: "Images/ltc.png")!));
-        self.feedbackItems.append(Section(title: "Send bug report", image: UIImage(named: "Images/xmr.png")!));
+        self.feedbackItems.append(Section(title: "Send Bug Report", image: UIImage(named: "Images/xmr.png")!));
         self.feedbackItems.append(Section(title: "About Cryptfolio", image: UIImage(named: "Images/eos.png")!));
         
         // section 3 - References
-        self.referenceItems.append(Section(title: "News sources", image: UIImage(named: "Images/etc.png")!));
+        self.referenceItems.append(Section(title: "News Sources", image: UIImage(named: "Images/etc.png")!));
         self.referenceItems.append(Section(title: "References", image: UIImage(named: "Images/usdt.png")!));
         
     }
@@ -307,7 +307,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         cell?.isUserInteractionEnabled = false;
         let alertController = UIAlertController(title: "Warning", message: "Are you sure you want to sign out?", preferredStyle: .alert);
         alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in cell?.isUserInteractionEnabled = true; }));
-        alertController.addAction(UIAlertAction(title: "Logout", style: .destructive, handler: { [weak self] (action) in
+        alertController.addAction(UIAlertAction(title: "Sign Out", style: .destructive, handler: { [weak self] (action) in
             SVProgressHUD.show(withStatus: "Loading...")
             var highscore:Double = 0.0;
             if (UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortChange) != 0 && !UserDefaults.standard.double(forKey: UserDefaultKeys.mainPortfolioKey).isLessThanOrEqualTo(0.0)) {
@@ -412,7 +412,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
                         }
                     }
                 } else {
-                    self?.displayAlertNormal(title: "Error", message: "Cannot find email address. Logout and sign back in to try again.", style: .default);
+                    self?.displayAlertNormal(title: "Error", message: "Cannot find email address. Sign out and sign back in to try again.", style: .default);
                     SVProgressHUD.dismiss();
                 }
             } else {

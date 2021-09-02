@@ -487,6 +487,15 @@ public class CryptoData {
         return formatter.string(from: number)!
         
     }
+	
+	public static func DisplayNetworkErrorAlert(vc:UIViewController?) -> Void {
+		let alert = UIAlertController(title: "Network Error", message: "You are currently not connected to a network.", preferredStyle: .alert);
+		let defaultButton = UIAlertAction(title: "OK", style: .default, handler: nil);
+		alert.addAction(defaultButton);
+		if let vc = vc {
+			vc.present(alert, animated: true, completion: nil)
+		}
+	}
     
 }
 

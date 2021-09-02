@@ -13,7 +13,6 @@ import SafariServices;
 class NewsTBVC: UITableViewController {
 
     // Private member variables
-    private var isLoading:Bool = true;
     private var newsList = Array<News>();
     private var counter:Int = 0;
     private var prevLength = 0;
@@ -31,55 +30,55 @@ class NewsTBVC: UITableViewController {
         self.tableView.refreshControl!.attributedTitle = NSAttributedString(string: "");
         self.tableView.refreshControl!.addTarget(self, action: #selector(self.refresh), for: .valueChanged);
         
-        self.getData();
+        self.getData(loadingIndicator: true);
         self.title = "News";
         
     }
     
-    private func getData() -> Void {
+	@objc private func refresh() -> Void {
+		self.getData(loadingIndicator: false);
+	}
+	
+	private func getData(loadingIndicator:Bool) -> Void {
         self.counter += 1;
-        if (!self.isLoading) {
-            self.isLoading = true;
-        }
+		if (loadingIndicator) { SVProgressHUD.show(withStatus: "Loading..."); self.tableView.separatorStyle = .none; }
         CryptoData.getNewsData { [weak self] (news, error) in
-            if let error = error {
-                print(error.localizedDescription);
-            } else {
-                if let news = news {
-                    self?.newsList.append(news);
-                    if (self!.counter < 2) {
-                        self!.prevLength = (self!.newsList.count);
-                    }
-                    if ((self!.newsList.count) > self!.prevLength) {
-                        self?.newsList.removeSubrange((0...self!.prevLength - 1));
-                    }
-                } else {
-                    self?.newsList.append(News(title: "Error Loading News", source: "There was an error loading news", publishedOn: Date().timeIntervalSince1970, url: "https://www.calculatedinc.org"));
-                }
-            }
-            self?.isLoading = false;
-            if let refresh = self?.tableView.refreshControl {
-                refresh.endRefreshing();
-            }
-            self?.tableView.reloadData();
+			if let _ = error { CryptoData.DisplayNetworkErrorAlert(vc: self); SVProgressHUD.dismiss(); return; }
+			if let news = news {
+				self?.newsList.append(news);
+				if (self!.counter < 2) {
+					self!.prevLength = (self!.newsList.count);
+				}
+				if ((self!.newsList.count) > self!.prevLength) {
+					self?.newsList.removeSubrange((0...self!.prevLength - 1));
+				}
+			} else {
+				self?.newsList.append(News(title: "Error Loading News", source: "There was an error loading news", publishedOn: Date().timeIntervalSince1970, url: "https://www.calculatedinc.org"));
+			}
+            if let refresh = self?.tableView.refreshControl { refresh.endRefreshing(); }
+			SVProgressHUD.dismiss();
+			self?.tableView.separatorStyle = .singleLine;
+			self?.tableView.reloadData();
         }
         
     }
-    
-    @objc private func refresh() -> Void {
-        self.tableView.reloadData();
-        self.getData();
-        self.tableView.reloadData();
-    }
 
     // MARK: - Table view data source
+	
+	override func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+		return 89;
+	}
+	
+	override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+		return 89;
+	}
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if (self.isLoading) {
+		if (self.newsList.isEmpty) {
             if let navBarItem = self.navigationItem.rightBarButtonItem {
                 navBarItem.isEnabled = false;
             }
-            return 1;
+            return 0;
         } else {
             if let navBarItem = self.navigationItem.rightBarButtonItem {
                 navBarItem.isEnabled = true;
@@ -90,16 +89,14 @@ class NewsTBVC: UITableViewController {
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! NewsTBVCCustomCell;
-        if (self.isLoading) {
-            SVProgressHUD.setDefaultStyle(.dark);
-            SVProgressHUD.show(withStatus: "Loading...");
-            cell.title_lbl.text = "";
-            cell.source_lbl.text = "";
-        } else {
-            SVProgressHUD.dismiss();
-            cell.title_lbl.text = self.newsList[indexPath.row].title;
-            cell.source_lbl.text = self.newsList[indexPath.row].source + " - " + "\(self.dateFormatter(time: self.newsList[indexPath.row].publishedOn))";
-        }
+		if (self.newsList.isEmpty) {
+			let cell = UITableViewCell();
+			cell.backgroundColor = .clear;
+			cell.contentView.backgroundColor = .clear;
+			return cell;
+		}
+		cell.title_lbl.text = self.newsList[indexPath.row].title;
+		cell.source_lbl.text = self.newsList[indexPath.row].source + " - " + "\(self.dateFormatter(time: self.newsList[indexPath.row].publishedOn))";
         return cell;
     }
     
