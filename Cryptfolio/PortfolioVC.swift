@@ -10,6 +10,7 @@ import UIKit;
 import SwiftChart;
 import SVProgressHUD;
 import FirebaseAuth;
+import ARKit;
 
 class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UICollectionViewDelegate, UICollectionViewDataSource, CellDelegate {
     
@@ -238,10 +239,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 	@objc private func arButtonTapped(_ sender:UIButton) -> Void {
 		self.vibrate(style: .light);
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-			let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
-			homeVC.isARSelection = true;
-			self.navigationController?.pushViewController(homeVC, animated: true);
-			self.navigationController?.navigationBar.isHidden = false;
+			if (ARWorldTrackingConfiguration.isSupported) {
+				let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
+				homeVC.isARSelection = true;
+				self.navigationController?.pushViewController(homeVC, animated: true);
+				self.navigationController?.navigationBar.isHidden = false;
+			} else {
+				self.displayAlert(title: "Error", message: "Your current device does not support Augmented Reality.");
+			}
 		}
 		UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 	}

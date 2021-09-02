@@ -10,6 +10,7 @@ import UIKit
 import SwiftChart;
 import Alamofire;
 import SafariServices;
+import ARKit;
 
 public class CoinData {
     
@@ -220,19 +221,23 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     @objc private func ARButtonTapped() -> Void {
 		self.vibrate(style: .light);
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-			if let coin = self.coin {
-				if (!self.dataPoints.isEmpty) {
-					var series:Array<Array<Double>> = Array<Array<Double>>();
-					for dataPoint in self.dataPoints {
-						series.append([dataPoint]);
+			if (ARWorldTrackingConfiguration.isSupported) {
+				if let coin = self.coin {
+					if (!self.dataPoints.isEmpty) {
+						var series:Array<Array<Double>> = Array<Array<Double>>();
+						for dataPoint in self.dataPoints {
+							series.append([dataPoint]);
+						}
+						let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
+						chartVC.dataPoints = series;
+						chartVC.coin = coin;
+						chartVC.hidesBottomBarWhenPushed = true;
+						self.navigationController?.pushViewController(chartVC, animated: true);
+						UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 					}
-					let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
-					chartVC.dataPoints = series;
-					chartVC.coin = coin;
-					chartVC.hidesBottomBarWhenPushed = true;
-					self.navigationController?.pushViewController(chartVC, animated: true);
-					UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 				}
+			} else {
+				self.displayAlert(title: "Error", message: "Your current device does not support Augmented Reality.");
 			}
 		}
     }
