@@ -226,6 +226,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 	}
 	
 	private func setupARButton() -> Void {
+		if (!ARWorldTrackingConfiguration.isSupported) { self.arButton.isHidden = true; return; }
 		if (!self.ranPulseOnce && !UserDefaults.standard.bool(forKey: UserDefaultKeys.arButtonTapped)) {
 			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
 				let pulseAnimation = APulseAnimation(radius: 31.25, position: self.arButton.center + CGPoint(x: 0, y: 3.5));
@@ -239,14 +240,10 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 	@objc private func arButtonTapped(_ sender:UIButton) -> Void {
 		self.vibrate(style: .light);
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-			if (ARWorldTrackingConfiguration.isSupported) {
-				let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
-				homeVC.isARSelection = true;
-				self.navigationController?.pushViewController(homeVC, animated: true);
-				self.navigationController?.navigationBar.isHidden = false;
-			} else {
-				self.displayAlert(title: "Error", message: "Your current device does not support Augmented Reality.");
-			}
+			let homeVC = self.storyboard?.instantiateViewController(withIdentifier: "homeTBVC") as! HomeTBVC;
+			homeVC.isARSelection = true;
+			self.navigationController?.pushViewController(homeVC, animated: true);
+			self.navigationController?.navigationBar.isHidden = false;
 		}
 		UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 	}

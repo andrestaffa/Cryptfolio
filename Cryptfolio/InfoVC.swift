@@ -160,6 +160,7 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
         self.allTimeHigh_lbl.adjustsFontSizeToFitWidth = true;
         self.daysRange_lbl.adjustsFontSizeToFitWidth = true;
         
+		self.ARCube.isHidden = !ARWorldTrackingConfiguration.isSupported;
         self.ARCube.addTarget(self, action: #selector(self.ARButtonTapped), for: .touchUpInside);
         self.ARCube.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.handleTranslationARCube(gesture:))))
                 
@@ -217,30 +218,26 @@ class InfoVC: UIViewController, UIScrollViewDelegate, ChartDelegate , UITableVie
     }
     
     // MARK: - AR Cube Methods
-    
-    @objc private func ARButtonTapped() -> Void {
+	
+	@objc private func ARButtonTapped() -> Void {
 		self.vibrate(style: .light);
 		DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-			if (ARWorldTrackingConfiguration.isSupported) {
-				if let coin = self.coin {
-					if (!self.dataPoints.isEmpty) {
-						var series:Array<Array<Double>> = Array<Array<Double>>();
-						for dataPoint in self.dataPoints {
-							series.append([dataPoint]);
-						}
-						let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
-						chartVC.dataPoints = series;
-						chartVC.coin = coin;
-						chartVC.hidesBottomBarWhenPushed = true;
-						self.navigationController?.pushViewController(chartVC, animated: true);
-						UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
+			if let coin = self.coin {
+				if (!self.dataPoints.isEmpty) {
+					var series:Array<Array<Double>> = Array<Array<Double>>();
+					for dataPoint in self.dataPoints {
+						series.append([dataPoint]);
 					}
+					let chartVC = self.storyboard?.instantiateViewController(withIdentifier: "ARChartVC") as! ARChartViewController;
+					chartVC.dataPoints = series;
+					chartVC.coin = coin;
+					chartVC.hidesBottomBarWhenPushed = true;
+					self.navigationController?.pushViewController(chartVC, animated: true);
+					UserDefaults.standard.set(true, forKey: UserDefaultKeys.arButtonTapped);
 				}
-			} else {
-				self.displayAlert(title: "Error", message: "Your current device does not support Augmented Reality.");
 			}
 		}
-    }
+	}
     
     private var currentARCubeTransform:CGAffineTransform = CGAffineTransform.identity;
     
