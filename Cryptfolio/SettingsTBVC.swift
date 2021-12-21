@@ -78,12 +78,8 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     private func getData() -> Void {
         
         // section 1 - General
-        if (NotificationManager.isAppTrackingAuthorized()) {
-            self.generalItems.append(Section(title: "Watch Reward Video", image: UIImage(named: "Images/neo.png")!));
-            self.generalItems.append(Section(title: "View Investing Tips", image: UIImage(named: "Images/dash.png")!));
-        } else {
-            self.generalItems.append(Section(title: "View Investing Tips", image: UIImage(named: "Images/dash.png")!));
-        }
+		self.generalItems.append(Section(title: "Watch Reward Video", image: UIImage(named: "Images/neo.png")!));
+		self.generalItems.append(Section(title: "View Investing Tips", image: UIImage(named: "Images/dash.png")!));
         
         // section 2 - Feedback and Support
         self.feedbackItems.append(Section(title: "More Info", image: UIImage(named: "Images/btc.png")!));
@@ -163,17 +159,16 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath);
+		cell.textLabel?.textColor = .white;
         switch indexPath.section {
         case 0:
             cell.isUserInteractionEnabled = true;
             cell.textLabel!.textColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1);
             cell.textLabel!.text = self.generalItems[indexPath.row].title;
-            if (NotificationManager.isAppTrackingAuthorized()) {
-                if (indexPath.row == 0) {
-                    cell.textLabel?.textColor = .systemOrange;
-                    self.glowAffect(view: cell.textLabel!, color: .orange);
-                }
-            }
+			if (indexPath.row == 0) {
+				cell.textLabel?.textColor = .systemOrange;
+				self.glowAffect(view: cell.textLabel!, color: .orange);
+			}
             break;
         case 1:
             cell.textLabel!.text = self.feedbackItems[indexPath.row].title;
@@ -204,11 +199,7 @@ class SettingsTBVC: UITableViewController, ISRewardedVideoDelegate {
         tableView.deselectRow(at: indexPath, animated: true);
         switch (indexPath.section, indexPath.row) {
         case (0, 0):
-            if (NotificationManager.isAppTrackingAuthorized()) {
-                self.watchAdForMoney();
-            } else {
-                self.viewInvestingTips();
-            }
+			self.watchAdForMoney();
             break;
         case (0, 1):
             self.viewInvestingTips();

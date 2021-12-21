@@ -24,9 +24,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window?.overrideUserInterfaceStyle = .dark
         SVProgressHUD.setDefaultStyle(.dark);
         FirebaseApp.configure();
-        if (NotificationManager.isAppTrackingAuthorized()) {
-            IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
-        }
+		IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
+		
+		if #available(iOS 13.0, *) {
+			let tabBarAppearance: UITabBarAppearance = UITabBarAppearance();
+			tabBarAppearance.configureWithDefaultBackground();
+			tabBarAppearance.backgroundColor = UIColor.mainBackgroundColor;
+			UITabBar.appearance().standardAppearance = tabBarAppearance;
+
+			if #available(iOS 15.0, *) {
+				UITabBar.appearance().scrollEdgeAppearance = tabBarAppearance;
+			}
+		}
     
         if (!UserDefaults.standard.bool(forKey: UserDefaultKeys.isNotFirstTime)) {
             UserDefaults.standard.set(10000.00, forKey: UserDefaultKeys.availableFundsKey);

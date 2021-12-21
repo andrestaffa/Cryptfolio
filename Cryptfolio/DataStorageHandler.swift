@@ -9,6 +9,41 @@
 import Foundation;
 import UIKit;
 
+public class UserManager {
+	
+	public static let shared = UserManager();
+	
+	public func getCurrentProfilePicture() -> UIImage? {
+		if let encodedimage = UserDefaults.standard.string(forKey: "profilePicture") {
+			return DataStorageHandler.decodeImage(strBase64: encodedimage);
+		}
+		return nil;
+	}
+	
+	public func setCurrentProfilePicture(image:UIImage) -> Void {
+		let encodedImage = DataStorageHandler.encodeImage(image: image);
+		UserDefaults.standard.set(encodedImage, forKey: "profilePicture");
+	}
+	
+	public func removeCurrentProfilePicture() -> Void {
+		UserDefaults.standard.removeObject(forKey: "profilePicture");
+	}
+	
+	public func getCurrentUsername() -> String? {
+		return UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername);
+	}
+	
+	public func setCurrentUsername(username:String) -> Void {
+		UserDefaults.standard.set(username, forKey: UserDefaultKeys.currentUsername);
+	}
+	
+	public func removeCurrentUsername() -> Void {
+		UserDefaults.standard.removeObject(forKey: UserDefaultKeys.currentUsername);
+	}
+	
+}
+
+
 public class DataStorageHandler {
     
     public static func loadObject<T : Codable>(type: T.Type, forKey:String) -> T? {
@@ -29,6 +64,21 @@ public class DataStorageHandler {
             UserDefaults.standard.set(encoded, forKey: forKey);
         }
     }
+	
+	public static func encodeImage(image:UIImage?) -> String {
+		guard let image = image else { return ""; }
+		if let imageData:Data = image.jpegData(compressionQuality: 1) {
+			let strBase64 = imageData.base64EncodedString();
+			return strBase64;
+		}
+		return "";
+	}
+	
+	public static func decodeImage(strBase64:String) -> UIImage? {
+		let newImageData = Data(base64Encoded: strBase64);
+		if let newImageData = newImageData { return UIImage(data: newImageData); }
+		return nil;
+	}
     
     public static func encodeTypeIntoJSON<T : Codable>(type: T) -> Array<Dictionary<String, Any>>? {
         let encoder = JSONEncoder();

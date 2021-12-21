@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="18122" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="19529" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="DU9-gU-mMc">
     <device id="retina4_7" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="18093"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="19519"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -61,7 +61,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" rowHeight="55" id="mOD-cL-WPK" customClass="CustomCell" customModule="Cryptfolio" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="24.5" width="375" height="55"/>
+                                <rect key="frame" x="0.0" y="44.5" width="375" height="55"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="mOD-cL-WPK" id="Cm8-8E-nOX">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="55"/>
@@ -160,7 +160,7 @@
                                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                                 <prototypes>
                                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="infoVCCell" rowHeight="62" id="XAh-4P-DOq" customClass="InfoVCCustomCell" customModule="Cryptfolio" customModuleProvider="target">
-                                                        <rect key="frame" x="0.0" y="24.5" width="375" height="62"/>
+                                                        <rect key="frame" x="0.0" y="44.5" width="375" height="62"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="XAh-4P-DOq" id="54t-vN-bvH">
                                                             <rect key="frame" x="0.0" y="0.0" width="375" height="62"/>
@@ -864,7 +864,7 @@
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="46" id="ejn-ZO-6Ia" customClass="PortfolioVCCustomCell" customModule="Cryptfolio" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="24.5" width="375" height="46"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="375" height="46"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="ejn-ZO-6Ia" id="oEx-Al-in3">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="46"/>
@@ -1307,7 +1307,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="cell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" rowHeight="89" id="D2f-gQ-wR8" customClass="NewsTBVCCustomCell" customModule="Cryptfolio" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="24.5" width="375" height="89"/>
+                                <rect key="frame" x="0.0" y="44.5" width="375" height="89"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="D2f-gQ-wR8" id="RHI-AN-e8B">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="89"/>
@@ -1370,7 +1370,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="cell" id="I2X-qJ-DHE">
-                                <rect key="frame" x="0.0" y="24.5" width="375" height="43.5"/>
+                                <rect key="frame" x="0.0" y="44.5" width="375" height="43.5"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="I2X-qJ-DHE" id="LGI-UP-Omv">
                                     <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -1818,7 +1818,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="47" id="Vug-fQ-qbc" customClass="LeaderboardCell" customModule="Cryptfolio" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="24.5" width="343" height="47"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="343" height="47"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="Vug-fQ-qbc" id="cz3-Na-3iI">
                                             <rect key="frame" x="0.0" y="0.0" width="343" height="47"/>
@@ -1915,7 +1915,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                     <color key="titleColor" systemColor="labelColor"/>
                                 </state>
                             </button>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AeE-G8-uyq">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="AeE-G8-uyq" userLabel="topView">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="126"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="jCO-He-SPJ">
@@ -1936,24 +1936,28 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="ygr-te-MJQ">
-                                        <rect key="frame" x="86" y="56" width="43.5" height="41"/>
+                                        <rect key="frame" x="50" y="56" width="50" height="40"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RANK" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UzP-xI-zVQ">
-                                                <rect key="frame" x="0.0" y="0.0" width="43.5" height="17"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="RANK" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UzP-xI-zVQ">
+                                                <rect key="frame" x="0.0" y="0.0" width="50" height="17"/>
                                                 <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="12"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="12845" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xRw-SB-qLn">
-                                                <rect key="frame" x="0.0" y="17" width="43.5" height="24"/>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="12845" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="xRw-SB-qLn">
+                                                <rect key="frame" x="0.0" y="17" width="50" height="23"/>
                                                 <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="17"/>
                                                 <nil key="textColor"/>
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="50" id="RSB-fT-mz0"/>
+                                            <constraint firstAttribute="height" constant="40" id="v9q-Iw-G04"/>
+                                        </constraints>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="wQ8-z0-OUH">
-                                        <rect key="frame" x="221" y="49" width="101.5" height="58"/>
+                                        <rect key="frame" x="243.5" y="49" width="101.5" height="58"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PORTFOLIO" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Yu-tz-6f1">
                                                 <rect key="frame" x="0.0" y="0.0" width="101.5" height="15.5"/>
@@ -1974,20 +1978,24 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                                 <nil key="highlightedColor"/>
                                             </label>
                                         </subviews>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="58" id="ZeU-S4-duK"/>
+                                            <constraint firstAttribute="width" constant="101.5" id="yIH-Vd-CgK"/>
+                                        </constraints>
                                     </stackView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <constraints>
                                     <constraint firstItem="jCO-He-SPJ" firstAttribute="centerX" secondItem="AeE-G8-uyq" secondAttribute="centerX" constant="-10" id="4OU-Rl-K0i"/>
-                                    <constraint firstItem="ygr-te-MJQ" firstAttribute="centerX" secondItem="AeE-G8-uyq" secondAttribute="centerX" constant="-80" id="Bg9-sM-7IX"/>
+                                    <constraint firstItem="ygr-te-MJQ" firstAttribute="leading" secondItem="AeE-G8-uyq" secondAttribute="leading" constant="50" id="AXb-Xd-tDL"/>
                                     <constraint firstItem="ygr-te-MJQ" firstAttribute="top" secondItem="AeE-G8-uyq" secondAttribute="top" constant="56" id="VqS-eM-gMV"/>
-                                    <constraint firstItem="wQ8-z0-OUH" firstAttribute="centerY" secondItem="AeE-G8-uyq" secondAttribute="centerY" constant="15" id="dyz-vb-Tlu"/>
-                                    <constraint firstItem="wQ8-z0-OUH" firstAttribute="leading" secondItem="ygr-te-MJQ" secondAttribute="trailing" constant="91.5" id="x8k-cB-89f"/>
+                                    <constraint firstAttribute="trailing" secondItem="wQ8-z0-OUH" secondAttribute="trailing" constant="30" id="ng6-ZQ-65u"/>
+                                    <constraint firstItem="wQ8-z0-OUH" firstAttribute="top" secondItem="cXX-kG-K2m" secondAttribute="bottom" constant="4.5" id="yYJ-Pq-4kG"/>
                                     <constraint firstItem="jCO-He-SPJ" firstAttribute="top" secondItem="AeE-G8-uyq" secondAttribute="top" constant="8" id="zp2-2Z-fyB"/>
                                 </constraints>
                             </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="MiP-J9-uuZ" userLabel="profileView">
-                                <rect key="frame" x="37.5" y="233.5" width="300" height="200"/>
+                                <rect key="frame" x="37.5" y="208.5" width="300" height="250"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zf1-iT-1dv">
                                         <rect key="frame" x="8" y="8" width="20" height="20"/>
@@ -2015,7 +2023,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="-1" translatesAutoresizingMaskIntoConstraints="NO" id="6yh-cF-S70">
-                                        <rect key="frame" x="30" y="139.5" width="79" height="34.5"/>
+                                        <rect key="frame" x="20.5" y="203.5" width="79" height="34.5"/>
                                         <subviews>
                                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Largest Holding" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OKN-Ds-FRZ">
                                                 <rect key="frame" x="0.0" y="0.0" width="79" height="15.5"/>
@@ -2032,9 +2040,9 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                         </subviews>
                                     </stackView>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="mHZ-gX-UB2">
-                                        <rect key="frame" x="179" y="137.5" width="101.5" height="36.5"/>
+                                        <rect key="frame" x="167" y="203.5" width="101.5" height="36.5"/>
                                         <subviews>
-                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="# OF COINS OWNED" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IHw-3p-9X9">
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="COINS OWNED" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="IHw-3p-9X9">
                                                 <rect key="frame" x="0.0" y="0.0" width="101.5" height="15.5"/>
                                                 <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="11"/>
                                                 <nil key="textColor"/>
@@ -2048,85 +2056,84 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                             </label>
                                         </subviews>
                                     </stackView>
-                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalCentering" alignment="top" spacing="30" translatesAutoresizingMaskIntoConstraints="NO" id="D5T-K9-2iP">
-                                        <rect key="frame" x="6" y="58" width="288" height="53.5"/>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="bO0-UL-QKv">
+                                        <rect key="frame" x="122.5" y="51" width="55.5" height="36.5"/>
                                         <subviews>
-                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="OJy-ab-A1u">
-                                                <rect key="frame" x="0.0" y="0.0" width="30" height="41"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RANK" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F09-N2-nYl">
-                                                        <rect key="frame" x="0.0" y="0.0" width="30" height="17"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="12"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wvp-Gq-jng">
-                                                        <rect key="frame" x="0.0" y="17" width="30" height="24"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="17"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                            </stackView>
-                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="bO0-UL-QKv">
-                                                <rect key="frame" x="97.5" y="0.0" width="55.5" height="36.5"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="USERNAME" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nYl-kv-0r7">
-                                                        <rect key="frame" x="0.0" y="0.0" width="55.5" height="15.5"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="11"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ANDRE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bw6-xw-gbY">
-                                                        <rect key="frame" x="0.0" y="15.5" width="55.5" height="21"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="15"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                            </stackView>
-                                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="UyM-Cp-0kl">
-                                                <rect key="frame" x="183" y="0.0" width="105" height="53.5"/>
-                                                <subviews>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PORTFOLIO" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RIl-A3-P4e">
-                                                        <rect key="frame" x="0.0" y="0.0" width="105" height="15.5"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="11"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$1284953499.58" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MU3-Rg-QXM">
-                                                        <rect key="frame" x="0.0" y="15.5" width="105" height="21"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="15"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+20899993599.46%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vph-xj-U8k">
-                                                        <rect key="frame" x="0.0" y="36.5" width="105" height="17"/>
-                                                        <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="12"/>
-                                                        <nil key="textColor"/>
-                                                        <nil key="highlightedColor"/>
-                                                    </label>
-                                                </subviews>
-                                            </stackView>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="USERNAME" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nYl-kv-0r7">
+                                                <rect key="frame" x="0.0" y="0.0" width="55.5" height="15.5"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="11"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="ANDRE" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bw6-xw-gbY">
+                                                <rect key="frame" x="0.0" y="15.5" width="55.5" height="21"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="UyM-Cp-0kl">
+                                        <rect key="frame" x="180" y="82" width="105" height="53.5"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="PORTFOLIO" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RIl-A3-P4e">
+                                                <rect key="frame" x="0.0" y="0.0" width="105" height="15.5"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="11"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="$1284953499.58" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MU3-Rg-QXM">
+                                                <rect key="frame" x="0.0" y="15.5" width="105" height="21"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="15"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+20899993599.46%" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Vph-xj-U8k">
+                                                <rect key="frame" x="0.0" y="36.5" width="105" height="17"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="12"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                        </subviews>
+                                    </stackView>
+                                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="OJy-ab-A1u">
+                                        <rect key="frame" x="30" y="88" width="30" height="41"/>
+                                        <subviews>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="RANK" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="F09-N2-nYl">
+                                                <rect key="frame" x="0.0" y="0.0" width="30" height="17"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="12"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
+                                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="1" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="wvp-Gq-jng">
+                                                <rect key="frame" x="0.0" y="17" width="30" height="24"/>
+                                                <fontDescription key="fontDescription" name="KohinoorBangla-Regular" family="Kohinoor Bangla" pointSize="17"/>
+                                                <nil key="textColor"/>
+                                                <nil key="highlightedColor"/>
+                                            </label>
                                         </subviews>
                                     </stackView>
                                 </subviews>
                                 <color key="backgroundColor" red="0.11763454230000001" green="0.1176540628" blue="0.1176278964" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <constraints>
                                     <constraint firstItem="ize-fp-ESg" firstAttribute="top" secondItem="MiP-J9-uuZ" secondAttribute="top" constant="10" id="874-Dv-eA6"/>
-                                    <constraint firstItem="6yh-cF-S70" firstAttribute="top" secondItem="mHZ-gX-UB2" secondAttribute="top" constant="2" id="9e7-Le-mIS"/>
+                                    <constraint firstAttribute="trailing" secondItem="UyM-Cp-0kl" secondAttribute="trailing" constant="15" id="8et-9k-uyX"/>
+                                    <constraint firstItem="6yh-cF-S70" firstAttribute="centerX" secondItem="F09-N2-nYl" secondAttribute="centerX" constant="15" id="AXT-4w-gsE"/>
                                     <constraint firstItem="ize-fp-ESg" firstAttribute="centerX" secondItem="MiP-J9-uuZ" secondAttribute="centerX" id="Bbc-tX-giM"/>
+                                    <constraint firstAttribute="bottom" secondItem="6yh-cF-S70" secondAttribute="bottom" constant="12" id="Bso-Og-tLw"/>
                                     <constraint firstAttribute="width" constant="300" id="Cmj-3Y-YCb"/>
                                     <constraint firstItem="zf1-iT-1dv" firstAttribute="leading" secondItem="MiP-J9-uuZ" secondAttribute="leading" constant="8" id="H73-x0-Y1l"/>
-                                    <constraint firstItem="D5T-K9-2iP" firstAttribute="centerX" secondItem="MiP-J9-uuZ" secondAttribute="centerX" id="JR3-5H-MkF"/>
-                                    <constraint firstAttribute="height" constant="200" id="bLr-yT-cOk"/>
-                                    <constraint firstItem="mHZ-gX-UB2" firstAttribute="leading" secondItem="6yh-cF-S70" secondAttribute="trailing" constant="70" id="bfj-bY-3nX"/>
-                                    <constraint firstItem="6yh-cF-S70" firstAttribute="top" secondItem="D5T-K9-2iP" secondAttribute="bottom" constant="28" id="fe3-Pt-63K"/>
+                                    <constraint firstItem="bO0-UL-QKv" firstAttribute="top" secondItem="ize-fp-ESg" secondAttribute="bottom" constant="17" id="RJF-Ov-kKL"/>
+                                    <constraint firstAttribute="height" constant="250" id="bLr-yT-cOk"/>
+                                    <constraint firstItem="UyM-Cp-0kl" firstAttribute="top" secondItem="bw6-xw-gbY" secondAttribute="bottom" constant="-5.5" id="bfW-eW-VaO"/>
+                                    <constraint firstItem="OJy-ab-A1u" firstAttribute="leading" secondItem="MiP-J9-uuZ" secondAttribute="leading" constant="30" id="cbV-Yf-vca"/>
+                                    <constraint firstItem="mHZ-gX-UB2" firstAttribute="centerX" secondItem="RIl-A3-P4e" secondAttribute="centerX" constant="-15" id="gIH-UC-ZUw"/>
                                     <constraint firstItem="MZT-zF-4TW" firstAttribute="top" secondItem="MiP-J9-uuZ" secondAttribute="top" constant="8" id="jHE-vF-iR7"/>
-                                    <constraint firstItem="6yh-cF-S70" firstAttribute="leading" secondItem="MiP-J9-uuZ" secondAttribute="leading" constant="30" id="qlx-zl-A1X"/>
+                                    <constraint firstItem="bO0-UL-QKv" firstAttribute="centerX" secondItem="MiP-J9-uuZ" secondAttribute="centerX" id="mBg-tG-DtV"/>
+                                    <constraint firstAttribute="bottom" secondItem="mHZ-gX-UB2" secondAttribute="bottom" constant="10" id="ocS-3u-OCP"/>
                                     <constraint firstAttribute="trailing" secondItem="MZT-zF-4TW" secondAttribute="trailing" constant="8" id="ucX-oG-gSJ"/>
                                     <constraint firstItem="zf1-iT-1dv" firstAttribute="top" secondItem="MiP-J9-uuZ" secondAttribute="top" constant="8" id="vWD-n9-bzg"/>
-                                    <constraint firstItem="D5T-K9-2iP" firstAttribute="top" secondItem="ize-fp-ESg" secondAttribute="bottom" constant="24" id="ycu-VV-qjY"/>
+                                    <constraint firstItem="OJy-ab-A1u" firstAttribute="top" secondItem="bw6-xw-gbY" secondAttribute="bottom" constant="0.5" id="y1q-gB-YvT"/>
                                 </constraints>
                             </view>
                         </subviews>
@@ -2171,6 +2178,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                         <outlet property="rankStatic_lbl" destination="UzP-xI-zVQ" id="UJq-ir-Opf"/>
                         <outlet property="rank_lbl" destination="xRw-SB-qLn" id="Eq2-TZ-xQC"/>
                         <outlet property="tableView" destination="GaH-ih-btn" id="ZLA-Bs-QP4"/>
+                        <outlet property="topView" destination="AeE-G8-uyq" id="Cti-JE-hMV"/>
                         <outlet property="usernameStatic_lbl" destination="5qh-dy-VB4" id="4Am-Dg-VKW"/>
                         <outlet property="username_lbl" destination="cXX-kG-K2m" id="mhU-X9-dEN"/>
                     </connections>
@@ -2498,7 +2506,7 @@ appreciate all the feedback from all of you as it helps me grow as a developer, 
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="cell" rowHeight="73" id="S2Z-dJ-Oh2" customClass="HoldingCell" customModule="Cryptfolio" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="24.5" width="375" height="73"/>
+                                        <rect key="frame" x="0.0" y="44.5" width="375" height="73"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="S2Z-dJ-Oh2" id="ap1-Cw-abP">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="73"/>

@@ -33,13 +33,10 @@ public class NotificationManager {
             ATTrackingManager.requestTrackingAuthorization { status in
                 switch (status) {
                 case .authorized:
-                    print("GRANTED!");
-                    IronSource.initWithAppKey("df7e7db9", adUnits: [IS_REWARDED_VIDEO]);
                     break;
                 case .denied,
                      .notDetermined,
                      .restricted:
-                    print("DENIED");
                     break;
                 default:
                     break;

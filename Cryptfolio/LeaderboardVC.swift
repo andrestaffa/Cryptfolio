@@ -10,9 +10,15 @@ import UIKit;
 import SVProgressHUD;
 import SwiftChart;
 
-class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
-    
-    @IBOutlet weak var tableView: UITableView!
+class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSource, ImagePickerDelegate {
+	
+	/*
+	 TODO:
+		- Adjust portfolio money format (100K, 1M etc.).
+	 */
+	
+	@IBOutlet weak var topView: UIView!
+	@IBOutlet weak var tableView: UITableView!
     
     @IBOutlet weak var username_lbl: UILabel!
     @IBOutlet weak var usernameStatic_lbl: UILabel!
@@ -40,7 +46,21 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var profileOwnedCoin_lbl: UILabel!
     @IBOutlet weak var profileHighestHolding_lbl: UILabel!
     private var profileCurrentUserIndex:Int = 0;
-    
+	
+	private let avatarImage : AvatarImage = {
+		let avatarImage = AvatarImage();
+		avatarImage.initialize();
+		avatarImage.translatesAutoresizingMaskIntoConstraints = false;
+		return avatarImage;
+	}();
+	
+	private let profileAvatarImage : AvatarImage = {
+		let avatarImage = AvatarImage();
+		avatarImage.initialize();
+		avatarImage.translatesAutoresizingMaskIntoConstraints = false;
+		return avatarImage;
+	}();
+	
     // member variables
     private var currentUsername:String = "";
     private var currentHighscore:Double = 0.0;
@@ -70,9 +90,17 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.currentChange = currentChange;
         self.isPortVC = isPortVC;
     }
-    public required init?(coder: NSCoder) { fatalError("Error loading SignUpVC"); }
+    public required init?(coder: NSCoder) { fatalError("Error loading LeaderboadVC"); }
 
     
+	override func viewDidLayoutSubviews() {
+		super.viewDidLayoutSubviews();
+		
+		self.avatarImage.circleize();
+		self.profileAvatarImage.circleize();
+		
+	}
+	
     override func viewWillAppear(_ animated: Bool) {
         self.navigationController?.navigationBar.prefersLargeTitles = false;
         self.navigationController?.navigationBar.barTintColor = .clear;
@@ -125,17 +153,60 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.username_lbl.adjustsFontSizeToFitWidth = true;
         self.rank_lbl.adjustsFontSizeToFitWidth = true;
         
-        // Configure searchView
+        // configure searchView
         searchController.searchResultsUpdater = self;
         searchController.obscuresBackgroundDuringPresentation = false;
         searchController.searchBar.placeholder = "Search";
         searchController.searchBar.delegate = self;
         navigationItem.searchController = searchController;
         definesPresentationContext = true;
-
+		
+		self.setupConstraints();
+		
+		// configure avatarImage
+		self.avatarImage.initializeWith(view: self.topView);
+		self.profileAvatarImage.initializeWith(view: self.profileView);
+		self.profileAvatarImage.avatarEditImageView.isHidden = true;
+		self.profileAvatarImage.isUserInteractionEnabled = false;
+		
+		self.avatarImage.setImagePickerDelegate(vc: self, delegate: self);
+		
         self.getUserData();
         
     }
+	
+	// MARK: Setting Up Constraints
+	
+	private func setupConstraints() -> Void {
+		self.topView.addSubview(self.avatarImage);
+		self.profileView.addSubview(self.profileAvatarImage);
+		
+		self.avatarImage.centerXAnchor.constraint(equalTo: self.username_lbl.centerXAnchor, constant: 0.0).isActive = true;
+		self.avatarImage.topAnchor.constraint(equalTo: self.username_lbl.bottomAnchor, constant: 10.0).isActive = true;
+		self.avatarImage.widthAnchor.constraint(equalToConstant: 75.0).isActive = true;
+		self.avatarImage.heightAnchor.constraint(equalToConstant: 75.0).isActive = true;
+		
+		self.profileAvatarImage.centerXAnchor.constraint(equalTo: self.profileView.centerXAnchor).isActive = true;
+		self.profileAvatarImage.centerYAnchor.constraint(equalTo: self.profileView.centerYAnchor, constant: 10.0).isActive = true;
+		self.profileAvatarImage.widthAnchor.constraint(equalToConstant: 75.0).isActive = true;
+		self.profileAvatarImage.heightAnchor.constraint(equalToConstant: 75.0).isActive = true;
+		
+	}
+	
+	// MARK: Image Picker Delegate Methods
+	
+	func didSelect(image: UIImage?) {
+		if let image = image {
+			let params:Dictionary<String, Any> = ["avatarImage":[DataStorageHandler.encodeImage(image: image)]];
+			if let username = self.username_lbl.text {
+				DatabaseManager.writeUserData(username: username, merge: true, data: params) { (error) in
+					if let error = error { print(error.localizedDescription); return; }
+					self.avatarImage.image = image;
+					UserManager.shared.setCurrentProfilePicture(image: image);
+				}
+			}
+		}
+	}
     
     // MARK: Data Gathering
     
@@ -147,6 +218,12 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                 if (user!.username == self?.currentUsername) {
                     self?.theRank = user!.rank;
                     self?.rank_lbl.text = user!.rank;
+					if let decodedImage = DataStorageHandler.decodeImage(strBase64: user!.encodedAvatarImage) {
+						self?.avatarImage.image = decodedImage;
+						UserManager.shared.setCurrentProfilePicture(image: decodedImage);
+					} else {
+						UserManager.shared.removeCurrentProfilePicture();
+					}
                 }
                 self?.isLoading = false;
                 self?.hideStats(hidden: false);
@@ -269,10 +346,20 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         self.setChange(change: &self.profileChange_lbl, changeString: userList[index].change);
         if (userList[index].username.lowercased() == self.currentUsername.lowercased()) {
-            self.profileUsername_lbl.textColor = .orange;
+			self.profileUsername_lbl.textColor = .orange;
+			if let decodedImage = UserManager.shared.getCurrentProfilePicture() {
+				self.profileAvatarImage.image = decodedImage;
+			} else {
+				self.profileAvatarImage.image = UIImage(named: "avatar_image");
+			}
         } else {
             self.profileUsername_lbl.textColor = .label;
-        }
+			if let decodedImage = DataStorageHandler.decodeImage(strBase64: userList[index].encodedAvatarImage) {
+				self.profileAvatarImage.image = decodedImage;
+			} else {
+				self.profileAvatarImage.image = UIImage(named: "avatar_image");
+			}
+		}
         self.profileOwnedCoin_lbl.text = "\(userList[index].numberOfOwnedCoin)";
         
     }
@@ -360,6 +447,11 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.rankHeader_btn.alpha = alpha;
         self.nameHeader_btn.alpha = alpha;
         self.portfolioHeader_btn.alpha = alpha;
+		self.avatarImage.alpha = alpha;
+		self.avatarImage.isUserInteractionEnabled = (alpha >= 1);
+		self.avatarImage.avatarEditImageView.alpha = alpha;
+		self.avatarImage.avatarEditImageView.tintColor = (alpha < 1) ? .lightGray : .orange;
+		self.avatarImage.avatarEditImageView.isUserInteractionEnabled = (alpha >= 1);
     }
     
     private func hideCells(cell:LeaderboardCell, hidden:Bool) {
@@ -380,6 +472,8 @@ class LeaderboardVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         self.rankHeader_btn.isHidden = hidden;
         self.nameHeader_btn.isHidden = hidden;
         self.portfolioHeader_btn.isHidden = hidden;
+		self.avatarImage.isHidden = hidden;
+		self.avatarImage.avatarEditImageView.isHidden = hidden;
     }
     
     private func attachImageToString(text:String, image:UIImage) -> NSAttributedString {
@@ -455,6 +549,7 @@ extension LeaderboardVC: UISearchResultsUpdating, UISearchBarDelegate {
         }
     }
 }
+
 
 public class LeaderboardCell : UITableViewCell {
     

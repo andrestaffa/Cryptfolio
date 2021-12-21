@@ -20,13 +20,14 @@ public struct User : Codable {
     let change:String;
     let numberOfOwnedCoin:Int;
     let highestHolding:String;
+	let encodedAvatarImage:String;
 }
 
 
 public class DatabaseManager {
     
     private static let db = Firestore.firestore();
-    private static let userServer = "users";  // Test Server: users-dev
+    private static let userServer = "users-dev";  // Test Server: users-dev
                                                   // Production Server: users
     
     
@@ -373,7 +374,10 @@ public class DatabaseManager {
                         let change = docData["change"] as! String;
                         let numberOfOwnedCoin = docData["numberOfOwnedCoin"] as? Int;
                         let highestHolding = docData["highestHolding"] as? String;
-                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, highestHolding: highestHolding ?? "No Holding" );
+						let encodedAvatarImage = docData["avatarImage"] as? Array<String>;
+						var encodedImage:String = "";
+						if let enc = encodedAvatarImage { encodedImage = enc[0]; }
+                        let user = User(rank: rank, email: email, username: username, highscore: highscore, change: change, numberOfOwnedCoin: numberOfOwnedCoin ?? 0, highestHolding: highestHolding ?? "No Holding", encodedAvatarImage: encodedImage);
                         completion(user, nil);
                     }
                 } else {

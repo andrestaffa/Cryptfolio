@@ -779,38 +779,9 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             } else { DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { self.saveUserData(); } }
         } else { DispatchQueue.main.asyncAfter(deadline: .now() + 0.01) { self.saveUserData(); } }
     }
-    
-//    private func addCustomCoin(id:String) -> Void {
-//        CryptoData.getCoinData(id: id) { (ticker, error) in
-//            if let error = error { print(error.localizedDescription); return; }
-//            if let ticker = ticker {
-//                let coin = Coin(ticker: ticker, image: Image(withImage: UIImage(named: "Images/\(ticker.symbol.lowercased()).png")!));
-//                DataStorageHandler.saveObject(type: coin, forKey: UserDefaultKeys.coinKey);
-//                var loadedCoins = DataStorageHandler.loadObject(type: [Coin].self, forKey: UserDefaultKeys.coinArrayKey)!;
-//                loadedCoins.append(coin);
-//                DataStorageHandler.saveObject(type: loadedCoins, forKey: UserDefaultKeys.coinArrayKey);
-//            }
-//        }
-//    }
-//
-//    private func removeAllData() -> Void {
-//        let domain = Bundle.main.bundleIdentifier!
-//        UserDefaults.standard.removePersistentDomain(forName: domain)
-//        UserDefaults.standard.set(13680.58, forKey: UserDefaultKeys.availableFundsKey);
-//        UserDefaults.standard.set(true, forKey: UserDefaultKeys.isNotFirstTime);
-//    }
-    
+        
     @objc private func availFundsTapped() -> Void {
-        print("Avail Tapped");
-//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.investingTipsKey);
-//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.foundAllTips);
-//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.randomIndex);
-//        UserDefaults.standard.removeObject(forKey: UserDefaultKeys.mainPortfolioGraph);
-//        if let currentUsername = UserDefaults.standard.string(forKey: UserDefaultKeys.currentUsername) {
-//            self.displayAlert(title: "Current Username:\n", message: "\(currentUsername)")
-//        } else {
-//            self.displayAlert(title: "Current Username:\n", message: "NO USER LOGGED IN");
-//        }
+		// Add testing
     }
     
     @IBAction func nameColButtonPressed(_ sender: Any) {
