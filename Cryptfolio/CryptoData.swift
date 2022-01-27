@@ -70,6 +70,8 @@ public class CryptoData {
                         prices.append(priceDouble!);
                         timestamps.append(timestampDouble);
                     }
+					prices.reverse();
+					timestamps.reverse();
                     completion(History(prices: prices, timestamps: timestamps), nil);
                 } else {
                     print("HISTORY WAS NULL");
@@ -496,6 +498,80 @@ public class CryptoData {
 			vc.present(alert, animated: true, completion: nil)
 		}
 	}
+	
+	
+	public static func formatMoney(money:Double) -> String {
+		var result:String = String(Int(money));
+		switch result.count {
+		case 15:
+			for _ in 1...15 - 5 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "T";
+		case 14:
+			for _ in 1...14 - 4 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "T";
+			break;
+		case 13:
+			for _ in 1...13 - 3 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "T";
+			break;
+		case 12:
+			for _ in 1...12 - 5 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "B";
+			break;
+		case 11:
+			for _ in 1...11 - 4 {
+				result.removeLast()
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "B";
+			break;
+		case 10:
+			for _ in 1...10 - 3 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "B";
+			break;
+		case 9:
+			for _ in 1...9 - 5 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "M";
+			break;
+		case 8:
+			for _ in 1...8 - 4 {
+				result.removeLast()
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "M";
+			break;
+		case 7:
+			for _ in 1...7 - 3 {
+				result.removeLast();
+			}
+			result.insert(".", at: result.index(result.startIndex, offsetBy: result.count - 2));
+			result = result + "M";
+			break;
+		default:
+			break;
+		}
+		result.insert("$", at: result.startIndex);
+		return result;
+	}
+	
     
 }
 

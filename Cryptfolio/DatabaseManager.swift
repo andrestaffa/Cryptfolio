@@ -27,7 +27,7 @@ public struct User : Codable {
 public class DatabaseManager {
     
     private static let db = Firestore.firestore();
-    private static let userServer = "users-dev";  // Test Server: users-dev
+    private static let userServer = "users";  // Test Server: users-dev
                                                   // Production Server: users
     
     

@@ -90,7 +90,7 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         PortfolioVC.indexOptionsPrice = 0;
         PortfolioVC.indexOptionsHolding = 0;
         
-        self.nameCol_img.image = #imageLiteral(resourceName: "normal")
+		self.nameCol_img.image = #imageLiteral(resourceName: "normal");
         self.priceCol_img.image = #imageLiteral(resourceName: "normal");
         self.holdingCol_img.image = #imageLiteral(resourceName: "normal");
         
@@ -941,7 +941,6 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             }
         }
 
-        // MIGHT CHANGE TO getIDToken INSTEAD FOR BETTER SECURITY
         if (FirebaseAuth.Auth.auth().currentUser != nil) {
             DatabaseManager.findUser(email: FirebaseAuth.Auth.auth().currentUser!.email!, highscore: highscore, change: change, numberOfCoin: self.getNumberOfOwnedCoin(), highestHolding: highestHolding, viewController: self, isPortVC: true, isLogin: false);
         } else {
