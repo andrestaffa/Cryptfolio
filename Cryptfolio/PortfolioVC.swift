@@ -227,14 +227,14 @@ class PortfolioVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
 	
 	private func setupARButton() -> Void {
 		if (!ARWorldTrackingConfiguration.isSupported) { self.arButton.isHidden = true; return; }
-		if (!self.ranPulseOnce && !UserDefaults.standard.bool(forKey: UserDefaultKeys.arButtonTapped)) {
-			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-				let pulseAnimation = APulseAnimation(radius: 31.25, position: self.arButton.center + CGPoint(x: 0, y: 3.5));
-				pulseAnimation.backgroundColor = UIColor(red: 0, green: 201/255, blue: 223/255, alpha: 1).cgColor;
-				self.view.layer.insertSublayer(pulseAnimation, below: self.view.layer);
-			}
-			self.ranPulseOnce = true;
-		}
+//		if (!self.ranPulseOnce && !UserDefaults.standard.bool(forKey: UserDefaultKeys.arButtonTapped)) {
+//			DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+//				let pulseAnimation = APulseAnimation(radius: 31.25, position: self.arButton.center + CGPoint(x: 0, y: 3.5));
+//				pulseAnimation.backgroundColor = UIColor(red: 0, green: 201/255, blue: 223/255, alpha: 1).cgColor;
+//				self.view.layer.insertSublayer(pulseAnimation, below: self.view.layer);
+//			}
+//			self.ranPulseOnce = true;
+//		}
 	}
 
 	@objc private func arButtonTapped(_ sender:UIButton) -> Void {
