@@ -65,9 +65,10 @@ public class CryptoData {
                     for i in 0...historys.count - 1 {
                         let price = historys[i]["price"] as? String;
                         let timestamp = historys[i]["timestamp"] as? Double;
-                        let priceDouble = Double(price ?? "0.0");
+						let priceDouble = Double(price ?? "0.0") ?? 0.0;
+						if (priceDouble.isLessThanOrEqualTo(Double.leastNormalMagnitude)) { continue; }
                         let timestampDouble = Double(timestamp ?? 0);
-                        prices.append(priceDouble!);
+                        prices.append(priceDouble);
                         timestamps.append(timestampDouble);
                     }
 					prices.reverse();
